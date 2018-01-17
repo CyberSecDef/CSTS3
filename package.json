@@ -12,6 +12,7 @@
   "dependencies": {
     "bootstrap": "^4.0.0-beta.3",
     "jquery": "^3.2.1",
+    "jsviews": "^0.9.90",
     "nw-dev": "^3.0.1",
     "popper.js": "^1.12.9"
   }

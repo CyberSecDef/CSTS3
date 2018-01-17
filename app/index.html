@@ -12,31 +12,20 @@
 		<script src="../node_modules/jquery/dist/jquery.js"></script>
 		<script src="../node_modules/popper.js/dist/umd/popper.js"></script>
 		<script src="../node_modules/bootstrap/dist/js/bootstrap.js"></script>
-		
-<script>
- 
-function display_template(tmpl, data) {
-	var tpl;
-	$.ajax({
-		'url' : tmpl,
-		'async' : false,
-		'success' : function(r,s,x){
-			tpl = Handlebars.compile(r);
-		}
-	});
-
-	var html = tpl(data);
-	return html
-}
-
-
-</script>
+		<script src="../node_modules/jsviews/jsviews.js"></script>
 	</head>
 	<body>
-	
+<div id="result"></div>
+
+<script id="myTmpl" type="text/x-jsrender">
+    <input data-link="name" />
+    {^{:name}}
+  </script>
 	</body>
 
+	
 	<script>
+	
 	var os = require('os');
 	$('footer.footer div div.status-bar-l').text( 'You are running on ' + os.platform());
 	
@@ -57,7 +46,23 @@ function display_template(tmpl, data) {
 $(document).ready(function() {
 	var name = 'show';
 	var data = { time: new Date };
-	$('body').append(display_template('/app/resources/views/layouts/default.tpl', { test : 'something' }));
+	
+	 $.when($.get('/app/resources/views/components/navbar.html'))
+         .done(function(tmplData) {
+             $.templates({ tmpl: tmplData });
+             console.log($.templates);
+         });    
+	
+	$.ajax({
+		url : '/app/resources/views/layouts/default.tpl',
+		type : 'GET',
+		success : function(r,s,x){
+			var tmpl = $.templates(r);
+			var data = {name: "Jim"};
+			tmpl.link("#result", data);
+		}
+	});
+	 
 });
 
   
