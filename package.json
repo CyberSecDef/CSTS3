@@ -1,0 +1,18 @@
+{
+  "name": "CSTS",
+  "version": "3.0.0a",
+  "description": "A Node/JS based tool suite for hardening windows based computers",
+  "license": "UNLICENSED",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CyberSecDef/CSTS3"
+  },
+  "main": "./app/index.html",
+  "dependencies": {
+    "bootstrap": "^4.0.0-beta.3",
+    "jquery": "^3.2.1",
+    "nw-dev": "^3.0.1",
+    "popper.js": "^1.12.9"
+  }
+}
