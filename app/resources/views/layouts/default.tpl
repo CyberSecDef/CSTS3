@@ -1,26 +1,13 @@
-<%- include('../components/navbar.tpl'); %>.
+<%- include('../components/navbar.tpl'); %>
 
-<main role="main" class="container">
-
-<a href="/about/">tests</a>
-
-	<div class="mt-3">
-		<h1>Cyber Security Tool Suite - Version 3</h1>
+<main role="main" class="container-fluid">
+	<div class="row">
+		<div class="col"></div>
+		<div class="col-8">
+			<%- include('../pages/home/home.tpl'); %>
+		</div>
+		<div class="col"></div>
 	</div>
-	<p class="lead">
-	The Cyber Security Tool Suite is a suite of PowerShell scripts that will help automate and validate various Cyber Security processes. 
-	This version is aiming to be cross-platform from the beginning, thanks to the NWJS framework built on top of the Node.JS suite and the Chromium runtime.
-	</p>
-	
-	<p>
-		Navigation:
-		<ul>
-			<li>The navigation bar at the top of this display breaks the multiple functions down into similar groups.</li>
-			<li>The panel on the right hand side of the form allows you to select hosts either by manually entering them (seperated by commas) or by selecting an OU from your domain environment.</li>
-			<li>The status bar at the bottom of the window is updated as the various tools are executing.</li>
-		</ul>
-	</p>
-	
 </main>
 
-<%- include('../components/footer.tpl'); %>.
+<%- include('../components/footer.tpl'); %>

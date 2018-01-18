@@ -9,10 +9,14 @@
     "url": "https://github.com/CyberSecDef/CSTS3"
   },
   "main": "./app/index.html",
+  "window": {
+    "toolbar": true
+  },
   "dependencies": {
     "bootstrap": "^4.0.0-beta.3",
     "ejs": "^2.5.7",
     "jquery": "^3.2.1",
+    "navigo": "^7.0.0",
     "nw-dev": "^3.0.1",
     "popper.js": "^1.12.9"
   }

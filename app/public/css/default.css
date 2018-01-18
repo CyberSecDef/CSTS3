@@ -23,11 +23,11 @@ body {
 -------------------------------------------------- */
 /* Not required for template or sticky footer method. */
 
-body > .container {
+body > .container, body > .container-fluid {
   padding: 60px 15px 0;
 }
 
-.footer > .container {
+.footer > .container, .footer > .container-fluid {
   padding-right: 5px;
   padding-left: 5px;
 }

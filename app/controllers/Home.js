@@ -1,8 +1,6 @@
-nw.App.controllers['Home'] = ({
+if(!nw.global.controllers){nw.global.controlers = {};}
+nw.global.controllers['Home'] = ({
 	name : 'Home',
-	test : function(){
-		return 'test';
-	},
 	index : function(){
 		return 'index function';
 		
