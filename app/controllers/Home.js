@@ -1,9 +1,15 @@
-if(!nw.global.controllers){nw.global.controlers = {};}
-nw.global.controllers['Home'] = ({
+if(!global.controllers){global.controllers = {};}
+global.controllers['Home'] = ({
 	name : 'Home',
 	index : function(){
-		return 'index function';
+		console.log('executing Home@index');
 		
+		ejs.renderFile('app/resources/views/pages/home/home.tpl',{},{},function(err,str){
+			if(err){
+				console.log(err);
+			}
+			$('#main-center-col').html(str);
+		}) 
 	}
 	
 });

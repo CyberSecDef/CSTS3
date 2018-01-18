@@ -3,9 +3,9 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-		<title>My OS Platform</title>
-
+		
+		<title>Cyber Security Tool Suite v3</title>
+		
 		<link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
 		<link rel="stylesheet" href="public/css/default.css">
 		
@@ -14,87 +14,10 @@
 		<script src="../node_modules/bootstrap/dist/js/bootstrap.js"></script>
 		<script src="../node_modules/navigo/lib/navigo.js"></script>
 		
+		<script src="controllers/Home.js"></script>
+		<script src="routes/web.js"></script>
+		
+		<script src="lib/csts.js"></script>
 	</head>
 	<body id='app'></body>
-	<script>
-		var os = require('os');		
-		var ejs = require('ejs');
-		var win = nw.Window.get();
-		if(win.width < 1280){
-			win.width = 1280;
-		}
-		
-		if(win.height < 800){
-			win.height = 800;
-		}
-	
-		var path = './';
-		var fs = require('fs');
-	  
-		var reloadWatcher=fs.watch(path, {recursive: true}, function() {
-			location.reload();
-			reloadWatcher.close();
-		});
-		
-		//load controllers
-		var normalizedPath = require("path").join('app', "controllers");
-		require("fs").readdirSync(normalizedPath).forEach(function(file) {
-			s = document.createElement('script');
-			s.src = ("./controllers/" + file);
-			document.getElementById('app').appendChild(s);
-		});
-		
-		//load routes
-		var normalizedPath = require("path").join('app', "routes");
-		require("fs").readdirSync(normalizedPath).forEach(function(file) {
-			s = document.createElement('script');
-			s.src = ("./routes/" + file);
-			document.getElementById('app').appendChild(s);
-		});
-	
-		var router = new Navigo(location.origin,false,'#');
-
-		$.each(nw.global.routes, function(name, val){
-			switch(typeof val){
-				case 'string' :
-					c = val.substring(0,val.indexOf('@'));
-					f = val.substring(val.indexOf('@')+1);
-					
-					router.on(name, nw.global.controllers[c][f] )
-					break;
-				case 'function' :
-					break;
-			}
-
-		})
-		
-		router.on('/products/list', function () {
-			console.log('in here');
-		})
-		.resolve(location.origin + '/products/about');	
-		
-		
-		nw.Window.get().on('navigation', function(frame, url, policy){
-			req = url.replace(location.origin,'')
-			console.log(req);
-			policy.ignore();
-			
-		});
-			
-			
-		
-		
-		
-		ejs.renderFile('app/resources/views/layouts/default.tpl',{},{},function(err,str){
-			if(err){
-				console.log(err);
-			}
-			$('body').html(str);
-		}) ;
-  
-		$(document).ready(function(){
-			$('footer.footer div div.status-bar-l').text( 'You are running on ' + os.platform());
-		})
-	</script>
-
 </html>
