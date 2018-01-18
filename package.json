@@ -1,5 +1,5 @@
 {
-  "name": "CSTS",
+  "name": "CSTS3",
   "version": "3.0.0a",
   "description": "A Node/JS based tool suite for hardening windows based computers",
   "license": "UNLICENSED",
@@ -11,8 +11,8 @@
   "main": "./app/index.html",
   "dependencies": {
     "bootstrap": "^4.0.0-beta.3",
+    "ejs": "^2.5.7",
     "jquery": "^3.2.1",
-    "jsviews": "^0.9.90",
     "nw-dev": "^3.0.1",
     "popper.js": "^1.12.9"
   }
