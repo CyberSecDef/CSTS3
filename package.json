@@ -16,7 +16,9 @@
     "bootstrap": "^4.0.0-beta.3",
     "ejs": "^2.5.7",
     "jquery": "^3.2.1",
+    "jquery-ui": "^1.12.1",
     "navigo": "^7.0.0",
+    "node-powershell": "^3.3.1",
     "nw-dev": "^3.0.1",
     "popper.js": "^1.12.9"
   }
