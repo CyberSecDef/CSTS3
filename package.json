@@ -22,7 +22,6 @@
     "nedb": "^1.8.0",
     "node-powershell": "^3.3.1",
     "nw-dev": "^3.0.1",
-    "popper.js": "^1.12.9",
-    "requirejs": "^2.3.5"
+    "popper.js": "^1.12.9"
   }
 }

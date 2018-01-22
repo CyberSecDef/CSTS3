@@ -1,10 +1,9 @@
-if(!global.controllers){global.controllers = {};}
-global.controllers['Home'] = ({
+csts.controllers['Home'] = ({
 	name : 'Home',
 	index : function(){
 		console.log('executing Home@index');
 		
-		ejs.renderFile('app/resources/views/pages/home/home.tpl',{},{},function(err,str){
+		csts.plugins.ejs.renderFile('app/resources/views/pages/home/home.tpl',{},{},function(err,str){
 			if(err){
 				console.log(err);
 			}

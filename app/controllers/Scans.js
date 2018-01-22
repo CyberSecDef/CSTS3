@@ -1,5 +1,4 @@
-if(!global.controllers){global.controllers = {};}
-global.controllers['Scans'] = ({
+csts.controllers['Scans'] = ({
 	name : 'Scans',
 	compare : function(){
 		console.log('executing Scans@compare');
