@@ -10,7 +10,8 @@
   },
   "main": "./app/index.html",
   "window": {
-    "toolbar": true
+    "toolbar": true,
+    "icon": "app/public/images/csts.png"
   },
   "dependencies": {
     "bootstrap": "^4.0.0-beta.3",
@@ -18,8 +19,10 @@
     "jquery": "^3.2.1",
     "jquery-ui": "^1.12.1",
     "navigo": "^7.0.0",
+    "nedb": "^1.8.0",
     "node-powershell": "^3.3.1",
     "nw-dev": "^3.0.1",
-    "popper.js": "^1.12.9"
+    "popper.js": "^1.12.9",
+    "requirejs": "^2.3.5"
   }
 }

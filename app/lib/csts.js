@@ -1,3 +1,6 @@
+var tray = new nw.Tray({ title: 'Tray', icon: 'app/public/images/csts.png' });
+tray.tooltip = "Cyber Security Tool Suite v3.0.0";
+
 var fs = require('fs');
 var ejs = require('ejs');
 ejs.delimeter = '$';
@@ -20,6 +23,7 @@ var reloadWatcher=fs.watch('./', {recursive: true}, function() {
 });
 
 var controllers = {};
+var models = {};
 
 var router = new Navigo(location.origin,false,'#');
 

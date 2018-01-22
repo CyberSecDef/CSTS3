@@ -1,33 +1,88 @@
-<div id="tree" style="font-size:8pt;">
-    <ul>
-        <li id="rootNode">
-            <input type="checkbox" />
-			<span>Root</span>
-            <ul>
-                <li>
-                    <input type="checkbox" /><span>Node 1.1</span>
-                    <ul>
-                        <li><input type="checkbox" /><span>Node 1.1.1</span></li>
-                    </ul>
-                </li>
-            </ul>
-            
-        </li>
-    </ul>
+
+<div class="hostManual resizable">
+	Manual entry
 </div>
-    
+<div id="tree" class="hostTree resizeable">
+	<ul>
+		<li id="rootNode">
+			<input type="checkbox" />
+			<span>Root</span>
+			<ul>
+				<li id="notRootNode" data-tag="ThisIsATest">
+					<input type="checkbox" /><span>Node 1.1</span>
+					<ul>
+						<li><input type="checkbox" /><span>Node 1.1.1</span></li>
+					</ul>
+				</li>
+			</ul>
+			
+		</li>
+	</ul>
+</div>
 
 
 <script>
-
 	$(document).ready(function() {
-        var hostTree = $('#tree').tree({ checkbox:true
-            /* specify here your options */
+		$('#tree').css('height', (window.innerHeight - 120 - $('div.hostManual').css('height').replace('px','')) + 'px'  );
+
+        var hostTree = $('#tree').tree({ 
+			checkbox:true, 
+			selectable:false,
+            onCheck : {
+				ancestors :	null
+			}
         });
 			 
-		node = hostTree.tree('addNode', {span : {  'html' : 'Test' }, li: {'class': 'leaf' }, input:{type:'checkbox'} } );
-		console.log(node);
+		hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox'/>Test" } } );
+hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox'/>Test" } } );
+hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox'/>Test" } } );
+hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox'/>Test" } } );
+hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox'/>Test" } } );
+hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox'/>Test" } } );
+hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox'/>Test" } } );
+hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox'/>Test" } } );
+hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox'/>Test" } } );
+hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox'/>Test" } } );
+hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox'/>Test" } } );
+hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox'/>Test" } } );
+hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox'/>Test" } } );
+hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox'/>Test" } } );
+hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox'/>Test" } } );
+hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox'/>Test" } } );
+hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox'/>Test" } } );
+hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox'/>Test" } } );
+hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox'/>Test" } } );
+hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox'/>Test" } } );
+hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox'/>Test" } } );
+hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox'/>Test" } } );
+hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox'/>Test" } } );
+hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox'/>Test" } } );
+hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox'/>Test" } } );
+hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox'/>Test" } } );
+hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox'/>Test" } } );
+hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox'/>Test" } } );
+hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox'/>Test" } } );
+
+
+
+
+		hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox'/>Test" } }, "li[data-tag='ThisIsATest']" );
+
+		$('.resizable').resizable( {
+			containment: '#main-right-col',
+			minWidth: 400,
+			minHeight:150,
+			maxHeight:300,
+			stop : function( event, ui){
+				$('#tree').css('height', window.innerHeight - 120 - ui.size.height);
+			}
+		});
+
+		$(window).on('resize',function(){
+			$('#tree').css('height', (window.innerHeight - 120 - $('div.hostManual').css('height').replace('px','')) + 'px'  );
+		});
     });
+
 	
 	
 
@@ -62,5 +117,47 @@
 	  console.log(err);
 	  ps.dispose();
 	});	
+
+
+
+
+	var i = 0;
+	var dragging = false;
+   $('#dragbar').mousedown(function(e){
+       e.preventDefault();
+       
+       dragging = true;
+       var main = $('#main');
+       var ghostbar = $('<div>',{
+			id:'ghostbar',
+			css: {
+				width: main.outerWidth(),
+				top: main.offset().top,
+				left: main.offset().left
+			}
+		}).appendTo('body');
+       
+        $(document).mousemove(function(e){
+			ghostbar.css("top",e.pageY+2);
+		});
+    });
+
+   $(document).mouseup(function(e){
+       if (dragging){
+           var percentage = (e.pageY / window.innerHeight) * 100;
+           var mainPercentage = 100-percentage;
+           
+           $('#console').text("side:" + percentage + " main:" + mainPercentage);
+           
+           $('#sidebar').css("height",percentage + "%");
+           $('#main').css("height",mainPercentage + "%");
+           $('#ghostbar').remove();
+           $(document).unbind('mousemove');
+           dragging = false;
+		}
+    });
+
+
+
 
 </script>

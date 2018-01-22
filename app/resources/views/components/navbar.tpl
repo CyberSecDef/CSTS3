@@ -85,7 +85,7 @@
 						<a class="dropdown-item" href="/Scans/software2Stig">Software To Stig</a>
 						<a class="dropdown-item" href="/Scans/vramOpenFindings">Vram Open Findings</a>
 						<div class="dropdown-divider"></div>
-						<a class="dropdown-item" href="/Scans/scanComparison">Scan Comparison</a>
+						<a class="dropdown-item" href="/Scans/compare">Scan Comparison</a>
 						<a class="dropdown-item" href="/Scans/resourceComparison">Report Source Comparison</a>
 					</div>
 				</li>
