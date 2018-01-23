@@ -95,7 +95,14 @@ var csts = {
 	},
 	ad			: {
 		fqdn		: function(){
-			return process.env.USERDNSDOMAIN;
+				if(typeof process.env.USERDNSDOMAIN !== 'undefined'){
+					return process.env.USERDNSDOMAIN;
+				}else if(typeof process.env.USERDOMAIN !== 'undefined'){
+					return process.env.USERDOMAIN;
+				}else{
+					return 'local';
+				}
+			
 		},
 		map 		: function(){
 			let ps = (new csts.plugins.shell({executionPolicy: 'Bypass',noProfile: true}));
