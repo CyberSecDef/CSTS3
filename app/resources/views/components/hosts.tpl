@@ -7,34 +7,71 @@
         var hostTree = $('#tree').tree({ 
 			checkbox:true, 
 			selectable:true,
+			collapseEffect: null,
+			dnd: false,
             onCheck : {
 				ancestors :	null,
 				node : 'expand'
 			},
 			select : function(event, element){
-				$(element).html('');
 				csts.ad.ouChildren( $(element).find('input[type="checkbox"]').attr('data-path') ).invoke()
-					.then( output => { 
-						console.log(element);
-						$.each( JSON.parse( output ), function(index, item){ 
-							hostTree.tree('addNode',{ li : { 'class' : '' }, span : {  'html' : "<div style='white-space:nowrap;'><input type='checkbox' data-path='" + item.Path + "' />" + item.OU + '</div>'} }, element ); 
-						}) 
+					.then( output => {
+						if(element.find('li').length == 0){
+							$.each( JSON.parse( output ), function(index, item){ 
+								hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox' data-path='" + item.Path + "' />" + item.OU } }, element ); 
+								
+							})
+						}
 					}).catch(err => { 
 						console.log(err) 
 					})
 			}
         });
 
-		hostTree.tree('addNode',{ li : { id : 'rootNode', 'class' : 'root-ou'}, span : {  'html' : "<input type='checkbox' data-path='' />" + csts.ad.fqdn().toLowerCase() } } ); 
+		hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox' data-path='' />" + csts.ad.fqdn().toLowerCase() } } ); 
 
-		csts.ad.ouChildren().invoke()
-			.then( output => { 
-				$.each( JSON.parse( output ), function(index, item){ 
-					hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox' data-path='" + item.Path + "' />" + item.OU } }, "li#rootNode" ); 
-				}) 
-			}).catch(err => { 
-				console.log(err) 
+		console.log('getting map');
+		ps = csts.ad.map()
+		ps.invoke()
+			.then( output => {
+				
+				var treeData = {}
+
+
+
+				$.each( JSON.parse(output), function(index, item){ 
+					//{"OU":"_In Transition","Path":"LDAP://OU=_In Transition,OU=A40,OU=Org - Z30,DC=rdte,DC=nswc,DC=navy,DC=mil","Name":"_In Transition","DN":"OU=_In Transition,OU=A40,OU=Org - Z30,DC=rdte,DC=nswc,DC=navy,DC=mil"}
+
+					console.log( item['DN'].split(',') );
+					
+				})
+
+
+				<!-- console.log( treeData ); -->
 			})
+		
+
+		<!-- function addNode(path, node){ -->
+			<!-- ps = csts.ad.ouChildren(path) -->
+			<!-- ps.invoke() -->
+				<!-- .then( output => { -->
+					<!-- hostTree.tree('collapse', node); -->
+					<!-- $.each( JSON.parse( output ), function(index, item){  -->
+						<!-- hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox' data-path='" + item.Path + "' />" + item.OU } }, node  );  -->
+						<!-- hostTree.tree('collapse', $("input[data-path='" + item.Path + "']").parent().parent()); -->
+						<!-- console.log( item.Path ); -->
+						<!-- addNode(item.Path, $("input[data-path='" + item.Path + "']").parent().parent() ); -->
+					<!-- })  -->
+				<!-- }).catch(err => {  -->
+					<!-- console.log(err)  -->
+				<!-- }) -->
+			<!-- <!-- ps.dispose().then( code => {console.log(code) }); --> -->
+		<!-- } -->
+
+
+		<!-- addNode( "", "div#tree > ul > li"); -->
+
+		
 		
 		$('.resizable').resizable( {
 			containment: '#main-right-col',

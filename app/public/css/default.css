@@ -59,9 +59,14 @@ div.hostManual{
 div.hostTree{
 	font-size:8pt;
 	border:0 !important;
-	overflow:auto;
+	overflow:scroll;
 }
 
 div.hostTree ul{
 	border-bottom: 0px;
+}
+
+
+div.hostTree span.daredevel-tree-label{
+	white-space:nowrap;
 }

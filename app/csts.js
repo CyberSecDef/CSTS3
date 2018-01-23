@@ -1,6 +1,6 @@
 var csts = {
 	init : function(){
-		//include library files
+		//include library files.  These are individually listed for ordering purposes
 		$.each([
 			'./public/js/jquery-ui.js',
 			'./public/js/bootstrap.bundle.js',
@@ -9,20 +9,22 @@ var csts = {
 		], function(index, item){csts.require(item)});
 
 		//include routes
-		$.each([
-			'./routes/web.js',
-		], function(index, item){csts.require(item)});
+		$.each(
+			csts.plugins.fs.readdirSync('./app/routes/'), 
+			function(index, item){csts.require('./routes/' + item)}
+		);
 
 		//controllers
-		$.each([
-			'./controllers/Home.js',
-			'./controllers/Scans.js',
-		], function(index, item){csts.require(item)});
+		$.each(
+			csts.plugins.fs.readdirSync('./app/controllers/'), 
+			function(index, item){csts.require('./controllers/' + item)}
+		);
 
 		//models
-		$.each([
-			'./models/Scans.js',
-		], function(index, item){csts.require(item)});
+		$.each(
+			csts.plugins.fs.readdirSync('./app/models/'), 
+			function(index, item){csts.require('./models/' + item)}
+		);
 
 		csts.plugins.tray.tooltip = "Cyber Security Tool Suite v3.0.0";
 		csts.plugins.win.width 	= ( csts.plugins.win.width < 1280 ? 1280 : csts.plugins.win.width);
@@ -74,13 +76,8 @@ var csts = {
 				return false;
 			});
 
-
 			csts.controllers['Home'].index();	
 			$('footer.footer div div.status-bar-l').text( 'You are running on ' + csts.plugins.os.platform());
-
-
-
-
 		})
 	},
 	require : function(script){
@@ -100,10 +97,33 @@ var csts = {
 		fqdn		: function(){
 			return process.env.USERDNSDOMAIN;
 		},
+		map 		: function(){
+			let ps = (new csts.plugins.shell({executionPolicy: 'Bypass',noProfile: true}));
+			let results = "";
+			if(typeof ou !== 'undefined' && ou !== ''){
+				ps.addCommand("$objPath= New-Object System.DirectoryServices.DirectoryEntry '" + ou + "'")
+			}else{
+				ps.addCommand("$objPath= New-Object System.DirectoryServices.DirectoryEntry")
+			}
+			ps.addCommand("$objSearcher = New-Object System.DirectoryServices.DirectorySearcher")
+			ps.addCommand("$objSearcher.SearchRoot = $objPath")
+			ps.addCommand("$objSearcher.PageSize = 1000")
+			ps.addCommand("$objSearcher.SearchScope = 'SubTree'")
+			ps.addCommand("$results = @();")
+			ps.addCommand("$objSearcher.findall() | sort-object { $_.properties.ou} | ? { $_.path -like '*//OU=*'} | % { $results += @{ 'Name' = $($_.properties.name) ; 'OU' = $($_.properties.ou); 'Path' = $($_.properties.adspath); 'DN' =  $($_.properties.distinguishedname); } }")
+			ps.addCommand("add-type -assembly system.web.extensions")
+			ps.addCommand("$ps_js=new-object system.web.script.serialization.javascriptSerializer")
+			ps.addCommand("$ps_js.Serialize($results) ")
+
+
+			
+
+			return ps;
+		},
 		ouChildren 	: function(ou){
 			let ps = (new csts.plugins.shell({executionPolicy: 'Bypass',noProfile: true}));
 			let results = "";
-			if(typeof ou !== 'undefined'){
+			if(typeof ou !== 'undefined' && ou !== ''){
 				ps.addCommand("$objPath= New-Object System.DirectoryServices.DirectoryEntry '" + ou + "'")
 			}else{
 				ps.addCommand("$objPath= New-Object System.DirectoryServices.DirectoryEntry")
