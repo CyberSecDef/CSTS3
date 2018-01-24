@@ -15,13 +15,18 @@
   },
   "dependencies": {
     "bootstrap": "^4.0.0-beta.3",
+    "datatables": "^1.10.13",
+    "datatables.net": "^1.10.16",
+    "datatables.net-dt": "^1.10.16",
     "ejs": "^2.5.7",
     "jquery": "^3.2.1",
     "jquery-ui": "^1.12.1",
+    "moment": "^2.20.1",
     "navigo": "^7.0.0",
     "nedb": "^1.8.0",
     "node-powershell": "^3.3.1",
     "nw-dev": "^3.0.1",
-    "popper.js": "^1.12.9"
+    "popper.js": "^1.12.9",
+    "xlsx": "^0.11.18"
   }
 }

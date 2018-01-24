@@ -6,6 +6,7 @@ var csts = {
 			'./public/js/bootstrap.bundle.js',
 			'./public/js/fontawesome-all.js',
 			'./public/js/jquery.tree.js',
+			'./public/js/jquery.dataTables.js',
 		], function(index, item){csts.require(item)});
 
 		//include routes
@@ -37,7 +38,9 @@ var csts = {
 		});
 
 		csts.router = new csts.plugins.navigo(location.origin,false,'#');
-		
+
+		var dt = require( 'datatables.net' )();
+
 		$(document).ready(function(){
 			$.each(csts.routes, function(name, val){
 				switch(typeof val){
@@ -45,7 +48,7 @@ var csts = {
 						c = val.substring(0,val.indexOf('@'));
 						f = val.substring(val.indexOf('@')+1);
 						
-						csts.router.on(name, csts.controllers[c][f] ).resolve();
+						csts.router.on(name, csts.controllers[c][f] );
 						console.log('Created router for ' + name);
 						break;
 					case 'function' :
@@ -66,13 +69,14 @@ var csts = {
 				$('body').html(str);
 			}) ;
 
+			//this function calls the routing without actually navigating away
 			csts.plugins.win.on('navigation', function(frame, url, policy){
-				window.onbeforeunload = function() { return false; }
+				window.onbeforeunload = null; 
 				policy.ignore();
 				req = url.replace(location.origin,'')
 				console.log("Request: " + req);
-				
-				router.navigate(req);
+			
+				window.csts.router.navigate(req);
 				return false;
 			});
 
@@ -152,14 +156,21 @@ var csts = {
 	models 		: {},
 	controllers : {},
 	plugins : {
-		'tray' 		: (new nw.Tray({ title: 'Tray', icon: 'app/public/images/csts.png' }) ),
+		'crypto'	: require('crypto'),
+		'dns'		: require('dns'),
 		'fs' 		: require('fs'),
 		'ejs'		: require('ejs'),
 		'os'		: require('os'),
+		'moment'	: require('moment'),
 		'navigo'	: require('navigo'),
+		'path'		: require('path'),
+		'util'		: require('util'),
+		'zlib'		: require('zlib'),
+		'tray' 		: (new nw.Tray({ title: 'Tray', icon: 'app/public/images/csts.png' }) ),
 		'win'		: nw.Window.get(),
 		'reload'	: {},
 		'shell'		: require('node-powershell'),
+		'xlsx'		: require('xlsx'),	
 	}
 
 };
