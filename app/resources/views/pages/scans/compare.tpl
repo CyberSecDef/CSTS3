@@ -7,14 +7,12 @@
 			</div>
 			<br />
 			
-			<h2>
-				<a data-toggle="collapse" href="#scans-compare-files" role="button" aria-expanded="false" aria-controls="scan-compare-files" class="no-decoration" id="scans-compare-files-link">
+			<h3>
+				<a data-toggle="" href="#scans-compare-files" role="button" aria-expanded="false" aria-controls="scan-compare-files" class="no-decoration" id="scans-compare-files-link">
 					File Selection Form
 				</a>
-			</h2>
-			<br />
-			
-			<div class="collapse show" id="scans-compare-files">
+			</h3>
+			<div class=" show" id="scans-compare-files">
 				<div class="card">
 					<div class="card-body">
 						<div class="container">
@@ -37,12 +35,12 @@
 				</div>	
 			</div>
 
-			<h2>
-				<a data-toggle="collapse" href="#scans-compare-file-info" role="button" aria-expanded="false" aria-controls="scans-compare-file-info" class="no-decoration" id="scans-compare-file-info-link">
+			<h3>
+				<a data-toggle="" href="#scans-compare-file-info" role="button" aria-expanded="false" aria-controls="scans-compare-file-info" class="no-decoration" id="scans-compare-file-info-link">
 					File Information
 				</a>
-			</h2>
-			<div class="table-responsives collapse show" id="scans-compare-file-info">
+			</h3>
+			<div class="table-responsive  " id="scans-compare-file-info">
 				<table class="table table-striped table-sm" id="tabSelFileInfo">
 					<thead>
 						<tr>
@@ -61,51 +59,67 @@
 			</div>
 
 
-			<h2>
-				<a data-toggle="collapse" href="#scans-compare-file-parameters" role="button" aria-expanded="false" aria-controls="scans-compare-file-parameters" class="no-decoration" id="scans-compare-file-parameters-link">
+			<h3>
+				<a data-toggle="" href="#scans-compare-file-parameters" role="button" aria-expanded="false" aria-controls="scans-compare-file-parameters" class="no-decoration" id="scans-compare-file-parameters-link">
 					Parameters
 				</a>
-			</h2>
+			</h3>
 
-			<div class="card collapse" style="width:98%;margin: 10px auto 0px auto;" id="scans-compare-file-parameters">
-			
-			<div class="card-body">
-				<p class="card-text">
-					<div class="container">
-						<form>
-							<div class="form-group row">
-								<label class="col-sm-2 col-form-label">Fields to Compare</label>
-								<div class="col-sm-10" id="fieldComparison">
-		
-									<% fields.forEach(function(field) { %>
-										<div class="form-check form-check-inline">
-											<label class="form-check-label">
-												<input class="form-check-input" type="checkbox" value="<%= field %>" name="comparisonFields"/><%= field %>
-											</label>
+			<div class="" id="scans-compare-file-parameters">
+				<div class="card" style="width:98%;margin: 10px auto 0px auto;" >
+				
+					<div class="card-body">
+						<p class="card-text">
+							<div class="container">
+								<form>
+								
+									<div class="form-group row">
+										<label class="col-sm-2 col-form-label"><h4>Fields:</h4> </label>
+										<div class="col-sm-10" id="fieldComparison">
+											<% fields.forEach(function(field) { %>
+												<div class="form-check form-check-inline">
+													<label class="form-check-label">
+														<input class="form-check-input" type="checkbox" value="<%= field %>" name="comparisonFields"/><%= field %>
+													</label>
+												</div>
+											<% }); %>
 										</div>
-									<% }); %>
+									</div>
+									<div class="input-group mb-3">
+										<div class="input-group-prepend">
+											<span class="input-group-text" id="basic-addon1">RAR Tab</span>
+										</div>
+										<select class="form-control" aria-label="RAR Tab" name="rarTabSel" id="rarTabSel"></select>
+										<div class="input-group-prepend">
+											<span class="input-group-text" id="basic-addon1">POAM Tab</span>
+										</div>
+										<select class="form-control" aria-label="POAM Tab" name="poamTabSel" id="poamTabSel"></select>
+									</div>
+									
+									<div class="" >
+										<button type="button" class="btn btn-primary float-right" id="scans-comparison-execute-btn">Execute</button>
+									</div>
+								</form>
+							</div>
+						</p>
 
-								</div>
-							</div>
-							<div class="form-group row">
-								<label class="col-sm-2 col-form-label">Selected RAR Sheet</label>
-								<div class="col-sm-10" id="rarSheets">
-									
-								</div>
-							</div>
-							<div class="form-group row">
-								<label class="col-sm-2 col-form-label">Selected POAM Sheet</label>
-								<div class="col-sm-10" id="poamSheets">
-									
-								</div>
-							</div>	
-						</form>
 					</div>
-				</p>
+				</div>
 			</div>
-
-
 
 		</main>
 	</div>
 </div>
+
+<script>
+	$("#fileRar, #filePoam").on("change",function(){
+		if($('#fileRar').val().trim() != '' && $('#filePoam').val().trim() != ''){
+			csts.controllers['Scans'].parseComparisonFiles();
+		}
+	});
+	
+	$('button#scans-comparison-execute-btn').on('click',function(){
+		console.log(1);
+		csts.controllers['Scans'].executeComparison();
+	});
+</script>

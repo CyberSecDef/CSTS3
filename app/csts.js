@@ -1,5 +1,7 @@
 var csts = {
 	init : function(){
+		nw.Window.get().showDevTools()
+		
 		//include library files.  These are individually listed for ordering purposes
 		$.each([
 			'./public/js/jquery-ui.js',
@@ -75,12 +77,14 @@ var csts = {
 				policy.ignore();
 				req = url.replace(location.origin,'')
 				console.log("Request: " + req);
-			
 				window.csts.router.navigate(req);
 				return false;
 			});
 
 			csts.controllers['Home'].index();	
+			
+			//ADDED THIS FOR DEBUGGING PURPOSES
+			csts.controllers['Scans'].compare();	
 			$('footer.footer div div.status-bar-l').text( 'You are running on ' + csts.plugins.os.platform());
 		})
 	},
@@ -97,39 +101,15 @@ var csts = {
 			}
 		});
 	},
-	ad			: {
-		fqdn		: function(){
-				if(typeof process.env.USERDNSDOMAIN !== 'undefined'){
-					return process.env.USERDNSDOMAIN;
-				}else if(typeof process.env.USERDOMAIN !== 'undefined'){
-					return process.env.USERDOMAIN;
-				}else{
-					return 'local';
-				}
-			
-		},
-		map 		: function(){
-			let ps = (new csts.plugins.shell({executionPolicy: 'Bypass',noProfile: true}));
-			let results = "";
-			if(typeof ou !== 'undefined' && ou !== ''){
-				ps.addCommand("$objPath= New-Object System.DirectoryServices.DirectoryEntry '" + ou + "'")
+	ad	: {
+		fqdn	: function(){
+			if(typeof process.env.USERDNSDOMAIN !== 'undefined'){
+				return process.env.USERDNSDOMAIN;
+			}else if(typeof process.env.USERDOMAIN !== 'undefined'){
+				return process.env.USERDOMAIN;
 			}else{
-				ps.addCommand("$objPath= New-Object System.DirectoryServices.DirectoryEntry")
+				return 'local';
 			}
-			ps.addCommand("$objSearcher = New-Object System.DirectoryServices.DirectorySearcher")
-			ps.addCommand("$objSearcher.SearchRoot = $objPath")
-			ps.addCommand("$objSearcher.PageSize = 1000")
-			ps.addCommand("$objSearcher.SearchScope = 'SubTree'")
-			ps.addCommand("$results = @();")
-			ps.addCommand("$objSearcher.findall() | sort-object { $_.properties.ou} | ? { $_.path -like '*//OU=*'} | % { $results += @{ 'Name' = $($_.properties.name) ; 'OU' = $($_.properties.ou); 'Path' = $($_.properties.adspath); 'DN' =  $($_.properties.distinguishedname); } }")
-			ps.addCommand("add-type -assembly system.web.extensions")
-			ps.addCommand("$ps_js=new-object system.web.script.serialization.javascriptSerializer")
-			ps.addCommand("$ps_js.Serialize($results) ")
-
-
-			
-
-			return ps;
 		},
 		ouChildren 	: function(ou){
 			let ps = (new csts.plugins.shell({executionPolicy: 'Bypass',noProfile: true}));
