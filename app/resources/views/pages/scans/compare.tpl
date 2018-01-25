@@ -79,7 +79,7 @@
 											<% fields.forEach(function(field) { %>
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
-														<input class="form-check-input" type="checkbox" value="<%= field %>" name="comparisonFields"/><%= field %>
+														<input class="form-check-input" type="checkbox" value="<%= field %>" name="comparisonFields" checked="checked" /><%= field %>
 													</label>
 												</div>
 											<% }); %>
