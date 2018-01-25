@@ -6,6 +6,16 @@
 				This is the POAM/RAR Management Tool.	This tool will allow you to execute multiple processes on your Excel based POAM's and RAR's.	Please select the applicable files below.
 			</div>
 			<br />
+
+The name is <input type="text" data-bind="value: personName" id="myBinding"/>
+
+
+<script>
+$(document).ready(function(){
+	ko.applyBindings( csts.controllers['Scans'].viewModels.myViewModel, document.getElementById('#myBinding') );
+});
+</script>			
+			
 			
 			<h3>
 				<a data-toggle="" href="#scans-compare-files" role="button" aria-expanded="false" aria-controls="scan-compare-files" class="no-decoration" id="scans-compare-files-link">
@@ -107,6 +117,12 @@
 				</div>
 			</div>
 
+			<h3>
+				<a data-toggle="" href="#scans-compare-results" role="button" aria-expanded="false" aria-controls="scans-compare-results" class="no-decoration" id="scans-compare-results-link">
+					Results
+				</a>
+			</h3>
+			
 		</main>
 	</div>
 </div>

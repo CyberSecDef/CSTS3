@@ -13,8 +13,6 @@
 						Home  
 					</a>
 					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
-						<a class="dropdown-item" href="/Home/help">Help</a>
-						<div class="dropdown-divider"></div>
 						<a class="dropdown-item" href="#">Reports</a>
 						<a class="dropdown-item" href="#">Analytics</a>
 						<div class="dropdown-divider"></div>
@@ -119,6 +117,22 @@
 						<div class="dropdown-divider"></div>
 						<a class="dropdown-item" href="/Systems/parseEventLogs">Parse Event Logs</a>
 						<a class="dropdown-item" href="/Systems/archiveEventLogs">Archive Event Logs</a>
+						
+					</div>
+				</li>
+				
+				<li class="nav-item dropdown <$= (url == '/Help' ? 'active' : '') $> ">
+					<a class="nav-link dropdown-toggle" href="/Help" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						Help
+					</a>
+					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+						<a class="dropdown-item" href="/Help/Help">Help</a>
+						<a class="dropdown-item" href="/Help/About">About</a>
+						<div class="dropdown-divider"></div>
+						<a class="dropdown-item" href="#">Version <span class="badge badge-info"><%= nw.App.manifest.version %></span></a>
+						<a class="dropdown-item" href="#">View Count <span class="badge badge-success observable" id="viewCount" data-bind="value: viewCount"></span></a>
+						
+						
 						
 					</div>
 				</li>

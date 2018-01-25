@@ -1,6 +1,8 @@
 var csts = {
 	init : function(){
 		nw.Window.get().showDevTools()
+		require('knockout')
+		csts.require('../node_modules/knockout/build/output/knockout-latest.js');
 		
 		//include library files.  These are individually listed for ordering purposes
 		$.each([
@@ -29,14 +31,31 @@ var csts = {
 			function(index, item){csts.require('./models/' + item)}
 		);
 
+		
+		
+		csts.db.config = new csts.plugins.Datastore({ filename: 'app/database/config.db', autoload: true });		
+		
+		csts.db.config.count( { 'viewCount' : { $gt : 0 } }, function(err, count){
+			if(count == 0){
+				csts.db.config.insert({viewCount : 1});	
+			}else{
+				csts.db.config.findOne( { 'viewCount' : { $gt : 0 } }, function(err, res){
+					csts.db.config.update({ _id : res._id}, { $set : {viewCount : (res.viewCount+1) } });
+					csts.db.config.persistence.compactDatafile();
+				});
+			}
+		})
+		
 		csts.plugins.tray.tooltip = "Cyber Security Tool Suite v3.0.0";
 		csts.plugins.win.width 	= ( csts.plugins.win.width < 1280 ? 1280 : csts.plugins.win.width);
 		csts.plugins.win.height = ( csts.plugins.win.height < 800 ? 800	 : csts.plugins.win.height);
 		csts.plugins.ejs.delimeter = '$';
 
-		csts.plugins.reload = csts.plugins.fs.watch('./', {recursive: true}, function() {
-			location.href='/app/index.html';
-			reloadWatcher.close();
+		csts.plugins.reload = csts.plugins.fs.watch('./app', {recursive: true}, function(eventType, filename) {
+			if( filename.substring(0,8) != 'database' ){
+				location.href='/app/index.html';
+				reloadWatcher.close();
+			}
 		});
 
 		csts.router = new csts.plugins.navigo(location.origin,false,'#');
@@ -61,9 +80,17 @@ var csts = {
 				}
 			});
 
+			
+			csts.db.config.findOne({ 'viewCount' : { $gt : 0 } },function(err,res){ 
+				console.log(res.viewCount);
+				$('#viewCount').text( res.viewCount ); 
+				csts.plugins.ejs.cache.set('viewCount', res.viewCount);
+			});
+			
+			
 			csts.plugins.ejs.renderFile('app/resources/views/layouts/default.tpl',{
-				'username' : process.env.USERNAME,
-				'url' : location.valueOf().pathname.replace('/app','').replace('index.html','')
+				'username' 	: process.env.USERNAME,
+				'url' 		: location.valueOf().pathname.replace('/app','').replace('index.html','')
 			},{},function(err,str){
 				if(err){
 					console.log(err);
@@ -86,6 +113,15 @@ var csts = {
 			//ADDED THIS FOR DEBUGGING PURPOSES
 			csts.controllers['Scans'].compare();	
 			$('footer.footer div div.status-bar-l').text( 'You are running on ' + csts.plugins.os.platform());
+
+			//heart beat for automatic value updates (observable in the class, variable name in the 'data-bind').  
+			//might make this more robust later
+			// var heartBeat = window.setInterval( function(){
+				// $.each( $('.observable'), function(){
+					// $(this).text( csts.plugins.ejs.cache.get( $(this).data('bind') ) );
+				// });
+			// }, 1000);
+			
 		})
 	},
 	require : function(script){
@@ -131,6 +167,7 @@ var csts = {
 			return ps;
 		}
 	},
+	db			: {},
 	routes 		: {},
 	router 		: {},
 	models 		: {},
@@ -151,8 +188,8 @@ var csts = {
 		'reload'	: {},
 		'shell'		: require('node-powershell'),
 		'xlsx'		: require('xlsx'),	
+		'Datastore' : require('nedb'),
 	}
 
 };
-
 csts.init();

@@ -1,5 +1,14 @@
 csts.controllers['Scans'] = ({
 	name : 'Scans',
+	viewModels : {
+		myViewModel : {
+			personName : ko.observable('Bob'),
+			personAge  : 123,
+			getName : function(){
+				return this.personName;
+			}
+		}
+	},
 	compare : function(){
 		console.log('executing Scans@compare');
 		

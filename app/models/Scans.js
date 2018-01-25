@@ -1,8 +1,7 @@
 csts.models['Scans'] = {
 	name : 'Scans',
 	compareFields : [ 'Comments', 'Description', 'Mitigations', 'Raw Risk', 'Residual Risk', 'Security Controls', 'Source', 'Status'],
-	workbooks : {
-	},
+	workbooks : {},
 	parseComparisonFiles : function(){
 		stats = csts.plugins.fs.statSync( $('#fileRar').val().trim() );
 		$('#tabSelFileInfo tbody').empty();
@@ -387,8 +386,6 @@ csts.models['Scans'] = {
 					});
 				}
 			}
-
-
 		});
 
 
