@@ -143,10 +143,12 @@
 				<li class="nav-item dropdown">
 					<a href="#" class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown"
 					   aria-haspopup="true" aria-expanded="false">
-						<%= username %>
+						<i class="fas fa-cog"></i> &nbsp;<%= username %>
 					</a>
 					<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
 						<a href="/Exit" class="dropdown-item">Exit</a>
+						<div class="dropdown-divider"></div>
+						<a class="dropdown-item" href="javascript:csts.utils.toggleHosts();"><i class="fas fa-eye"></i>&nbsp;Toggle Host Column</a>
 					</div>
 				</li>
 			</ul>

@@ -1,120 +1,95 @@
 csts.models['Scans'] = {
 	name : 'Scans',
-	compareFields : [ 'Comments', 'Description', 'Mitigations', 'Raw Risk', 'Residual Risk', 'Security Controls', 'Source', 'Status'],
-	workbooks : {},
-	parseComparisonFiles : function(){
-		stats = csts.plugins.fs.statSync( $('#fileRar').val().trim() );
-		$('#tabSelFileInfo tbody').empty();
-		var table = $('table#tabSelFileInfo').DataTable({ searching: false, paging: false});
-		table.clear();
-
-		table.row.add(
-			[
-				"RAR", 
-				csts.plugins.path.basename( $('#fileRar').val().trim() ),
-				csts.plugins.moment(stats.ctimeMs).format("MM/DD/YYYY HH:mm"), 
-				csts.plugins.moment(stats.atimeMs).format("MM/DD/YYYY HH:mm"),
-				csts.plugins.moment(stats.mtimeMs).format("MM/DD/YYYY HH:mm"),
-				stats.size,
-				csts.plugins.path.extname( $('#fileRar').val().trim() )
-			] 
-		)
-		
-		stats = csts.plugins.fs.statSync( $('#filePoam').val().trim() );
-		table.row.add(
-			[
-				"POAM", 
-				csts.plugins.path.basename( $('#filePoam').val().trim() ),
-				csts.plugins.moment(stats.ctimeMs).format("MM/DD/YYYY HH:mm"), 
-				csts.plugins.moment(stats.atimeMs).format("MM/DD/YYYY HH:mm"),
-				csts.plugins.moment(stats.mtimeMs).format("MM/DD/YYYY HH:mm"),
-				stats.size,
-				csts.plugins.path.extname( $('#filePoam').val().trim() )
-			] 
-		)
-
-		table.rows().invalidate().draw();
-
-		// $('#scans-compare-files').hide();
-		// $('#scans-compare-file-info').show();
-		// $('#scans-compare-file-parameters').show();
-		$('#myModal').modal('hide');
-
-
-		$('#rarTabSel').find('option').remove()
-		$('#poamTabSel').find('option').remove()
-		
-		csts.models['Scans'].workbooks['rar'] = csts.plugins.xlsx.readFile( $('#fileRar').val().trim() );
-		
-		$.each(csts.models['Scans'].workbooks['rar'].SheetNames, function(index,item){
-			$('#rarTabSel').append( $('<option></option>').text(item).prop('selected', (item.toLowerCase().replace(/[^a-zA-Z]/,'').indexOf('rar')>=0 ) ) );
-		});
-
-		csts.models['Scans'].workbooks['poam'] = csts.plugins.xlsx.readFile( $('#filePoam').val().trim() );
-		$.each(csts.models['Scans'].workbooks['poam'].SheetNames, function(index,item){
-			$('#poamTabSel').append( $('<option></option>').text(item).prop('selected', (item.toLowerCase().replace(/[^a-zA-Z]/,'').indexOf('poam')>=0 ) ) );
-		});
-
+	compareFields 	: [ 'Mitigation',       'Comment', 		 'Description',       'Raw Risk',       'Residual Risk',       'Security Control',       'Source',       'Status'],
+	rarFields 		: { 'Mitigation' : 'J', 'Comment' : 'N', 'Description' : 'D', 'Raw Risk' : 'F', 'Residual Risk' : 'L', 'Security Control' : 'A', 'Source' : 'B', 'Status' : 'M', 'Test Id' : 'C', 'Likelihood' : 'H' },
+	poamFields 		: { 'Mitigation' : 'G', 'Comment' : 'O', 'Description' : 'B', 'Raw Risk' : 'F', 'Residual Risk' : 'H', 'Security Control' : 'C', 'Source' : 'M', 'Status' : 'N' },
+ 	workbooks : {},
+	comparison : {
+		parseFile : function( file ){
+			return csts.plugins.fs.statSync( file );
+		}
 	},
-	executeComparison : function(){
+	isBlank : function(workbook, sheet, address){
+		if(Array.isArray(address)){
+			ret = true;
+			for(i = 0; i < address.length; i++){
+				ret = ret & csts.models['Scans'].isBlank(workbook, sheet, address[i])
+			}
+			return ret;
+		}else{
+			return(
+				typeof csts.models['Scans'].workbooks[workbook].Sheets[sheet][address] == 'undefined' ||
+				typeof csts.models['Scans'].workbooks[workbook].Sheets[sheet][address].v == 'undefined' ||
+				typeof csts.models['Scans'].workbooks[workbook].Sheets[sheet][address].v == ''
+			)
+		}
+	},
+	fieldMove : function(e){
+		console.log('test');
+	},
+	compareVals : function(workbook, sheet, address, val){
+		if(!csts.models['Scans'].isBlank(workbook,sheet,address)){
+			return (
+				csts.models['Scans'].workbooks[workbook].Sheets[sheet][address].v.toUpperCase().indexOf( $.trim(val).toUpperCase() ) >= 0
+			);
+		}else{
+			return false;
+		}
+	},
+	getVulnId : function(workbook, sheet, address){
+		var vulnId = '';
+		if(!csts.models['Scans'].isBlank(workbook,sheet,address)){
+			vulnId = csts.models['Scans'].workbooks[workbook].Sheets[sheet][address].v
+			if( vulnId.indexOf("Vuln ID:") > 0){
+				var temp = vulnId.split("\n");
+				$.each(temp, function(i,item){
+					i = item.split(":")
+					if( $.trim(i[0]) == "Vuln ID"  && $.trim(i[1]) != ""){
+						vulnId = $.trim(i[1]);
+					}
+					if( $.trim(i[0]) == "Plugin ID"  && $.trim(i[1]) != ""){
+						vulnId = $.trim(i[1]);
+					}
+				});
+			}
+		}
+		return vulnId;
+	},
+	setVal : function(workbook, sheet, address, val){
+		csts.models['Scans'].workbooks[workbook].Sheets[sheet][address].v = val;
+		return ( !csts.models['Scans'].isBlank(workbook, sheet, address) ? csts.models['Scans'].workbooks[workbook].Sheets[sheet][address].v : '' );
+	},
+	getVal : function(workbook, sheet, address){
+		return ( !csts.models['Scans'].isBlank(workbook, sheet, address) ? csts.models['Scans'].workbooks[workbook].Sheets[sheet][address].v : '' );
+	},
+	executeComparison : function( rarTab, poamTab, fields ){
 		var rowIndex = 0;
 		var rarRow = 0;
 		var $items = [];
 				
 		rarRow = 8;
-		while(rarRow < 3000 && 
-			(
-				typeof csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['A'+rarRow] != 'undefined' &&
-				(csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['A'+rarRow].v != '' || typeof csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['A'+rarRow].v != 'undefined')  &&
-				(csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['B'+rarRow].v != '' || typeof csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['B'+rarRow].v != 'undefined') 
-			)
-		){
-
-			if(
-				typeof csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['F'+rarRow] != 'undefined' &&
-				csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['F'+rarRow].v != 'IV' &&
-				typeof csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['B'+rarRow].v != 'undefined' &&
-				csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['B'+rarRow].v != '' 
-				
-			){
-				
-				var vulnId = '';
-				if(typeof csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['C'+rarRow] != 'undefined'){
-					vulnId = csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['C'+rarRow].v
-					if( vulnId.indexOf("Vuln ID:") > 0){
-						var temp = vulnId.split("\n");
-						$.each(temp, function(i,item){
-							i = item.split(":")
-							if( $.trim(i[0]) == "Vuln ID"  && $.trim(i[1]) != ""){
-								vulnId = $.trim(i[1]);
-							}
-							if( $.trim(i[0]) == "Plugin ID"  && $.trim(i[1]) != ""){
-								vulnId = $.trim(i[1]);
-							}
-						});
-					}
-				}
-							
-							
+		while(rarRow < 3000 &&  ( !csts.models['Scans'].isBlank('rar',rarTab,[ 'A'+rarRow, 'b'+rarRow]) ) ){
+			if(	!csts.models['Scans'].isBlank('rar',rarTab,['F'+rarRow, 'B'+rarRow])  && csts.models['Scans'].workbooks['rar'].Sheets[rarTab]['F'+rarRow].v != 'IV'  ){
+				var vulnId = csts.models['Scans'].getVulnId( 'rar',rarTab,'C'+rarRow);
 				$items.push(
 					{
 						row					: rarRow,
 						vulnId				: vulnId,
-						control 			: typeof csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['A'+rarRow] != 'undefined' ? csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['A'+rarRow].v : '', 
-						source  			: typeof csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['B'+rarRow] != 'undefined' ? csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['B'+rarRow].v : '',
-						testId 				: typeof csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['C'+rarRow] != 'undefined' ? csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['C'+rarRow].v : '',
-						description 		: typeof csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['D'+rarRow] != 'undefined' ? csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['D'+rarRow].v : '',
-						riskStatement 		: typeof csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['E'+rarRow] != 'undefined' ? csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['E'+rarRow].v : '',
-						rawRisk 			: typeof csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['F'+rarRow] != 'undefined' ? csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['F'+rarRow].v : '',
-						impact 				: typeof csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['G'+rarRow] != 'undefined' ? csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['G'+rarRow].v : '',
-						likelihood 			: typeof csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['H'+rarRow] != 'undefined' ? csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['H'+rarRow].v : '',
-						correctiveAction 	: typeof csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['I'+rarRow] != 'undefined' ? csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['I'+rarRow].v : '',
-						mitigation 			: typeof csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['J'+rarRow] != 'undefined' ? csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['J'+rarRow].v : '',
-						remediation 		: typeof csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['K'+rarRow] != 'undefined' ? csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['K'+rarRow].v : '',
-						residualRisk 		: typeof csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['L'+rarRow] != 'undefined' ? csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['L'+rarRow].v : '',
-						status 				: typeof csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['M'+rarRow] != 'undefined' ? csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['M'+rarRow].v : '',
-						comment 			: typeof csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['N'+rarRow] != 'undefined' ? csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['N'+rarRow].v : '',
-						devices 			: typeof csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['O'+rarRow] != 'undefined' ? csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['O'+rarRow].v : '',
+						control 			: csts.models['Scans'].getVal('rar',rarTab,'A'+rarRow),
+						source  			: csts.models['Scans'].getVal('rar',rarTab,'B'+rarRow),
+						testId 				: csts.models['Scans'].getVal('rar',rarTab,'C'+rarRow),
+						description 		: csts.models['Scans'].getVal('rar',rarTab,'D'+rarRow),
+						riskStatement 		: csts.models['Scans'].getVal('rar',rarTab,'E'+rarRow),
+						rawRisk 			: csts.models['Scans'].getVal('rar',rarTab,'F'+rarRow),
+						impact 				: csts.models['Scans'].getVal('rar',rarTab,'G'+rarRow),
+						likelihood 			: csts.models['Scans'].getVal('rar',rarTab,'H'+rarRow),
+						correctiveAction 	: csts.models['Scans'].getVal('rar',rarTab,'I'+rarRow),
+						mitigation 			: csts.models['Scans'].getVal('rar',rarTab,'J'+rarRow),
+						remediation 		: csts.models['Scans'].getVal('rar',rarTab,'K'+rarRow),
+						residualRisk 		: csts.models['Scans'].getVal('rar',rarTab,'L'+rarRow),
+						status 				: csts.models['Scans'].getVal('rar',rarTab,'M'+rarRow),
+						comment 			: csts.models['Scans'].getVal('rar',rarTab,'N'+rarRow),
+						devices 			: csts.models['Scans'].getVal('rar',rarTab,'O'+rarRow),
 					}
 				);
 			}
@@ -128,158 +103,138 @@ csts.models['Scans'] = {
 			poamRow = 8;
 			var found = false;
 			//loop through all the poam until blanks are recieved
-			while(poamRow < 3000 && 
-				(
-					typeof csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['B'+poamRow] != 'undefined' ||
-					typeof csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['L'+poamRow] != 'undefined' ||
-					typeof csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['N'+poamRow] != 'undefined' ||
-					typeof csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['O'+poamRow] != 'undefined'
-				)
-			){
-
-				if(	
-					(
-						typeof csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['B'+poamRow] != 'undefined' &&
-						csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['B'+poamRow].v.toUpperCase().indexOf( $.trim(this.vulnId).toUpperCase() ) >= 0
-					) || 
-					(
-						typeof csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['M'+poamRow] != 'undefined' &&
-						csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['M'+poamRow].v.toUpperCase().indexOf( this.vulnId.toUpperCase() ) >= 0
-					)
-				){
+			while(poamRow < 3000 &&  ( !csts.models['Scans'].isBlank('poam',poamTab,[ 'B'+poamRow, 'L'+poamRow, 'N'+poamRow, 'O'+poamRow]) ) ){
+				if(	csts.models['Scans'].compareVals('poam',poamTab,'B'+poamRow, this.vulnId) || csts.models['Scans'].compareVals('poam',poamTab,'M'+poamRow, this.vulnId) ){
 					found = true;
 
-					if(
-						typeof csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['N'+poamRow] != 'undefined' &&
-						this.status.toUpperCase() != csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['N'+poamRow].v.toUpperCase() &&
-						$("input[type='checkbox'][name='comparisonFields'][value='Status']").prop("checked") 
-					){
+					if( !csts.models['Scans'].compareVals('poam',poamTab,'N'+poamRow, this.status) &&  $.grep( fields, function(n,i){ return n.value == 'Status';}).length > 0 ){
 						csts.controllers.Scans.viewModels.comparison.push({
+							guid   : csts.utils.guid(),
 							vulnId : this.vulnId,
 							type   : 'Status',
 							rarRow : this.row,
 							rarVal : this.status,
 							poamRow : poamRow,
-							poamVal : csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['N'+poamRow].v
+							poamVal : csts.models['Scans'].getVal('poam',poamTab,'N'+poamRow)
 						});
 					}
-
-					if(
-						typeof csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['C'+poamRow] != 'undefined' &&
-						this.control.toUpperCase() != csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['C'+poamRow].v.toUpperCase() &&
-						$("input[type='checkbox'][name='comparisonFields'][value='Security Controls']").prop("checked") 
-					){
+					
+					if( !csts.models['Scans'].compareVals('poam',poamTab,'C'+poamRow, this.control) &&  $.grep( fields, function(n,i){ return n.value == 'Security Controls';}).length > 0 ){
 						csts.controllers.Scans.viewModels.comparison.push({
+							guid   : csts.utils.guid(),
 							vulnId : this.vulnId,
-							type   : 'Security Control',
+							type   : 'Security Controls',
 							rarRow : this.row,
 							rarVal : this.control,
 							poamRow : poamRow,
-							poamVal : csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['C'+poamRow].v
+							poamVal : csts.models['Scans'].getVal('poam',poamTab,'C'+poamRow)
 						});
 					}
-
-					if(
-						typeof csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['M'+poamRow] != 'undefined' &&
-						csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['M'+poamRow].v.toUpperCase().indexOf( this.source.toUpperCase() ) > 0 &&
-						$("input[type='checkbox'][name='comparisonFields'][value='Source']").prop("checked") 
-					){
+					
+					if( !csts.models['Scans'].compareVals('poam',poamTab,'M'+poamRow, this.source) &&  $.grep( fields, function(n,i){ return n.value == 'Source';}).length > 0 ){
 						csts.controllers.Scans.viewModels.comparison.push({
+							guid   : csts.utils.guid(),
 							vulnId : this.vulnId,
 							type   : 'Source',
 							rarRow : this.row,
 							rarVal : this.source,
 							poamRow : poamRow,
-							poamVal : csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['M'+poamRow].v
+							poamVal : csts.models['Scans'].getVal('poam',poamTab,'M'+poamRow)
 						});
 					}
+					
 
 					if(
-						typeof csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['F'+poamRow] != 'undefined' &&
-						this.rawRisk.toUpperCase().replace('CAT','') != csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['F'+poamRow].v.toUpperCase() &&
-						$("input[type='checkbox'][name='comparisonFields'][value='Raw Risk']").prop("checked") 
+						!csts.models['Scans'].compareVals('poam',poamTab,'F'+poamRow, this.rawRisk) &&
+						this.rawRisk.toUpperCase().replace('CAT','') != csts.models['Scans'].getVal('poam',poamTab,'F'+poamRow) &&
+						$.grep( fields, function(n,i){ return n.value == 'Raw Risk';}).length > 0
 					){
 						csts.controllers.Scans.viewModels.comparison.push({
+							guid   : csts.utils.guid(),
 							vulnId : this.vulnId,
 							type   : 'Raw Risk',
 							rarRow : this.row,
 							rarVal : this.rawRisk,
 							poamRow : poamRow,
-							poamVal : csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['F'+poamRow].v
+							poamVal : csts.models['Scans'].getVal('poam',poamTab,'F'+poamRow)
 						});
 					}
 
 					if(
-						typeof csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['H'+poamRow] != 'undefined' &&
-						this.residualRisk.toUpperCase().replace('CAT','') != csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['H'+poamRow].v.toUpperCase() &&
-						$("input[type='checkbox'][name='comparisonFields'][value='Residual Risk']").prop("checked") 
+						!csts.models['Scans'].compareVals('poam',poamTab,'H'+poamRow, this.residualRisk) &&
+						this.residualRisk.toUpperCase().replace('CAT','') != csts.models['Scans'].getVal('poam',poamTab,'H'+poamRow) &&
+						$.grep( fields, function(n,i){ return n.value == 'Residual Risk';}).length > 0
 					){
 						csts.controllers.Scans.viewModels.comparison.push({
+							guid   : csts.utils.guid(),
 							vulnId : this.vulnId,
 							type   : 'Residual Risk',
 							rarRow : this.row,
 							rarVal : this.residualRisk,
 							poamRow : poamRow,
-							poamVal : csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['H'+poamRow].v
+							poamVal : csts.models['Scans'].getVal('poam',poamTab,'H'+poamRow)
 						});
 					}
 
 					if(
 						(	
-							typeof csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['B'+poamRow] != 'undefined' &&
-							($.trim(this.vulnId) + ' - ' + $.trim(this.description)).toUpperCase() != $.trim( csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['B'+poamRow].v ).toUpperCase() &&
-							('('+$.trim(this.vulnId)+')' + ' - ' + $.trim(this.description)).toUpperCase() != $.trim( csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['B'+poamRow].v ).toUpperCase() &&
-							$.trim( csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['B'+poamRow].v.toUpperCase() ).replace(/\W/g , '').indexOf(
+							!csts.models['Scans'].compareVals('poam',poamTab,'B'+poamRow, this.description) &&
+							($.trim(this.vulnId) + ' - ' + $.trim(this.description)).toUpperCase() != $.trim( csts.models['Scans'].getVal('poam',poamTab,'B'+poamRow) ).toUpperCase() &&
+							('('+$.trim(this.vulnId)+')' + ' - ' + $.trim(this.description)).toUpperCase() != $.trim( csts.models['Scans'].getVal('poam',poamTab,'B'+poamRow) ).toUpperCase() &&
+							$.trim( csts.models['Scans'].getVal('poam',poamTab,'B'+poamRow).toUpperCase() ).replace(/\W/g , '').indexOf(
 								this.description.toUpperCase().replace(/\W/g , '')
 							) == -1
 						) &&
-						$("input[type='checkbox'][name='comparisonFields'][value='Description']").prop("checked") 
+						$.grep( fields, function(n,i){ return n.value == 'Residual Risk';}).length > 0
 					){
 						csts.controllers.Scans.viewModels.comparison.push({
+							guid   : csts.utils.guid(),
 							vulnId : this.vulnId,
 							type   : 'Description',
 							rarRow : this.row,
 							rarVal : this.description,
 							poamRow : poamRow,
-							poamVal : csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['B'+poamRow].v
+							poamVal : csts.models['Scans'].getVal('poam',poamTab,'B'+poamRow)
 						});
 					}
 
 					if(
 						(	
-							typeof csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['G'+poamRow] != 'undefined' &&
-							( csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['G'+poamRow].v.toUpperCase() ).replace(/\W/g , '').indexOf(
-							'' + this.mitigation.toUpperCase().replace(/\W/g , '')
+							!csts.models['Scans'].compareVals('poam',poamTab,'G'+poamRow, this.mitigation) &&
+							(csts.models['Scans'].getVal('poam',poamTab,'G'+poamRow).toUpperCase() ).replace(/\W/g , '').indexOf(
+								'' + this.mitigation.toUpperCase().replace(/\W/g , '')
 							) == -1
 						) &&
-						$("input[type='checkbox'][name='comparisonFields'][value='Mitigations']").prop("checked") 
+						$.grep( fields, function(n,i){ return n.value == 'Mitigations';}).length > 0
 					){
 						csts.controllers.Scans.viewModels.comparison.push({
+							guid   : csts.utils.guid(),
 							vulnId : this.vulnId,
 							type   : 'Mitigation',
 							rarRow : this.row,
 							rarVal : this.mitigation,
 							poamRow : poamRow,
-							poamVal : csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['G'+poamRow].v
+							poamVal : csts.models['Scans'].getVal('poam',poamTab,'G'+poamRow)
 						});
 					}
 
 					if(
 						(	
-							typeof csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['O'+poamRow] != 'undefined' &&
-							( csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['O'+poamRow].v.toUpperCase() ).replace(/\W/g , '').indexOf(
-							'' + this.comment.toUpperCase().replace(/\W/g , '')
+							!csts.models['Scans'].compareVals('poam',poamTab,'O'+poamRow, this.comment) &&
+							( csts.models['Scans'].getVal('poam',poamTab,'O'+poamRow).toUpperCase() ).replace(/\W/g , '').indexOf(
+								'' + this.comment.toUpperCase().replace(/\W/g , '')
 							) == -1
 						) &&
-						$("input[type='checkbox'][name='comparisonFields'][value='Comments']").prop("checked") 
+						$.grep( fields, function(n,i){ return n.value == 'Comments';}).length > 0
 					){
 						csts.controllers.Scans.viewModels.comparison.push({
+							guid   : csts.utils.guid(),
 							vulnId : this.vulnId,
 							type   : 'Comment',
 							rarRow : this.row,
 							rarVal : this.comment,
 							poamRow : poamRow,
-							poamVal : csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['O'+poamRow].v
+							poamVal : csts.models['Scans'].getVal('poam',poamTab,'O'+poamRow)
 						});
 					}
 				}
@@ -288,6 +243,7 @@ csts.models['Scans'] = {
 			if(!found){
 				if( this.status != 'Completed'){
 					csts.controllers.Scans.viewModels.comparison.push({
+						guid   : csts.utils.guid(),
 						vulnId : this.vulnId,
 						type   : 'Missing from POAM',
 						rarRow : this.row,
@@ -302,49 +258,22 @@ csts.models['Scans'] = {
 		//see if anything is in the POAM, but not in the rar
 		var $items = [];
 		var poamRow = 8;
-		while(poamRow < 3000 && 
-			(
-				 typeof csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['B'+poamRow] != 'undefined' &&
-				(typeof csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['B'+poamRow] != 'undefined' || csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['B'+poamRow].v != '' ) &&
-				(typeof csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['N'+poamRow] != 'undefined' || csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['N'+poamRow].v != '' )
-			)
-		){
-			if(
-				typeof csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['N'+poamRow] != 'undefined' &&	csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['N'+poamRow].v != 'IV' &&
-				typeof csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['B'+poamRow] != 'undefined' && csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['B'+poamRow].v != '' 				
-			){
-				
-				var vulnId = '';
-				if(typeof csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['M'+poamRow] != 'undefined'){
-					vulnId = csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['M'+poamRow].v
-					if( vulnId.indexOf("Vuln ID:") > 0){
-						
-						var temp = vulnId.split("\n");
-						$.each(temp, function(i,item){
-							i = item.split(":")
-							if( $.trim(i[0]) == "Vuln ID"  && $.trim(i[1]) != ""){
-								vulnId = $.trim(i[1]);
-							}
-							if( $.trim(i[0]) == "Plugin ID"  && $.trim(i[1]) != ""){
-								vulnId = $.trim(i[1]);
-							}
-						});
-						console.log(vulnId);
-					}
-				}
+		while(poamRow < 3000 &&  !csts.models['Scans'].isBlank('poam',poamTab,[ 'B'+poamRow, 'N'+poamRow]) ){
+			if( csts.models['Scans'].getVal('poam',poamTab,'F'+poamRow) != 'IV'){
+				var vulnId = csts.models['Scans'].getVulnId( 'poam',poamTab,'M'+rarRow);
 
 				$items.push( 
 					{
 						row					: poamRow,
 						vulnId				: vulnId,
-						description			: typeof csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['B'+poamRow] != 'undefined' ? csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['B'+poamRow].v : '', 	
-						control 			: typeof csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['C'+poamRow] != 'undefined' ? csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['B'+poamRow].v : '', 	
-						source  			: typeof csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['M'+poamRow] != 'undefined' ? csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['B'+poamRow].v : '', 	
-						testId 				: typeof csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['M'+poamRow] != 'undefined' ? csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['B'+poamRow].v : '', 	
-						rawRisk 			: typeof csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['F'+poamRow] != 'undefined' ? csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['B'+poamRow].v : '', 	
-						mitigation 			: typeof csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['H'+poamRow] != 'undefined' ? csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['B'+poamRow].v : '', 	
-						status 				: typeof csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['N'+poamRow] != 'undefined' ? csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['B'+poamRow].v : '', 	
-						comment 			: typeof csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['O'+poamRow] != 'undefined' ? csts.models['Scans'].workbooks['poam'].Sheets[$('#poamTabSel').val()]['B'+poamRow].v : '', 	
+						description			: csts.models['Scans'].getVal('poam',poamTab,'B'+poamRow),
+						control 			: csts.models['Scans'].getVal('poam',poamTab,'C'+poamRow),
+						source  			: csts.models['Scans'].getVal('poam',poamTab,'M'+poamRow),
+						testId 				: csts.models['Scans'].getVal('poam',poamTab,'M'+poamRow),
+						rawRisk 			: csts.models['Scans'].getVal('poam',poamTab,'F'+poamRow),
+						mitigation 			: csts.models['Scans'].getVal('poam',poamTab,'H'+poamRow),
+						status 				: csts.models['Scans'].getVal('poam',poamTab,'N'+poamRow),
+						comment 			: csts.models['Scans'].getVal('poam',poamTab,'O'+poamRow),
 					}
 				);
 			}
@@ -355,20 +284,8 @@ csts.models['Scans'] = {
 			rarRow = 8;
 			var found = false;
 
-			while(rarRow < 3000 && 
-				(
-					typeof csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['B'+rarRow] != 'undefined' ||
-					typeof csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['C'+rarRow] != 'undefined' ||
-					typeof csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['F'+rarRow] != 'undefined' ||
-					typeof csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['M'+rarRow] != 'undefined' ||
-					typeof csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['N'+rarRow] != 'undefined'
-				)
-			){
-				if( typeof csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['C'+rarRow] != 'undefined' && 
-					csts.models['Scans'].workbooks['rar'].Sheets[$('#rarTabSel').val()]['C'+rarRow].v.toUpperCase().indexOf( this.vulnId.toUpperCase() ) >= 0
-				){
-					// console.log(this.vulnId);
-					// console.log(rarRow);
+			while(rarRow < 3000 &&  !csts.models['Scans'].isBlank('poam',poamTab,[ 'B'+rarRow, 'C'+rarRow, 'F'+rarRow,'M'+rarRow, 'N'+rarRow]) ){
+				if( !csts.models['Scans'].compareVals('rar',rarTab,'C'+rarRow, this.vulnId) ){
 					found = true;
 				}
 				rarRow++;
@@ -377,6 +294,7 @@ csts.models['Scans'] = {
 			if(!found){
 				if( this.status != 'Completed'){
 					csts.controllers.Scans.viewModels.comparison.push({
+						guid   : csts.utils.guid(),
 						vulnId : this.vulnId,
 						type   : 'Missing from RAR',
 						rarRow : '',
@@ -388,8 +306,6 @@ csts.models['Scans'] = {
 			}
 		});
 
-
 		console.log(csts.controllers['Scans'].viewModels.comparison);
-		
 	}
 };

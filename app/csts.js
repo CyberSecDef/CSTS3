@@ -30,11 +30,8 @@ var csts = {
 			csts.plugins.fs.readdirSync('./app/models/'), 
 			function(index, item){csts.require('./models/' + item)}
 		);
-
-		
 		
 		csts.db.config = new csts.plugins.Datastore({ filename: 'app/database/config.db', autoload: true });		
-		
 		csts.db.config.count( { 'viewCount' : { $gt : 0 } }, function(err, count){
 			if(count == 0){
 				csts.db.config.insert({viewCount : 1});	
@@ -100,28 +97,27 @@ var csts = {
 
 			//this function calls the routing without actually navigating away
 			csts.plugins.win.on('navigation', function(frame, url, policy){
+				$('#main-center-col *').remove();
+				
 				window.onbeforeunload = null; 
 				policy.ignore();
 				req = url.replace(location.origin,'')
-				console.log("Request: " + req);
-				window.csts.router.navigate(req);
+				console.log("Request: '" + req + "'");
+				$('#main-center-col').html('');
+				csts.router.navigate(req);
+				
 				return false;
 			});
 
-			csts.controllers['Home'].index();	
+			csts.controllers['Home'].index();
 			
 			//ADDED THIS FOR DEBUGGING PURPOSES
 			csts.controllers['Scans'].compare();	
+			
+			
+			
 			$('footer.footer div div.status-bar-l').text( 'You are running on ' + csts.plugins.os.platform());
 
-			//heart beat for automatic value updates (observable in the class, variable name in the 'data-bind').  
-			//might make this more robust later
-			// var heartBeat = window.setInterval( function(){
-				// $.each( $('.observable'), function(){
-					// $(this).text( csts.plugins.ejs.cache.get( $(this).data('bind') ) );
-				// });
-			// }, 1000);
-			
 		})
 	},
 	require : function(script){
@@ -172,6 +168,22 @@ var csts = {
 	router 		: {},
 	models 		: {},
 	controllers : {},
+	utils		: {
+		toggleHosts	: function(){
+			if(	$('#main-right-col').is(':visible') ){
+				$('#main-right-col').hide()
+				$('#main-center-col').removeClass('col-10').addClass('col-12')
+			}else{
+				$('#main-right-col').show()
+				$('#main-center-col').removeClass('col-12').addClass('col-10')
+			}
+		},
+		guid : function(){
+		  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+			(c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+		  );
+		}
+	},
 	plugins : {
 		'crypto'	: require('crypto'),
 		'dns'		: require('dns'),

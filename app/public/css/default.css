@@ -59,6 +59,8 @@ div#main-right-col{
 div.hostManual{
 	font-size:8pt;
 	height:150px;
+	width:100%;
+	min-width:100%;
 	border-bottom:1px solid #999;
 }
 
@@ -84,4 +86,14 @@ div.hostTree span.daredevel-tree-label{
 h3 a{
 	color :#000;
 	text-decoration: underline !important;
+}
+
+.table-small-text{
+	table-layout: fixed; 
+	font-size:.8em;
+}
+
+.span-info {
+	background: #17a2b8;
+	color:#fff;
 }

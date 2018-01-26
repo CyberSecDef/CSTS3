@@ -1,10 +1,10 @@
-<div class="hostManual resizable"><textarea placeholder="Manual Host Entry (comma separated)" style="width:100%;height:100%;resize: none;"></textarea></div>
+<div class="hostManual resizable"><textarea placeholder="Manual Host Entry (comma separated)" style="min-width:100%; width:100%;height:100%;resize: none;"></textarea></div>
 <div id="tree" class="hostTree resizeable"></div>
 <script>
 	$(document).ready(function() {
 		$('#tree').css('height', (window.innerHeight - 120 - $('div.hostManual').css('height').replace('px','')) + 'px'  );
 
-        var hostTree = $('#tree').tree({ 
+        var hostTree = $('#tree').tree({
 			checkbox:true, 
 			selectable:true,
 			collapseEffect: null,

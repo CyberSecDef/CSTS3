@@ -8,6 +8,7 @@ csts.controllers['Home'] = ({
 				console.log(err);
 			}
 			$('#main-center-col').html(str);
+			
 		}) 
 	}
 	
