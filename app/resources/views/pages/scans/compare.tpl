@@ -6,16 +6,6 @@
 				This is the POAM/RAR Management Tool.	This tool will allow you to execute multiple processes on your Excel based POAM's and RAR's.	Please select the applicable files below.
 			</div>
 			<br />
-
-The name is <input type="text" data-bind="value: personName" id="myBinding"/>
-
-
-<script>
-$(document).ready(function(){
-	ko.applyBindings( csts.controllers['Scans'].viewModels.myViewModel, document.getElementById('#myBinding') );
-});
-</script>			
-			
 			
 			<h3>
 				<a data-toggle="" href="#scans-compare-files" role="button" aria-expanded="false" aria-controls="scan-compare-files" class="no-decoration" id="scans-compare-files-link">
@@ -122,12 +112,53 @@ $(document).ready(function(){
 					Results
 				</a>
 			</h3>
-			
+			<div class="row">
+				<div class="card">
+					<div class="card-body" style="padding-top:10px;">
+						<table class="table table-sm table-striped" style="table-layout: fixed; font-size:10px;" id="scans-compare-results">
+							<thead>
+								<tr>
+									<th style="width: 7% !important;">#</th>
+									<th style="width: 12% !important;">Vuln Id</th>
+									<th style="width: 15% !important;">Type</th>
+									<th style="width: 7% !important;">RAR Row</th>
+									<th style="width: 20% !important;">RAR Value</th>
+									<th style="width: 12% !important;">Actions</th>
+									<th style="width: 7% !important;">POAM Row</th>
+									<th style="width: 20% !important;">POAM Value</th>
+								</tr>
+							</thead>
+							<tbody data-bind="foreach: comparison">
+								<tr>
+									<td></td>
+									<td data-bind="text: vulnId"></td>
+									<td data-bind="text: type"></td>
+									<td data-bind="text: rarRow"></td>
+									<td data-bind="text: rarVal"></td>
+									<td></td>
+									<td data-bind="text: poamRow"></td>
+									<td data-bind="text: poamVal"></td>
+								</tr>
+							</tbody>
+						</table>
+
+					</div>
+				</div>
+
+			</div>
+
+	
 		</main>
 	</div>
 </div>
 
 <script>
+
+$(document).ready(function(){
+	ko.applyBindings({ comparison: csts.controllers.Scans.viewModels.comparison });
+});
+
+
 	$("#fileRar, #filePoam").on("change",function(){
 		if($('#fileRar').val().trim() != '' && $('#filePoam').val().trim() != ''){
 			csts.controllers['Scans'].parseComparisonFiles();
@@ -135,7 +166,7 @@ $(document).ready(function(){
 	});
 	
 	$('button#scans-comparison-execute-btn').on('click',function(){
-		console.log(1);
+		$('#scans-compare-results tbody tr').remove();
 		csts.controllers['Scans'].executeComparison();
 	});
 </script>

@@ -1,6 +1,7 @@
 csts.controllers['Scans'] = ({
 	name : 'Scans',
 	viewModels : {
+		comparison : ko.observableArray(),
 		myViewModel : {
 			personName : ko.observable('Bob'),
 			personAge  : 123,
