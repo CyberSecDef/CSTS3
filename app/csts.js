@@ -1,6 +1,9 @@
 var csts = {
 	init : function(){
-		nw.Window.get().showDevTools()
+		if(nw.App.manifest.environment == 'developmental'){
+			nw.Window.get().showDevTools()
+		}
+		
 		require('knockout')
 		csts.require('../node_modules/knockout/build/output/knockout-latest.js');
 		
@@ -67,7 +70,7 @@ var csts = {
 						f = val.substring(val.indexOf('@')+1);
 						
 						csts.router.on(name, csts.controllers[c][f] );
-						console.log('Created router for ' + name);
+						dbg('Created router for ' + name);
 						break;
 					case 'function' :
 						console.log("creating function call to " + name);
@@ -115,8 +118,12 @@ var csts = {
 			csts.controllers['Scans'].compare();	
 			
 			
+
+			$('footer.footer div div.status-bar-l').text( 'You are running on ' + csts.plugins.os.type());
 			
-			$('footer.footer div div.status-bar-l').text( 'You are running on ' + csts.plugins.os.platform());
+			csts.plugins.isElevated().then(elevated => {
+				$('footer.footer div div.status-bar-r').html( ( elevated ? '<i class="fas fa-user-secret"></i>' : '<i class="fas fa-user"></i>' ) );
+			});
 
 		})
 	},
@@ -182,6 +189,11 @@ var csts = {
 		  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
 			(c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
 		  );
+		},
+		debug : function(msg){
+			if(nw.App.manifest.environment == 'developmental'){
+				console.log(msg);
+			}
 		}
 	},
 	plugins : {
@@ -189,6 +201,7 @@ var csts = {
 		'dns'		: require('dns'),
 		'fs' 		: require('fs'),
 		'ejs'		: require('ejs'),
+		'isElevated': require('is-elevated'),
 		'os'		: require('os'),
 		'moment'	: require('moment'),
 		'navigo'	: require('navigo'),
@@ -204,4 +217,6 @@ var csts = {
 	}
 
 };
+///shortcuts
+dbg = function(msg){ csts.utils.debug(msg);}
 csts.init();

@@ -101,29 +101,7 @@ csts.controllers['Scans'] = ({
 					)
 				)
 				
-				
-				csts.models['Scans'].workbooks['rar'].Sheets[ $('#rarTabSel').val().trim() ]['!cols'] = [
-    {wch:15.43},
-    {wch:27.86},
-    {wch:83.43},
-    {wch:27.86},
-	{wch:33.57},
-	{wch:13.57},
-	{wch:15.43},
-	{wch:19.29},
-	{wch:39.29},
-	{wch:35.43},
-	{wch:27.86},
-	{wch:20.29},
-	{wch:14.57},
-	{wch:32.57},
-	{wch:32.57}
-];
-				
-				
 				csts.plugins.xlsx.writeFile( csts.models['Scans'].workbooks['rar'],  $('#fileRar').val().trim(), { bookSST : true, bookType : 'xlsx', compression : true} );
-				
-				
 				
 				console.log( 
 					csts.models['Scans'].getVal('rar', $('#rarTabSel').val(), (csts.models['Scans'].rarFields[ fields.type ]) + fields.rarRow)

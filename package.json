@@ -3,6 +3,7 @@
   "version": "3.0.0a",
   "description": "A Node/JS based tool suite for hardening windows based computers",
   "license": "UNLICENSED",
+  "environment": "developmental",
   "private": true,
   "repository": {
     "type": "git",
@@ -19,6 +20,7 @@
     "datatables.net": "^1.10.16",
     "datatables.net-dt": "^1.10.16",
     "ejs": "^2.5.7",
+    "is-elevated": "^2.0.1",
     "jquery": "^3.2.1",
     "jquery-ui": "^1.12.1",
     "knockout": "^3.5.0-beta",

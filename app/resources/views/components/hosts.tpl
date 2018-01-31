@@ -2,7 +2,7 @@
 <div id="tree" class="hostTree resizeable"></div>
 <script>
 	$(document).ready(function() {
-		$('#tree').css('height', (window.innerHeight - 120 - $('div.hostManual').css('height').replace('px','')) + 'px'  );
+		$('#tree').css('height', (window.innerHeight - 80 - $('div.hostManual').css('height').replace('px','')) + 'px'  );
 
         var hostTree = $('#tree').tree({
 			checkbox:true, 
@@ -61,12 +61,12 @@
 			minHeight:150,
 			maxHeight:300,
 			stop : function( event, ui){
-				$('#tree').css('height', window.innerHeight - 120 - ui.size.height);
+				$('#tree').css('height', window.innerHeight - 80 - ui.size.height);
 			}
 		});
 
 		$(window).on('resize',function(){
-			$('#tree').css('height', (window.innerHeight - 120 - $('div.hostManual').css('height').replace('px','')) + 'px'  );
+			$('#tree').css('height', (window.innerHeight - 80 - $('div.hostManual').css('height').replace('px','')) + 'px'  );
 		});
 
 		var i = 0;
