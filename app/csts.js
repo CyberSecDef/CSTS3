@@ -1,11 +1,31 @@
 var csts = {
 	init : function(){
+		new csts.plugins.cron('1-60/10 * * * * *', 
+			function(){
+				csts.plugins.si.mem(function(data){ 
+					p = parseFloat( data.used / data.total )
+					$('#memChart').css('background', ( '#' + Math.ceil( ( 0xFF * p)).toString(16) + Math.ceil( 0xFF - ( 0xFF * p)).toString(16) + '00' ) );
+				});
+			}, function(){},true
+		);
+		
+		new csts.plugins.cron('1-60/10 * * * * *', 
+			function(){
+				csts.plugins.cpu.usagePercent(function(err, p, seconds) {
+					$('#cpuChart').css('background', ( '#' + Math.ceil( ( 0xFF * (p/99))).toString(16) + Math.ceil( 0xFF - ( 0xFF * (p/99))).toString(16) + '00' ) );
+				});
+				
+			}, function(){},true
+		);
+
+	
 		if(nw.App.manifest.environment == 'developmental'){
 			nw.Window.get().showDevTools()
 		}
 		
 		require('knockout')
 		csts.require('../node_modules/knockout/build/output/knockout-latest.js');
+		csts.require('../node_modules/chart.js/dist/Chart.bundle.min.js');
 		
 		//include library files.  These are individually listed for ordering purposes
 		$.each([
@@ -117,16 +137,13 @@ var csts = {
 			//ADDED THIS FOR DEBUGGING PURPOSES
 			csts.controllers['Scans'].compare();	
 			
-			
-
-			$('footer.footer div div.status-bar-l').text( 'You are running on ' + csts.plugins.os.type());
-			
 			csts.plugins.isElevated().then(elevated => {
 				$('footer.footer div div.status-bar-r').html( ( elevated ? '<i class="fas fa-user-secret"></i>' : '<i class="fas fa-user"></i>' ) );
 			});
 
 		})
 	},
+	startTime : (new Date().getTime() ),
 	require : function(script){
 		$.ajax({
 			url: script,
@@ -198,6 +215,8 @@ var csts = {
 	},
 	plugins : {
 		'crypto'	: require('crypto'),
+		'cpu'		: require('cpu-stat'),
+		'cron'		: require('cron').CronJob,
 		'dns'		: require('dns'),
 		'fs' 		: require('fs'),
 		'ejs'		: require('ejs'),
@@ -212,6 +231,7 @@ var csts = {
 		'win'		: nw.Window.get(),
 		'reload'	: {},
 		'shell'		: require('node-powershell'),
+		'si'		: require('systeminformation'),
 		'xlsx'		: require('xlsx'),	
 		'Datastore' : require('nedb'),
 	}

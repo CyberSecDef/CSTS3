@@ -1,7 +1,7 @@
 csts.controllers['Scans'] = ({
 	name : 'Scans',
 	viewModels : {
-		comparison : ko.observableArray()
+		comparison : ko.observableArray().extend({notify: 'always'})
 	},
 	compare : function(){
 		console.log('executing Scans@compare');
@@ -101,19 +101,26 @@ csts.controllers['Scans'] = ({
 					)
 				)
 				
-				csts.plugins.xlsx.writeFile( csts.models['Scans'].workbooks['rar'],  $('#fileRar').val().trim(), { bookSST : true, bookType : 'xlsx', compression : true} );
-				
-				console.log( 
-					csts.models['Scans'].getVal('rar', $('#rarTabSel').val(), (csts.models['Scans'].rarFields[ fields.type ]) + fields.rarRow)
-					
-				);
-				
-				
 				// writeFile
-				
+				csts.plugins.xlsx.writeFile( csts.models['Scans'].workbooks['rar'],  $('#fileRar').val().trim(), { bookSST : true, bookType : 'xlsx', compression : true} );
+					
 				//update viewModels
+				sel = ko.utils.arrayFilter(csts.controllers.Scans.viewModels.comparison(), function(i) { return i.guid == guid; })[0]
+				sel.rarVal = sel.poamVal
+				
+			
+				// console.log(sel);
+				// console.log( 
+					// csts.models['Scans'].getVal('rar', $('#rarTabSel').val(), (csts.models['Scans'].rarFields[ fields.type ]) + fields.rarRow)
+					
+				// );
 				
 				//update UI
+				$("table#scans-compare-results tbody tr[data-guid='" + guid + "'] td:nth-child(5)").text( fields.poamVal );
+				
+				
+				
+				
 				break;
 			case 'merge' :
 				break;

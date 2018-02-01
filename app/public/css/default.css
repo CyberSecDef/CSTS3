@@ -51,18 +51,56 @@ div#main-right-col{
 	border-top:1px solid #666;
 }
 
-.footer > .container, .footer > .container-fluid {
-  padding-right: 5px;
-  padding-left: 5px;
+.footer > .container-full{
+  padding-right: 0px;
+  padding-left: 0px;
+  display:flex; 
+  width:100%;
 }
 
 .footer .status-bar-l{
 	border-right:1px solid black;
+	width:81px;
+	padding:0px;
+	margin:0px;
+	float:left;
+}
+
+.footer .status-bar-m{
+	flex-grow:1;
+	padding:0px 0px 0px 10px;
+	margin:0px;
+}
+
+div.chart{
+	background:white;
+	padding:0;
+	margin:0;
+	text-align:center;
+	font-weight:bold;
+	
+	border-right:1px solid black;
+}
+
+.footer .status-bar-l div.chart{
+	display:inline; 
+	width:40px; 
+	margin:0px; 
+	padding:0px;
+}
+
+.footer .status-bar-l div{
+	padding:0px;
+	margin:0px;
 }
 
 .footer .status-bar-r{
 	text-align:right;
-	
+	border-left:1px solid black;
+	width:120px;
+	padding:0px 15px 0px 0px;
+	margin:0px;
+	float:right;	
 }
 
 div.hostManual{

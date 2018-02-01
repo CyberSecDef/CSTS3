@@ -1,9 +1,13 @@
 <footer class="footer">
-	<div class="container-fluid">
-		<div class="row">
-			<div class="col status-bar-l"></div>
-			<div class="col-8 status-bar-m"></div>
-			<div class="col status-bar-r"></div>
+	<div class="container-full">
+		<div class="status-bar-l">
+			<div id="cpuChart" class="chart" style="float:left;"> C </div>
+			<div id="memChart" class="chart" style="float:right;"> M</div>
 		</div>
+		<div class="status-bar-m">Status:</div>
+		<div class="status-bar-r"></div>
+		
 	</div>
 </footer>
+
+
