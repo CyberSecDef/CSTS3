@@ -66,7 +66,8 @@ csts.models['Scans'] = {
 		var rowIndex = 0;
 		var rarRow = 0;
 		var $items = [];
-				
+		var resRow = 0;
+		
 		rarRow = 8;
 		while(rarRow < 3000 &&  ( !csts.models['Scans'].isBlank('rar',rarTab,[ 'A'+rarRow, 'b'+rarRow]) ) ){
 			if(	!csts.models['Scans'].isBlank('rar',rarTab,['F'+rarRow, 'B'+rarRow])  && csts.models['Scans'].workbooks['rar'].Sheets[rarTab]['F'+rarRow].v != 'IV'  ){
@@ -97,6 +98,7 @@ csts.models['Scans'] = {
 		}
 		
 		
+		
 		//all rar foundings are found, time to search the poam
 		var results = [];
 		$.each($items, function(){
@@ -109,9 +111,11 @@ csts.models['Scans'] = {
 
 					if( !csts.models['Scans'].compareVals('poam',poamTab,'N'+poamRow, this.status) &&  $.grep( fields, function(n,i){ return n.value == 'Status';}).length > 0 ){
 						csts.controllers.Scans.viewModels.comparison.push({
+							rowId  : ++resRow,
 							guid   : csts.utils.guid(),
 							vulnId : this.vulnId,
 							type   : 'Status',
+							mismatch : 'STATUS',
 							rarRow : this.row,
 							rarVal : this.status,
 							poamRow : poamRow,
@@ -121,9 +125,11 @@ csts.models['Scans'] = {
 					
 					if( !csts.models['Scans'].compareVals('poam',poamTab,'C'+poamRow, this.control) &&  $.grep( fields, function(n,i){ return n.value == 'Security Controls';}).length > 0 ){
 						csts.controllers.Scans.viewModels.comparison.push({
+							rowId  : ++resRow,
 							guid   : csts.utils.guid(),
 							vulnId : this.vulnId,
 							type   : 'Security Controls',
+							mismatch : 'CONTROL',
 							rarRow : this.row,
 							rarVal : this.control,
 							poamRow : poamRow,
@@ -133,9 +139,11 @@ csts.models['Scans'] = {
 					
 					if( !csts.models['Scans'].compareVals('poam',poamTab,'M'+poamRow, this.source) &&  $.grep( fields, function(n,i){ return n.value == 'Source';}).length > 0 ){
 						csts.controllers.Scans.viewModels.comparison.push({
+							rowId  : ++resRow,
 							guid   : csts.utils.guid(),
 							vulnId : this.vulnId,
 							type   : 'Source',
+							mismatch : 'SOURCE',
 							rarRow : this.row,
 							rarVal : this.source,
 							poamRow : poamRow,
@@ -150,9 +158,11 @@ csts.models['Scans'] = {
 						$.grep( fields, function(n,i){ return n.value == 'Raw Risk';}).length > 0
 					){
 						csts.controllers.Scans.viewModels.comparison.push({
+							rowId  : ++resRow,
 							guid   : csts.utils.guid(),
 							vulnId : this.vulnId,
 							type   : 'Raw Risk',
+							mismatch : 'RAWRISK',
 							rarRow : this.row,
 							rarVal : this.rawRisk,
 							poamRow : poamRow,
@@ -166,9 +176,11 @@ csts.models['Scans'] = {
 						$.grep( fields, function(n,i){ return n.value == 'Residual Risk';}).length > 0
 					){
 						csts.controllers.Scans.viewModels.comparison.push({
+							rowId  : ++resRow,
 							guid   : csts.utils.guid(),
 							vulnId : this.vulnId,
 							type   : 'Residual Risk',
+							mismatch : 'RESIDUALRISK',
 							rarRow : this.row,
 							rarVal : this.residualRisk,
 							poamRow : poamRow,
@@ -188,9 +200,11 @@ csts.models['Scans'] = {
 						$.grep( fields, function(n,i){ return n.value == 'Residual Risk';}).length > 0
 					){
 						csts.controllers.Scans.viewModels.comparison.push({
+							rowId  : ++resRow,
 							guid   : csts.utils.guid(),
 							vulnId : this.vulnId,
 							type   : 'Description',
+							mismatch : 'DESCRIPTION',
 							rarRow : this.row,
 							rarVal : this.description,
 							poamRow : poamRow,
@@ -208,9 +222,11 @@ csts.models['Scans'] = {
 						$.grep( fields, function(n,i){ return n.value == 'Mitigations';}).length > 0
 					){
 						csts.controllers.Scans.viewModels.comparison.push({
+							rowId  : ++resRow,
 							guid   : csts.utils.guid(),
 							vulnId : this.vulnId,
 							type   : 'Mitigation',
+							mismatch : 'MITIGATION',
 							rarRow : this.row,
 							rarVal : this.mitigation,
 							poamRow : poamRow,
@@ -228,9 +244,11 @@ csts.models['Scans'] = {
 						$.grep( fields, function(n,i){ return n.value == 'Comments';}).length > 0
 					){
 						csts.controllers.Scans.viewModels.comparison.push({
+							rowId  : ++resRow,
 							guid   : csts.utils.guid(),
 							vulnId : this.vulnId,
 							type   : 'Comment',
+							mismatch : 'COMMENT',
 							rarRow : this.row,
 							rarVal : this.comment,
 							poamRow : poamRow,
@@ -243,9 +261,11 @@ csts.models['Scans'] = {
 			if(!found){
 				if( this.status != 'Completed'){
 					csts.controllers.Scans.viewModels.comparison.push({
+						rowId  : ++resRow,
 						guid   : csts.utils.guid(),
 						vulnId : this.vulnId,
 						type   : 'Missing from POAM',
+						mismatch : 'POAM',
 						rarRow : this.row,
 						rarVal : this.description,
 						poamRow : '',
@@ -294,9 +314,11 @@ csts.models['Scans'] = {
 			if(!found){
 				if( this.status != 'Completed'){
 					csts.controllers.Scans.viewModels.comparison.push({
+						rowId  : ++resRow,
 						guid   : csts.utils.guid(),
 						vulnId : this.vulnId,
 						type   : 'Missing from RAR',
+						mismatch : 'RAR',
 						rarRow : '',
 						rarVal : '',
 						poamRow : this.row,

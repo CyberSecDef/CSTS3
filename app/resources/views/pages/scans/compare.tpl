@@ -125,7 +125,24 @@
 					</div>
 					<div id="scans-compare-results" class="collapse" aria-labelledby="headingFour" data-parent="#accordion">
 						<div class="card-body">
-							<table class="table table-sm table-striped table-small-text" id="scans-compare-results">
+							
+							<form class="form-inline float-right">
+								<div class="form-group mb-2">
+									<div class="btn-group" role="group">
+										<button class="btn btn-outline-primary" type="button" id="exportDOC">
+											<i class="fas fa-file-word"></i>
+										</button>
+										<button class="btn btn-outline-danger" type="button" id="exportPDF">
+											<i class="fas fa-file-pdf"></i>
+										</button>
+										<button class="btn btn-outline-success" type="button" id="exportCSV">
+											<i class="fas fa-file-excel"></i>
+										</button>
+									</div>
+								</div>
+							</form>
+
+							<table class="table table-sm table-striped table-small-text data-table" id="scans-compare-results">
 							<thead>
 								<tr>
 									<th style="width: 7% !important;">#</th>
@@ -139,8 +156,8 @@
 								</tr>
 							</thead>
 							<tbody data-bind="foreach: comparison" >
-								<tr data-bind="attr: { 'data-guid': guid }">
-									<td></td>
+								<tr data-bind="attr: { 'data-guid': guid, 'data-mismatch': mismatch }">
+									<td data-bind="text: rowId"></td>
 									<td data-bind="text: vulnId"></td>
 									<td data-bind="text: type"></td>
 									<td data-bind="text: rarRow"></td>
@@ -169,6 +186,7 @@
 </div>
 
 <script>
+
 	$(document).ready(function(){
 		csts.controllers['Scans'].viewModels.comparison.removeAll();
 		$.each( $("*[data-bind]"), function(){ 
@@ -176,6 +194,7 @@
 		});
 		ko.applyBindings({ comparison: csts.controllers.Scans.viewModels.comparison }, $('table#scans-compare-results tbody')[0] );
 	});
+	
 	$(window).bind('beforeunload', function(){
 		$('#scans-compare-results tbody tr').remove();
 		ko.removeNode( csts.controllers['Scans'].viewModels.comparison ); 
@@ -189,7 +208,6 @@
 
 	$("#fileRar, #filePoam").on("change",function(){
 		$('label[for="'+$(this).attr('id')+'"]').text( csts.plugins.path.basename( $(this).val() ) );
-
 		if($('#fileRar').val().trim() != '' && $('#filePoam').val().trim() != ''){
 			csts.controllers['Scans'].parseComparisonFiles();
 		}
@@ -200,4 +218,56 @@
 		csts.controllers['Scans'].executeComparison(  $("input:checked[type='checkbox'][name='comparisonFields']").serializeArray() );
 		$('button.btn-compare-action').on('click', function(){ csts.controllers['Scans'].fieldMove( $(this) ); } );
 	});
+	
+	$('button#exportDOC').on('click',function(){
+		$results = $('#scans-compare-results')
+		$results.find('th').remove(':nth-child(6)');
+		$results.find('td').remove(':nth-child(6)');
+		csts.export.doc($results.html(), 'rarPoamComparison.doc')
+	});
+	
+	$('button#exportPDF').on('click',function(){
+		data = {};
+		data.styles = {
+			columnStyles : { 0: {columnWidth: 40}, 1: {columnWidth: 75}, 2: {columnWidth: 125}, 3: {columnWidth: 40}, 4: {columnWidth: 200}, 5: {columnWidth: 40}, 6: {columnWidth: 200}},
+			styles : { overflow : 'linebreak', fontSize : 8, lineWidth : 1} 
+		}
+		
+		data.columns = $("th",$("table#scans-compare-results")).not('th:nth-child(6)').map(function() {  return (this.innerText || this.textContent) }).get();
+		data.rows = [];
+		$.each( $("table#scans-compare-results tbody tr"), function(d,el){ 
+			data.rows.push( [ 
+				$(el).find('td:nth-child(1)').text(),
+				$(el).find('td:nth-child(2)').text(),
+				$(el).find('td:nth-child(3)').text(),
+				$(el).find('td:nth-child(4)').text(),
+				$(el).find('td:nth-child(5)').text(),
+				$(el).find('td:nth-child(7)').text(),
+				$(el).find('td:nth-child(8)').text()
+			] )
+		})
+		console.log(data);
+			
+		csts.export.pdf(data, 'rarPoamComparison.pdf')
+	});
+	
+	$('button#exportCSV').on('click',function(){
+		data = {};
+		data.columns = $("th",$("table#scans-compare-results")).not('th:nth-child(6)').map(function() {  return (this.innerText || this.textContent) }).get();
+		data.rows = [];
+		$.each( $("table#scans-compare-results tbody tr"), function(d,el){ 
+			data.rows.push( [ 
+				$(el).find('td:nth-child(1)').text(),
+				$(el).find('td:nth-child(2)').text(),
+				$(el).find('td:nth-child(3)').text(),
+				$(el).find('td:nth-child(4)').text(),
+				$(el).find('td:nth-child(5)').text(),
+				$(el).find('td:nth-child(7)').text(),
+				$(el).find('td:nth-child(8)').text()
+			] )
+		})
+		csts.export.csv(data, 'rarPoamComparison.csv')
+	});
+	
+	
 </script>

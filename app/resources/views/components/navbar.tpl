@@ -13,10 +13,10 @@
 						Home  
 					</a>
 					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
-						<a class="dropdown-item" href="#">Reports</a>
-						<a class="dropdown-item" href="#">Analytics</a>
+						<a class="dropdown-item" href="/Home">Home</a>
 						<div class="dropdown-divider"></div>
-						<a class="dropdown-item" href="#">Export</a>
+						<a class="dropdown-item" href="#">Reports</a>
+						<a class="dropdown-item" href="#">Dashboard</a>
 					</div>
 				</li>
 				
@@ -131,9 +131,6 @@
 						<div class="dropdown-divider"></div>
 						<a class="dropdown-item" href="#">Version <span class="badge badge-info"><%= nw.App.manifest.version %></span></a>
 						<a class="dropdown-item" href="#">View Count <span class="badge badge-success observable" id="viewCount" data-bind="value: viewCount"></span></a>
-						
-						
-						
 					</div>
 				</li>
 				

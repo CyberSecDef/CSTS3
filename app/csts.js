@@ -26,6 +26,8 @@ var csts = {
 		require('knockout')
 		csts.require('../node_modules/knockout/build/output/knockout-latest.js');
 		csts.require('../node_modules/chart.js/dist/Chart.bundle.min.js');
+		csts.require('../node_modules/jspdf/dist/jspdf.min.js');
+		csts.require('../node_modules/jspdf-autotable/dist/jspdf.plugin.autotable.min.js');
 		
 		//include library files.  These are individually listed for ordering purposes
 		$.each([
@@ -102,7 +104,6 @@ var csts = {
 
 			
 			csts.db.config.findOne({ 'viewCount' : { $gt : 0 } },function(err,res){ 
-				console.log(res.viewCount);
 				$('#viewCount').text( res.viewCount ); 
 				csts.plugins.ejs.cache.set('viewCount', res.viewCount);
 			});
@@ -192,7 +193,86 @@ var csts = {
 	router 		: {},
 	models 		: {},
 	controllers : {},
+	export		: {
+		doc	: function(content, filename){
+			var css= [];
+			for (var sheeti= 0; sheeti <  document.styleSheets.length; sheeti++) {
+				var sheet= document.styleSheets[sheeti];
+				var rules= ('cssRules' in sheet)? sheet.cssRules : sheet.rules;
+				if(rules){
+					for (var rulei= 0; rulei < rules.length; rulei++) {
+						var rule= rules[rulei];
+						if ('cssText' in rule)
+							css.push(rule.cssText);
+						else
+							css.push(rule.selectorText+' {\n'+rule.style.cssText+'\n}\n');
+					}
+				}
+			}
+			styles = css.join('\n');
+			csts.plugins.ejs.renderFile('app/resources/views/components/export/doc.tpl',{
+				'styles' 	: styles
+			},{},function(err,str){
+				var parser = new DOMParser()
+				el = parser.parseFromString(str, "text/xml");
+				$(el).find('body').append( content );
+				
+				csts.utils.blob('text/html', el.documentElement.outerHTML , filename)
+			}) ;
+		},
+		csv : function(data, filename){
+			var processRow = function (row) {
+				var finalVal = '';
+				for (var j = 0; j < row.length; j++) {
+					var innerValue = row[j]
+					if (row[j] instanceof Date) {
+						innerValue = row[j].toLocaleString();
+					};
+					var result = innerValue.replace(/"/g, '""').replace(/[\u2018\u2019]/g, "").replace(/[\u201C\u201D]/g, '');
+
+					if (result.search(/("|,|\n)/g) >= 0){
+						result = '"' + result + '"';
+					}
+					if (j > 0){
+						finalVal += ',';
+					}
+					finalVal += result;
+				}
+				return finalVal + '\n';
+			};
+
+			console.log(data);
+			var csvFile = processRow( data.columns )
+			$.each(data.rows, function(i, r){ 
+				csvFile += processRow(  r  ); 
+			});
+			csts.utils.blob('text/csv', csvFile , filename)
+		},
+		pdf : function(data, filename){
+			var pdf = new jsPDF('l','pt','letter');
+			pdf.autoTable(data.columns, data.rows, data.styles);
+			pdf.save( filename );
+		}
+	},
 	utils		: {
+		blob	: function(mime, content, filename){
+			var blob = new Blob([content], { type: mime + ';charset=utf-8;' });
+			if (navigator.msSaveBlob) {
+				navigator.msSaveBlob(blob, filename);
+			} else {
+				var link = document.createElement("a");
+				if (link.download !== undefined) {
+
+					var url = URL.createObjectURL(blob);
+					link.setAttribute("href", url);
+					link.setAttribute("download", filename);
+					link.style.visibility = 'hidden';
+					document.body.appendChild(link);
+					link.click();
+					document.body.removeChild(link);
+				}
+			}
+		},
 		toggleHosts	: function(){
 			if(	$('#main-right-col').is(':visible') ){
 				$('#main-right-col').hide()

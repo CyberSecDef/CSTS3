@@ -80,6 +80,7 @@ csts.controllers['Scans'] = ({
 			guid	: guid,
 			vulnId	: $("table#scans-compare-results tbody tr[data-guid='" + guid + "'] td:nth-child(2)").text(),
 			type	: $("table#scans-compare-results tbody tr[data-guid='" + guid + "'] td:nth-child(3)").text(),
+			mismatch: $(el).parents('tr').data('mismatch'),
 			rarRow	: $("table#scans-compare-results tbody tr[data-guid='" + guid + "'] td:nth-child(4)").text(),
 			rarVal	: $("table#scans-compare-results tbody tr[data-guid='" + guid + "'] td:nth-child(5)").text(),
 			poamRow	: $("table#scans-compare-results tbody tr[data-guid='" + guid + "'] td:nth-child(7)").text(),
@@ -88,47 +89,163 @@ csts.controllers['Scans'] = ({
 		
 		switch( $(el).data('action') ){
 			case 'left' :
-				//update excel
-				
-				csts.models['Scans'].setVal(
-					'rar', 
-					$('#rarTabSel').val(), 
-					(csts.models['Scans'].rarFields[ fields.type ]) + fields.rarRow,
-					csts.models['Scans'].getVal(
-						'poam', 
-						$('#poamTabSel').val(), 
-						(csts.models['Scans'].poamFields[ fields.type ]) + fields.poamRow
+				if(fields.mismatch != 'POAM' && fields.mismatch != 'RAR'){
+					csts.models['Scans'].setVal('rar', $('#rarTabSel').val(), (csts.models['Scans'].rarFields[ fields.type ]) + fields.rarRow,
+						csts.models['Scans'].getVal('poam', $('#poamTabSel').val(), (csts.models['Scans'].poamFields[ fields.type ]) + fields.poamRow)
 					)
-				)
-				
-				// writeFile
-				csts.plugins.xlsx.writeFile( csts.models['Scans'].workbooks['rar'],  $('#fileRar').val().trim(), { bookSST : true, bookType : 'xlsx', compression : true} );
+					csts.plugins.xlsx.writeFile( csts.models['Scans'].workbooks['rar'],  $('#fileRar').val().trim(), { bookSST : true, bookType : 'xlsx', compression : true} );
+					sel = ko.utils.arrayFilter(csts.controllers.Scans.viewModels.comparison(), function(i) { return i.guid == guid; })[0]
+					sel.rarVal = sel.poamVal
+					$("table#scans-compare-results tbody tr[data-guid='" + guid + "'] td:nth-child(5)").text( fields.poamVal );
+				}else{
+					r = csts.models['Scans'].getVal('poam', $('#poamTabSel').val(), (csts.models['Scans'].poamFields['Raw Risk']) + fields.poamRow);
+					i = '';
+					l = '';
+					switch(r){
+						case 'I' :
+							i = 'High';
+							l = 'High';
+							break;
+						case 'II' :
+							i = 'Medium';
+							l = 'Medium';
+							break;
+						case 'III' :
+							i = 'Low';
+							l = 'Low';
+							break;
+						case 'IV' :
+							i = 'None';
+							l = 'Info';
+							break;
+					}
 					
-				//update viewModels
-				sel = ko.utils.arrayFilter(csts.controllers.Scans.viewModels.comparison(), function(i) { return i.guid == guid; })[0]
-				sel.rarVal = sel.poamVal
-				
-			
-				// console.log(sel);
-				// console.log( 
-					// csts.models['Scans'].getVal('rar', $('#rarTabSel').val(), (csts.models['Scans'].rarFields[ fields.type ]) + fields.rarRow)
+					csts.plugins.xlsx.utils.sheet_add_json(
+						csts.models.Scans.workbooks.rar.Sheets.RAR, 
+						[ 
+							{ 
+								'control' 		: csts.models['Scans'].getVal('poam', $('#poamTabSel').val(), (csts.models['Scans'].poamFields['Security Control']) + fields.poamRow),
+								'source'		: csts.models['Scans'].getVal('poam', $('#poamTabSel').val(), (csts.models['Scans'].poamFields['Source']) + fields.poamRow).substring(
+									0,
+									csts.models['Scans'].getVal('poam', $('#poamTabSel').val(), (csts.models['Scans'].poamFields['Source']) + fields.poamRow).indexOf('Group ID:')
+								),
+								'threat'		: csts.models['Scans'].getVal('poam', $('#poamTabSel').val(), (csts.models['Scans'].poamFields['Source']) + fields.poamRow).substring(
+									csts.models['Scans'].getVal('poam', $('#poamTabSel').val(), (csts.models['Scans'].poamFields['Source']) + fields.poamRow).indexOf('Group ID:')
+								),
+								'description'	: csts.models['Scans'].getVal('poam', $('#poamTabSel').val(), (csts.models['Scans'].poamFields['Description']) + fields.poamRow),
+								'risk'			: '',
+								'rawrisk'		: r,
+								'impact'		: i,
+								'likelihood'	: l,
+								'correction'	: '',
+								'mitigation'	: csts.models['Scans'].getVal('poam', $('#poamTabSel').val(), (csts.models['Scans'].poamFields['Mitigation']) + fields.poamRow),
+								'remediation'	: csts.models['Scans'].getVal('poam', $('#poamTabSel').val(), (csts.models['Scans'].poamFields['Mitigation']) + fields.poamRow),
+								'residualrisk'	: csts.models['Scans'].getVal('poam', $('#poamTabSel').val(), (csts.models['Scans'].poamFields['Residual Risk']) + fields.poamRow),
+								'status'		: csts.models['Scans'].getVal('poam', $('#poamTabSel').val(), (csts.models['Scans'].poamFields['Status']) + fields.poamRow),
+								'comment'		: csts.models['Scans'].getVal('poam', $('#poamTabSel').val(), (csts.models['Scans'].poamFields['Comment']) + fields.poamRow),
+								'devices'		: ''
+							}
+							
+						],
+						{
+							header : ['control','source','threat','description','risk','rawrisk','impact','likelihood','correction','mitigation','remediation','residualrisk','status','comment','devices'],
+							origin : -1,
+							skipHeader : true
+						}
+					);
 					
-				// );
-				
-				//update UI
-				$("table#scans-compare-results tbody tr[data-guid='" + guid + "'] td:nth-child(5)").text( fields.poamVal );
-				
-				
-				
-				
+					csts.plugins.xlsx.writeFile( csts.models['Scans'].workbooks['rar'],  $('#fileRar').val().trim(), { bookSST : true, bookType : 'xlsx', compression : true} );
+				}
 				break;
 			case 'merge' :
+					var text = (
+						$("table#scans-compare-results tbody tr[data-guid='" + guid + "'] td:nth-child(8)").text() +
+						'\n' + 
+						$("table#scans-compare-results tbody tr[data-guid='" + guid + "'] td:nth-child(5)").text()
+					).replace(/see rar[\.]*/ig,'')
+					
+					csts.models['Scans'].setVal('rar',  $('#rarTabSel').val(),  (csts.models['Scans'].rarFields[  fields.type ]) + fields.rarRow, text)
+					csts.models['Scans'].setVal('poam', $('#poamTabSel').val(), (csts.models['Scans'].poamFields[ fields.type ]) + fields.poamRow, text)
+					
+					csts.plugins.xlsx.writeFile( csts.models['Scans'].workbooks['rar'],  $('#fileRar').val().trim(),  { bookSST : true, bookType : 'xlsx', compression : true} );
+					csts.plugins.xlsx.writeFile( csts.models['Scans'].workbooks['poam'], $('#filePoam').val().trim(), { bookSST : true, bookType : 'xlsx', compression : true} );
+					
+					sel = ko.utils.arrayFilter(csts.controllers.Scans.viewModels.comparison(), function(i) { return i.guid == guid; })[0]
+					sel.rarVal = text
+					sel.poamVal = text
+					
+					
+					$("table#scans-compare-results tbody tr[data-guid='" + guid + "'] td:nth-child(5)").text( text );
+					$("table#scans-compare-results tbody tr[data-guid='" + guid + "'] td:nth-child(8)").text( text );
+			
 				break;
 			case 'right' :
+				if(fields.mismatch != 'POAM' && fields.mismatch != 'RAR'){
+					csts.models['Scans'].setVal('poam', $('#poamTabSel').val(), (csts.models['Scans'].poamFields[ fields.type ]) + fields.poamRow,
+						csts.models['Scans'].getVal('rar', $('#rarTabSel').val(), (csts.models['Scans'].rarFields[ fields.type ]) + fields.rarRow)
+					)
+					csts.plugins.xlsx.writeFile( csts.models['Scans'].workbooks['poam'],  $('#filePoam').val().trim(), { bookSST : true, bookType : 'xlsx', compression : true} );
+					sel = ko.utils.arrayFilter(csts.controllers.Scans.viewModels.comparison(), function(i) { return i.guid == guid; })[0]
+					sel.poamVal = sel.rar
+					$("table#scans-compare-results tbody tr[data-guid='" + guid + "'] td:nth-child(8)").text( fields.rarVal );
+				}else{
+					r = csts.models['Scans'].getVal('rar', $('#rarTabSel').val(), (csts.models['Scans'].rarFields['Raw Risk']) + fields.rarRow);
+					i = '';
+					l = '';
+					switch(r){
+						case 'I' :
+							i = 'High';
+							l = 'High';
+							break;
+						case 'II' :
+							i = 'Medium';
+							l = 'Medium';
+							break;
+						case 'III' :
+							i = 'Low';
+							l = 'Low';
+							break;
+						case 'IV' :
+							i = 'None';
+							l = 'Info';
+							break;
+					}
+					
+					csts.plugins.xlsx.utils.sheet_add_json(
+						csts.models.Scans.workbooks.rar.Sheets.RAR, 
+						[ 
+							{ 
+								'blank'			: '',
+								'description'	: csts.models['Scans'].getVal('rar', $('#rarTabSel').val(), (csts.models['Scans'].rarFields['Description']) + fields.rarRow),
+								'control' 		: csts.models['Scans'].getVal('rar', $('#rarTabSel').val(), (csts.models['Scans'].rarFields['Security Control']) + fields.rarRow),
+								'office'		: '',
+								'security'		: '',
+								'rawrisk'		: r,
+								'mitigation'	: csts.models['Scans'].getVal('poam', $('#poamTabSel').val(), (csts.models['Scans'].poamFields['Mitigation']) + fields.poamRow),
+								'residualrisk'	: csts.models['Scans'].getVal('poam', $('#poamTabSel').val(), (csts.models['Scans'].poamFields['Residual Risk']) + fields.poamRow),
+								'resources'		: '',
+								'scd'			: '',
+								'milestonesWD'	: '',
+								'milestronsWC'	: '',
+								'source'		: csts.models['Scans'].getVal('rar', $('#rarTabSel').val(), (csts.models['Scans'].rarFields['Source']) + fields.rarRow) +
+									"\n" +
+									csts.models['Scans'].getVal('rar', $('#rarTabSel').val(), (csts.models['Scans'].rarFields['Test Id']) + fields.rarRow),
+								'status'		: csts.models['Scans'].getVal('rar', $('#rarTabSel').val(), (csts.models['Scans'].rarFields['Status']) + fields.rarRow),
+								'comment'		: csts.models['Scans'].getVal('rar', $('#rarTabSel').val(), (csts.models['Scans'].rarFields['Comment']) + fields.rarRow),
+							}
+							
+						],
+						{
+							header : ['blank','description','control', 'office','security','rawrisk','mitigation','residualrisk','resources','scd','milestonesWD','milestronsWC','source','status','comment'],
+							origin : -1,
+							skipHeader : true
+						}
+					);
+					
+					csts.plugins.xlsx.writeFile( csts.models['Scans'].workbooks['poam'],  $('#filePoam').val().trim(), { bookSST : true, bookType : 'xlsx', compression : true} );
+				}
+			
 				break;
 		}
-		
-		
-		
 	}
 });

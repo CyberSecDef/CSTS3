@@ -59,8 +59,7 @@ div#main-right-col{
 }
 
 .footer .status-bar-l{
-	border-right:1px solid black;
-	width:81px;
+	width:80px;
 	padding:0px;
 	margin:0px;
 	float:left;
