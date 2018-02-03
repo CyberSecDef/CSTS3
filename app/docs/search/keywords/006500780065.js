@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("exe",["Function"],[["execute",,[["comparison",,,,0,"File:controllers/Scans.js:comparison.execute","JavaScriptClass:comparison:execute"]]],["executeComparison",,[["comparison",,,,0,"File:models/Scans.js:comparison.executeComparison","JavaScriptClass:comparison:executeComparison"]]]]);

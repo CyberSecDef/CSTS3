@@ -1,4 +1,105 @@
+/*
+	Package: CSTS
+	This is the main CSTS class that bootstraps and loads everything.  This class also creates a global object that everything can be attached to.
+*/
 var csts = {
+	
+/*
+	Variable: startTime
+	The time the application started
+*/
+	startTime : (new Date().getTime() ),	
+	
+/*
+	Variable: db
+	Wrapper to hold all the database collections
+*/
+	db			: {},
+	
+/*
+	Object: routes
+	Wrapper to hold all the routes used in application navigation
+*/
+	routes 		: {},
+	
+/*
+	Object: router
+	This holds the router object
+*/
+	router 		: {},
+	
+/*
+	Object: models
+	Wrapper to hold all the model objects
+*/
+	models 		: {},
+	
+/*
+	Object: libs
+	Wrapper to hold all the generic library objects
+*/
+	libs 		: {},
+	
+/*
+	Object: controllers
+	Wrapper to hold all the controller objects
+*/
+	controllers : {},	
+
+/*
+	Object: plugins
+	wrapper for all the plugins the CSTS uses from node modules
+	
+		crypto - cryptographic functions
+		cpu - cpu statistics
+		cron - cron jobs
+		dns - dns framework
+		fs - file system module
+		ejs - Embedded JavaScript templates
+		isElevated - determins if the user is elevated
+		os - pulls information from the os
+		moment - used for managing time objects
+		navigo - the router used for navigating the site
+		path - module to handle filesystem paths
+		util - utility module
+		zlib - zlib compression
+		tray - works with the systray and taskbar
+		win - module to manage the application window
+		reload - watches for changes in the file system and reloads the application
+		shell - allows nwjs to interface with powershell
+		si - system information module
+		xlsx - reads and writes various spreadsheet files
+		Datastore - database module
+		
+*/
+	plugins : {
+		'crypto'	: require('crypto'),
+		'cpu'		: require('cpu-stat'),
+		'cron'		: require('cron').CronJob,
+		'dns'		: require('dns'),
+		'fs' 		: require('fs'),
+		'ejs'		: require('ejs'),
+		'isElevated': require('is-elevated'),
+		'os'		: require('os'),
+		'moment'	: require('moment'),
+		'navigo'	: require('navigo'),
+		'path'		: require('path'),
+		'util'		: require('util'),
+		'zlib'		: require('zlib'),
+		'tray' 		: (new nw.Tray({ title: 'Tray', icon: 'app/public/images/csts.png' }) ),
+		'win'		: nw.Window.get(),
+		'reload'	: {},
+		'shell'		: require('node-powershell'),
+		'si'		: require('systeminformation'),
+		'xlsx'		: require('xlsx'),	
+		'Datastore' : require('nedb'),
+	},
+	
+	
+/*
+	Method: init
+	This function initializes the csts class
+*/
 	init : function(){
 		new csts.plugins.cron('1-60/10 * * * * *', 
 			function(){
@@ -33,7 +134,7 @@ var csts = {
 		$.each([
 			'./public/js/jquery-ui.js',
 			'./public/js/bootstrap.bundle.js',
-			'./public/js/fontawesome-all.js',
+			'./public/js/fontawesome-all.min.js',
 			'./public/js/jquery.tree.js',
 			'./public/js/jquery.dataTables.js',
 		], function(index, item){csts.require(item)});
@@ -56,6 +157,12 @@ var csts = {
 			function(index, item){csts.require('./models/' + item)}
 		);
 		
+		//lib
+		$.each(
+			csts.plugins.fs.readdirSync('./app/lib/'), 
+			function(index, item){csts.require('./lib/' + item)}
+		);
+		
 		csts.db.config = new csts.plugins.Datastore({ filename: 'app/database/config.db', autoload: true });		
 		csts.db.config.count( { 'viewCount' : { $gt : 0 } }, function(err, count){
 			if(count == 0){
@@ -74,7 +181,8 @@ var csts = {
 		csts.plugins.ejs.delimeter = '$';
 
 		csts.plugins.reload = csts.plugins.fs.watch('./app', {recursive: true}, function(eventType, filename) {
-			if( filename.substring(0,8) != 'database' ){
+			if( filename.substring(0,8) != 'database' && filename.substring(0,4) != 'docs' ){
+				// console.log(filename);
 				location.href='/app/index.html';
 				reloadWatcher.close();
 			}
@@ -134,17 +242,18 @@ var csts = {
 			});
 
 			csts.controllers['Home'].index();
-			
-			//ADDED THIS FOR DEBUGGING PURPOSES
-			csts.controllers['Scans'].compare();	
-			
+						
 			csts.plugins.isElevated().then(elevated => {
-				$('footer.footer div div.status-bar-r').html( ( elevated ? '<i class="fas fa-user-secret"></i>' : '<i class="fas fa-user"></i>' ) );
+				$('footer.footer div div.status-bar-r').html( ( elevated ? '<i class="fas fa-chess-king"></i>' : '<i class="fas fa-user"></i>' ) );
 			});
 
 		})
 	},
-	startTime : (new Date().getTime() ),
+	
+/*
+	Method: require
+	Used to include dynamic files in the browser 
+*/
 	require : function(script){
 		$.ajax({
 			url: script,
@@ -158,7 +267,25 @@ var csts = {
 			}
 		});
 	},
+
+/*
+	Package: ad
+	Active directory wrapper 
+*/
 	ad	: {
+
+/*
+	Method: fqdn
+	Determines the hosts fully qualified domain name
+	
+	Parameters:
+	
+	Returns:
+		String - FQDN of host
+	
+	See Also:
+		<ouChildren>
+*/
 		fqdn	: function(){
 			if(typeof process.env.USERDNSDOMAIN !== 'undefined'){
 				return process.env.USERDNSDOMAIN;
@@ -168,6 +295,20 @@ var csts = {
 				return 'local';
 			}
 		},
+
+/*
+	Method: ouChildren
+	Returns the child nodes for a given OU
+	
+	Parameters:
+		ou - String of path to OU
+	
+	Returns:
+		String - JSON object of OU children
+	
+	See Also:
+		<fqdn>
+*/		
 		ouChildren 	: function(ou){
 			let ps = (new csts.plugins.shell({executionPolicy: 'Bypass',noProfile: true}));
 			let results = "";
@@ -188,12 +329,21 @@ var csts = {
 			return ps;
 		}
 	},
-	db			: {},
-	routes 		: {},
-	router 		: {},
-	models 		: {},
-	controllers : {},
+
+/*
+	Package: export
+	This object is responsible for exporting reports in DOC, PDF and CSV formats
+*/
 	export		: {
+
+/*
+	Method: doc
+	Exports reports in DOC formats
+	
+	Parameters:
+		content - The html content being exported
+		filename - The name of the file to save as
+*/
 		doc	: function(content, filename){
 			var css= [];
 			for (var sheeti= 0; sheeti <  document.styleSheets.length; sheeti++) {
@@ -220,6 +370,15 @@ var csts = {
 				csts.utils.blob('text/html', el.documentElement.outerHTML , filename)
 			}) ;
 		},
+
+/*
+	Method: csv
+	Exports reports in CSV	formats
+	
+	Parameters:
+		data - JSON Object containing data to export
+		filename - The name of the file to save as
+*/
 		csv : function(data, filename){
 			var processRow = function (row) {
 				var finalVal = '';
@@ -241,20 +400,43 @@ var csts = {
 				return finalVal + '\n';
 			};
 
-			console.log(data);
 			var csvFile = processRow( data.columns )
 			$.each(data.rows, function(i, r){ 
 				csvFile += processRow(  r  ); 
 			});
 			csts.utils.blob('text/csv', csvFile , filename)
 		},
+
+/*
+	Method: pdf
+	Exports reports in PDF formats
+	
+	Parameters:
+		content - JSON Object containing data to export
+		filename - The name of the file to save as
+*/		
 		pdf : function(data, filename){
 			var pdf = new jsPDF('l','pt','letter');
 			pdf.autoTable(data.columns, data.rows, data.styles);
 			pdf.save( filename );
 		}
 	},
-	utils		: {
+
+/*
+	Package: utils
+	Object that contains utility type functions for the CSTS
+*/
+	utils : {
+		
+/*
+	Method: blob
+	This method will allow files to be saved from the CSTS app (file save dialog)
+	
+	Parameters:
+		mime - The mime type of the file to save
+		content - The data to be saved
+		filename - The name of the file to save asin
+*/
 		blob	: function(mime, content, filename){
 			var blob = new Blob([content], { type: mime + ';charset=utf-8;' });
 			if (navigator.msSaveBlob) {
@@ -273,6 +455,11 @@ var csts = {
 				}
 			}
 		},
+
+/*
+	Method: toggleHosts
+	Shows or hides the hosts column of the CSTS application
+*/
 		toggleHosts	: function(){
 			if(	$('#main-right-col').is(':visible') ){
 				$('#main-right-col').hide()
@@ -282,41 +469,28 @@ var csts = {
 				$('#main-center-col').removeClass('col-12').addClass('col-10')
 			}
 		},
+
+/*
+	Method: guid
+	Generates a GUID like string
+*/
 		guid : function(){
 		  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
 			(c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
 		  );
 		},
+
+/*
+	Method: debug
+	Will log a message to the console if the application environment is set to developmental
+	
+	Parameters:
+		msg - A String or object to be logged
+*/
 		debug : function(msg){
 			if(nw.App.manifest.environment == 'developmental'){
 				console.log(msg);
 			}
 		}
-	},
-	plugins : {
-		'crypto'	: require('crypto'),
-		'cpu'		: require('cpu-stat'),
-		'cron'		: require('cron').CronJob,
-		'dns'		: require('dns'),
-		'fs' 		: require('fs'),
-		'ejs'		: require('ejs'),
-		'isElevated': require('is-elevated'),
-		'os'		: require('os'),
-		'moment'	: require('moment'),
-		'navigo'	: require('navigo'),
-		'path'		: require('path'),
-		'util'		: require('util'),
-		'zlib'		: require('zlib'),
-		'tray' 		: (new nw.Tray({ title: 'Tray', icon: 'app/public/images/csts.png' }) ),
-		'win'		: nw.Window.get(),
-		'reload'	: {},
-		'shell'		: require('node-powershell'),
-		'si'		: require('systeminformation'),
-		'xlsx'		: require('xlsx'),	
-		'Datastore' : require('nedb'),
 	}
-
 };
-///shortcuts
-dbg = function(msg){ csts.utils.debug(msg);}
-csts.init();

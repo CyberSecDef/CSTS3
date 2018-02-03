@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("par",["Function"],[["parseFile",,[["comparison",,,,0,"File:models/Scans.js:comparison.parseFile","JavaScriptClass:comparison:parseFile"]]],["parseFiles",,[["comparison",,,,0,"File:controllers/Scans.js:comparison.parseFiles","JavaScriptClass:comparison:parseFiles"]]]]);

@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("ini",["Function"],[["init",,[["CSTS",,,,0,"File:csts.js:CSTS.init","JavaScriptClass:CSTS:init"]]]]);

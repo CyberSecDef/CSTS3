@@ -1,14 +1,65 @@
+/*
+	Package: csts.models.Scans
+	This is the model for handling 'Scan' type functions
+*/
 csts.models['Scans'] = {
+/*
+	Variable: name
+	The name of the model
+*/	
 	name : 'Scans',
+	
+/*
+	Variable: compareFields
+	The fields that are available for comparison
+*/
 	compareFields 	: [ 'Mitigation',       'Comment', 		 'Description',       'Raw Risk',       'Residual Risk',       'Security Control',       'Source',       'Status'],
+
+/*
+	Variable: rarFields
+	A mapping between fields and columns in a RAR Spreadsheet
+*/
 	rarFields 		: { 'Mitigation' : 'J', 'Comment' : 'N', 'Description' : 'D', 'Raw Risk' : 'F', 'Residual Risk' : 'L', 'Security Control' : 'A', 'Source' : 'B', 'Status' : 'M', 'Test Id' : 'C', 'Likelihood' : 'H' },
+	
+/*
+	Variable: poamFields
+	A mapping between fields and columns in a POAM spreadsheet
+*/
 	poamFields 		: { 'Mitigation' : 'G', 'Comment' : 'O', 'Description' : 'B', 'Raw Risk' : 'F', 'Residual Risk' : 'H', 'Security Control' : 'C', 'Source' : 'M', 'Status' : 'N' },
- 	workbooks : {},
+ 
+/*
+	Variable: workbooks
+	A container for any excel workbooks that are opened
+*/
+	workbooks : {},
+
+/*
+	Package: comparison
+	This is the container for the functions that deal with the poam/rar comparison module
+*/
 	comparison : {
+
+/*
+	Method: parseFile
+	gets the filesystem statistics for the submitted file pathname
+	
+	Parameters:
+		file - The file path being checked
+*/
 		parseFile : function( file ){
 			return csts.plugins.fs.statSync( file );
 		}
 	},
+	
+/*
+	Method: isBlank
+	Determines if a cell in a worksheet is blanks
+	
+	Parameters:
+		workbook - the workbook being checked
+		sheet - the sheet in a workbook being checked
+		address - the address of the cell being checked
+*/
 	isBlank : function(workbook, sheet, address){
 		if(Array.isArray(address)){
 			ret = true;
@@ -24,9 +75,17 @@ csts.models['Scans'] = {
 			)
 		}
 	},
-	fieldMove : function(e){
-		console.log('test');
-	},
+
+/*
+	Method: compareVals
+	compares the value in a worksheet to the value submitted
+	
+	Parameters:
+		workbook - the workbook being checked
+		sheet - the sheet in a workbook being checked
+		address - the address of the cell being checked
+		val - the value being checked
+*/	
 	compareVals : function(workbook, sheet, address, val){
 		if(!csts.models['Scans'].isBlank(workbook,sheet,address)){
 			return (
@@ -36,6 +95,16 @@ csts.models['Scans'] = {
 			return false;
 		}
 	},
+	
+/*
+	Method: getVulnId
+	parses a cell and returns the vulnerability id 
+	
+	Parameters:
+		workbook - the workbook being checked
+		sheet - the sheet in a workbook being checked
+		address - the address of the cell being checked
+*/	
 	getVulnId : function(workbook, sheet, address){
 		var vulnId = '';
 		if(!csts.models['Scans'].isBlank(workbook,sheet,address)){
@@ -55,13 +124,44 @@ csts.models['Scans'] = {
 		}
 		return vulnId;
 	},
+	
+/*
+	Method: setVal
+	sets the value for a cell in a spreadsheet
+	
+	Parameters:
+		workbook - the workbook being checked
+		sheet - the sheet in a workbook being checked
+		address - the address of the cell being checked
+		val - the value being setActive
+*/
 	setVal : function(workbook, sheet, address, val){
 		csts.models['Scans'].workbooks[workbook].Sheets[sheet][address].v = val;
 		return ( !csts.models['Scans'].isBlank(workbook, sheet, address) ? csts.models['Scans'].workbooks[workbook].Sheets[sheet][address].v : '' );
 	},
+	
+/*
+	Method: getVal
+	gets the value for a cell in a spreadsheet
+	
+	Parameters:
+		workbook - the workbook being checked
+		sheet - the sheet in a workbook being checked
+		address - the address of the cell being checked
+*/	
 	getVal : function(workbook, sheet, address){
 		return ( !csts.models['Scans'].isBlank(workbook, sheet, address) ? csts.models['Scans'].workbooks[workbook].Sheets[sheet][address].v : '' );
 	},
+	
+/*
+	Method: executeComparison
+	This method will compare the data between a rar and a poam and return the differences
+	
+	Parameters:
+		rarTab - the tab in the rar workbook being checked
+		poamTab - the tab in the poam workbook being checked
+		fields - the fields being compared
+*/	
 	executeComparison : function( rarTab, poamTab, fields ){
 		var rowIndex = 0;
 		var rarRow = 0;
@@ -96,8 +196,6 @@ csts.models['Scans'] = {
 			}
 			rarRow++;
 		}
-		
-		
 		
 		//all rar foundings are found, time to search the poam
 		var results = [];

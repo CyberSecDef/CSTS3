@@ -209,14 +209,14 @@
 	$("#fileRar, #filePoam").on("change",function(){
 		$('label[for="'+$(this).attr('id')+'"]').text( csts.plugins.path.basename( $(this).val() ) );
 		if($('#fileRar').val().trim() != '' && $('#filePoam').val().trim() != ''){
-			csts.controllers['Scans'].parseComparisonFiles();
+			csts.controllers['Scans'].comparison.parseFiles();
 		}
 	});
 	
 	$('button#scans-comparison-execute-btn').on('click',function(){
 		$('#scans-compare-results tbody tr').remove();
-		csts.controllers['Scans'].executeComparison(  $("input:checked[type='checkbox'][name='comparisonFields']").serializeArray() );
-		$('button.btn-compare-action').on('click', function(){ csts.controllers['Scans'].fieldMove( $(this) ); } );
+		csts.controllers['Scans'].comparison.execute(  $("input:checked[type='checkbox'][name='comparisonFields']").serializeArray() );
+		$('button.btn-compare-action').on('click', function(){ csts.controllers['Scans'].comparison.fieldMove( $(this) ); } );
 	});
 	
 	$('button#exportDOC').on('click',function(){

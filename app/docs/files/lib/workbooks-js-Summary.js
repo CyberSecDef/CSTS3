@@ -1,0 +1,1 @@
+NDFramePage.OnPageTitleLoaded("File:lib/workbooks.js","workbooks.js");NDSummary.OnSummaryLoaded("File:lib/workbooks.js",[["JavaScript","JavaScript"]],[["Classes","Class"]],[[72,0,0,"<span class=\"Qualifier\">csts.&#8203;lib.</span>&#8203;workbooks","csts.lib.workbooks"]]);

@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("ind",["Function"],[["index",,[["csts.controllers.Home",,,,0,"File:controllers/Home.js:csts.controllers.Home.index","JavaScriptClass:csts.controllers.Home:index"]]]]);

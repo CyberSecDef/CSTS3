@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("isb",["Function"],[["isBlank",,[["comparison",,,,0,"File:models/Scans.js:comparison.isBlank","JavaScriptClass:comparison:isBlank"]]]]);

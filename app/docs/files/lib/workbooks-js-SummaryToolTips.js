@@ -1,0 +1,1 @@
+NDSummary.OnToolTipsLoaded("File:lib/workbooks.js",{72:"<div class=\"NDToolTip TClass LJavaScript\"><div class=\"TTSummary\">Generic functions for working with workbooks</div></div>"});
