@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("doc",["Function"],[["doc",,[["export",,,,0,"File:csts.js:export.doc","JavaScriptClass:export:doc"]]]]);
+NDSearch.OnPrefixDataLoaded("doc",["Function"],[["doc",,[["csts.libs.export",,,,0,"File:lib/export.js:csts.libs.export.doc","JavaScriptClass:csts.libs.export:doc"]]]]);

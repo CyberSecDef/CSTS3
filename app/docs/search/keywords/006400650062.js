@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("deb",["Function"],[["debug",,[["utils",,,,0,"File:csts.js:utils.debug","JavaScriptClass:utils:debug"]]]]);
+NDSearch.OnPrefixDataLoaded("deb",["Function"],[["debug",,[["csts.libs.utils",,,,0,"File:lib/utils.js:csts.libs.utils.debug","JavaScriptClass:csts.libs.utils:debug"]]]]);

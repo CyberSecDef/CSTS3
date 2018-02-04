@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("poa",["Variable"],[["poamFields",,[["csts.models.Scans",,,,0,"File:models/Scans.js:csts.models.Scans.poamFields","JavaScriptClass:csts.models.Scans:poamFields"]]]]);
+NDSearch.OnPrefixDataLoaded("poa",["Variable"],[["poamFields",,[["csts.models.scans",,,,0,"File:models/Scans.js:csts.models.scans.poamFields","JavaScriptClass:csts.models.scans:poamFields"]]]]);

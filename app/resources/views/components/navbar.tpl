@@ -143,9 +143,10 @@
 						<i class="fas fa-cog"></i> &nbsp;<%= username %>
 					</a>
 					<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
-						<a href="/Exit" class="dropdown-item">Exit</a>
+						
+						<a class="dropdown-item" href="javascript:csts.libs.utils.toggleHosts();"><i class="fas fa-eye"></i>&nbsp;Toggle Host Column</a>
 						<div class="dropdown-divider"></div>
-						<a class="dropdown-item" href="javascript:csts.utils.toggleHosts();"><i class="fas fa-eye"></i>&nbsp;Toggle Host Column</a>
+						<a href="#" class="dropdown-item" id="exit">Exit</a>
 					</div>
 				</li>
 			</ul>
@@ -155,7 +156,7 @@
 
 <script>
 $(document).ready(function(){
-	
+	$('#exit').on('click',function(){ nw.App.quit(); } );
 
 	
 });

@@ -1,5 +1,5 @@
 /*
-	Package: CSTS
+	Namespace: csts
 	This is the main CSTS class that bootstraps and loads everything.  This class also creates a global object that everything can be attached to.
 */
 var csts = {
@@ -95,13 +95,31 @@ var csts = {
 		'Datastore' : require('nedb'),
 	},
 	
+	/*
+		Method: require
+		Used to include dynamic files in the browser 
+	*/
+	require : function(script){
+		$.ajax({
+			url: script,
+			dataType: "script",
+			async: false,           // <-- This is the key
+			success: function () {
+				console.log('included ' + script);
+			},
+			error: function () {
+				throw new Error("Could not load script " + script);
+			}
+		});
+	},
+	
 	
 /*
 	Method: init
 	This function initializes the csts class
 */
 	init : function(){
-		new csts.plugins.cron('1-60/10 * * * * *', 
+		new csts.plugins.cron('1-60/6 * * * * *', 
 			function(){
 				csts.plugins.si.mem(function(data){ 
 					p = parseFloat( data.used / data.total )
@@ -110,7 +128,7 @@ var csts = {
 			}, function(){},true
 		);
 		
-		new csts.plugins.cron('1-60/10 * * * * *', 
+		new csts.plugins.cron('1-60/6 * * * * *', 
 			function(){
 				csts.plugins.cpu.usagePercent(function(err, p, seconds) {
 					$('#cpuChart').css('background', ( '#' + Math.ceil( ( 0xFF * (p/99))).toString(16) + Math.ceil( 0xFF - ( 0xFF * (p/99))).toString(16) + '00' ) );
@@ -199,12 +217,15 @@ var csts = {
 						c = val.substring(0,val.indexOf('@'));
 						f = val.substring(val.indexOf('@')+1);
 						
-						csts.router.on(name, csts.controllers[c][f] );
-						dbg('Created router for ' + name);
+						function index(obj,i) {return obj[i]} //this is magic that allows dynamic dot objects for grouping routes (scans.comparison.index)
+						if(f.indexOf('.') > 0){
+							csts.router.on(name, f.split('.').reduce(index, csts.controllers[c]) );
+						}else{
+							csts.router.on(name, csts.controllers[c][f] );	
+						}
+						
 						break;
 					case 'function' :
-						console.log("creating function call to " + name);
-						console.log(val);
 						csts.router.on(name, val);
 						break;
 				}
@@ -241,7 +262,7 @@ var csts = {
 				return false;
 			});
 
-			csts.controllers['Home'].index();
+			csts.controllers['Home'].main.index();
 						
 			csts.plugins.isElevated().then(elevated => {
 				$('footer.footer div div.status-bar-r').html( ( elevated ? '<i class="fas fa-chess-king"></i>' : '<i class="fas fa-user"></i>' ) );
@@ -249,248 +270,4 @@ var csts = {
 
 		})
 	},
-	
-/*
-	Method: require
-	Used to include dynamic files in the browser 
-*/
-	require : function(script){
-		$.ajax({
-			url: script,
-			dataType: "script",
-			async: false,           // <-- This is the key
-			success: function () {
-				console.log('included ' + script);
-			},
-			error: function () {
-				throw new Error("Could not load script " + script);
-			}
-		});
-	},
-
-/*
-	Package: ad
-	Active directory wrapper 
-*/
-	ad	: {
-
-/*
-	Method: fqdn
-	Determines the hosts fully qualified domain name
-	
-	Parameters:
-	
-	Returns:
-		String - FQDN of host
-	
-	See Also:
-		<ouChildren>
-*/
-		fqdn	: function(){
-			if(typeof process.env.USERDNSDOMAIN !== 'undefined'){
-				return process.env.USERDNSDOMAIN;
-			}else if(typeof process.env.USERDOMAIN !== 'undefined'){
-				return process.env.USERDOMAIN;
-			}else{
-				return 'local';
-			}
-		},
-
-/*
-	Method: ouChildren
-	Returns the child nodes for a given OU
-	
-	Parameters:
-		ou - String of path to OU
-	
-	Returns:
-		String - JSON object of OU children
-	
-	See Also:
-		<fqdn>
-*/		
-		ouChildren 	: function(ou){
-			let ps = (new csts.plugins.shell({executionPolicy: 'Bypass',noProfile: true}));
-			let results = "";
-			if(typeof ou !== 'undefined' && ou !== ''){
-				ps.addCommand("$objPath= New-Object System.DirectoryServices.DirectoryEntry '" + ou + "'")
-			}else{
-				ps.addCommand("$objPath= New-Object System.DirectoryServices.DirectoryEntry")
-			}
-			ps.addCommand("$objSearcher = New-Object System.DirectoryServices.DirectorySearcher")
-			ps.addCommand("$objSearcher.SearchRoot = $objPath")
-			ps.addCommand("$objSearcher.PageSize = 1000")
-			ps.addCommand("$objSearcher.SearchScope = 'OneLevel'")
-			ps.addCommand("$results = @();")
-			ps.addCommand("$objSearcher.findall() | sort-object { $_.properties.ou} | ? { $_.path -like '*//OU=*'} | % { $results += @{ 'Name' = $($_.properties.name) ; 'OU' = $($_.properties.ou); 'Path' = $($_.properties.adspath); 'DN' =  $($_.properties.distinguishedname); } }")
-			ps.addCommand("add-type -assembly system.web.extensions")
-			ps.addCommand("$ps_js=new-object system.web.script.serialization.javascriptSerializer")
-			ps.addCommand("$ps_js.Serialize($results) ")
-			return ps;
-		}
-	},
-
-/*
-	Package: export
-	This object is responsible for exporting reports in DOC, PDF and CSV formats
-*/
-	export		: {
-
-/*
-	Method: doc
-	Exports reports in DOC formats
-	
-	Parameters:
-		content - The html content being exported
-		filename - The name of the file to save as
-*/
-		doc	: function(content, filename){
-			var css= [];
-			for (var sheeti= 0; sheeti <  document.styleSheets.length; sheeti++) {
-				var sheet= document.styleSheets[sheeti];
-				var rules= ('cssRules' in sheet)? sheet.cssRules : sheet.rules;
-				if(rules){
-					for (var rulei= 0; rulei < rules.length; rulei++) {
-						var rule= rules[rulei];
-						if ('cssText' in rule)
-							css.push(rule.cssText);
-						else
-							css.push(rule.selectorText+' {\n'+rule.style.cssText+'\n}\n');
-					}
-				}
-			}
-			styles = css.join('\n');
-			csts.plugins.ejs.renderFile('app/resources/views/components/export/doc.tpl',{
-				'styles' 	: styles
-			},{},function(err,str){
-				var parser = new DOMParser()
-				el = parser.parseFromString(str, "text/xml");
-				$(el).find('body').append( content );
-				
-				csts.utils.blob('text/html', el.documentElement.outerHTML , filename)
-			}) ;
-		},
-
-/*
-	Method: csv
-	Exports reports in CSV	formats
-	
-	Parameters:
-		data - JSON Object containing data to export
-		filename - The name of the file to save as
-*/
-		csv : function(data, filename){
-			var processRow = function (row) {
-				var finalVal = '';
-				for (var j = 0; j < row.length; j++) {
-					var innerValue = row[j]
-					if (row[j] instanceof Date) {
-						innerValue = row[j].toLocaleString();
-					};
-					var result = innerValue.replace(/"/g, '""').replace(/[\u2018\u2019]/g, "").replace(/[\u201C\u201D]/g, '');
-
-					if (result.search(/("|,|\n)/g) >= 0){
-						result = '"' + result + '"';
-					}
-					if (j > 0){
-						finalVal += ',';
-					}
-					finalVal += result;
-				}
-				return finalVal + '\n';
-			};
-
-			var csvFile = processRow( data.columns )
-			$.each(data.rows, function(i, r){ 
-				csvFile += processRow(  r  ); 
-			});
-			csts.utils.blob('text/csv', csvFile , filename)
-		},
-
-/*
-	Method: pdf
-	Exports reports in PDF formats
-	
-	Parameters:
-		content - JSON Object containing data to export
-		filename - The name of the file to save as
-*/		
-		pdf : function(data, filename){
-			var pdf = new jsPDF('l','pt','letter');
-			pdf.autoTable(data.columns, data.rows, data.styles);
-			pdf.save( filename );
-		}
-	},
-
-/*
-	Package: utils
-	Object that contains utility type functions for the CSTS
-*/
-	utils : {
-		
-/*
-	Method: blob
-	This method will allow files to be saved from the CSTS app (file save dialog)
-	
-	Parameters:
-		mime - The mime type of the file to save
-		content - The data to be saved
-		filename - The name of the file to save asin
-*/
-		blob	: function(mime, content, filename){
-			var blob = new Blob([content], { type: mime + ';charset=utf-8;' });
-			if (navigator.msSaveBlob) {
-				navigator.msSaveBlob(blob, filename);
-			} else {
-				var link = document.createElement("a");
-				if (link.download !== undefined) {
-
-					var url = URL.createObjectURL(blob);
-					link.setAttribute("href", url);
-					link.setAttribute("download", filename);
-					link.style.visibility = 'hidden';
-					document.body.appendChild(link);
-					link.click();
-					document.body.removeChild(link);
-				}
-			}
-		},
-
-/*
-	Method: toggleHosts
-	Shows or hides the hosts column of the CSTS application
-*/
-		toggleHosts	: function(){
-			if(	$('#main-right-col').is(':visible') ){
-				$('#main-right-col').hide()
-				$('#main-center-col').removeClass('col-10').addClass('col-12')
-			}else{
-				$('#main-right-col').show()
-				$('#main-center-col').removeClass('col-12').addClass('col-10')
-			}
-		},
-
-/*
-	Method: guid
-	Generates a GUID like string
-*/
-		guid : function(){
-		  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-			(c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-		  );
-		},
-
-/*
-	Method: debug
-	Will log a message to the console if the application environment is set to developmental
-	
-	Parameters:
-		msg - A String or object to be logged
-*/
-		debug : function(msg){
-			if(nw.App.manifest.environment == 'developmental'){
-				console.log(msg);
-			}
-		}
-	}
 };

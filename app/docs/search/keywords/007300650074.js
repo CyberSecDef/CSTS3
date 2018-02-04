@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("set",["Function"],[["setVal",,[["comparison",,,,0,"File:models/Scans.js:comparison.setVal","JavaScriptClass:comparison:setVal"]]]]);

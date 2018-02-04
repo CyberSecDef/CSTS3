@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("blo",["Function"],[["blob",,[["utils",,,,0,"File:csts.js:utils.blob","JavaScriptClass:utils:blob"]]]]);
+NDSearch.OnPrefixDataLoaded("blo",["Function"],[["blob",,[["csts.libs.utils",,,,0,"File:lib/utils.js:csts.libs.utils.blob","JavaScriptClass:csts.libs.utils:blob"]]]]);

@@ -223,7 +223,7 @@
 		$results = $('#scans-compare-results')
 		$results.find('th').remove(':nth-child(6)');
 		$results.find('td').remove(':nth-child(6)');
-		csts.export.doc($results.html(), 'rarPoamComparison.doc')
+		csts.libs.export.doc($results.html(), 'rarPoamComparison.doc')
 	});
 	
 	$('button#exportPDF').on('click',function(){
@@ -248,7 +248,7 @@
 		})
 		console.log(data);
 			
-		csts.export.pdf(data, 'rarPoamComparison.pdf')
+		csts.libs.export.pdf(data, 'rarPoamComparison.pdf')
 	});
 	
 	$('button#exportCSV').on('click',function(){
@@ -266,7 +266,7 @@
 				$(el).find('td:nth-child(8)').text()
 			] )
 		})
-		csts.export.csv(data, 'rarPoamComparison.csv')
+		csts.libs.export.csv(data, 'rarPoamComparison.csv')
 	});
 	
 	

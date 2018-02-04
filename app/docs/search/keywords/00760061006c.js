@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("val",["Variable"],[["value",,[[,"[ owner, key, value ] args",,"[owner,key,value]args",0,"File:public/js/jquery.js:[owner,key,value]args"]]]]);
+NDSearch.OnPrefixDataLoaded("val",["Function","Variable"],[["val",,[["csts.libs.workbooks",,,,0,"File:lib/workbooks.js:csts.libs.workbooks.val","JavaScriptClass:csts.libs.workbooks:val"]]],["value",,[[,"[ owner, key, value ] args",,"[owner,key,value]args",1,"File:public/js/jquery.js:[owner,key,value]args"]]]]);

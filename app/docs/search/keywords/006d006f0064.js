@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("mod",["Variable"],[["models",,[["CSTS",,,,0,"File:csts.js:CSTS.models","JavaScriptClass:CSTS:models"]]]]);
+NDSearch.OnPrefixDataLoaded("mod",["Variable"],[["models",,[["csts",,,,0,"File:csts.js:csts.models","JavaScriptClass:csts:models"]]]]);

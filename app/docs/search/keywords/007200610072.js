@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("rar",["Variable"],[["rarFields",,[["csts.models.Scans",,,,0,"File:models/Scans.js:csts.models.Scans.rarFields","JavaScriptClass:csts.models.Scans:rarFields"]]]]);
+NDSearch.OnPrefixDataLoaded("rar",["Variable"],[["rarFields",,[["csts.models.scans",,,,0,"File:models/Scans.js:csts.models.scans.rarFields","JavaScriptClass:csts.models.scans:rarFields"]]]]);

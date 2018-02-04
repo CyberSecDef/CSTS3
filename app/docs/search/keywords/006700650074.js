@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("get",["Function"],[["getVal",,[["comparison",,,,0,"File:models/Scans.js:comparison.getVal","JavaScriptClass:comparison:getVal"]]],["getVulnId",,[["comparison",,,,0,"File:models/Scans.js:comparison.getVulnId","JavaScriptClass:comparison:getVulnId"]]]]);
+NDSearch.OnPrefixDataLoaded("get",["Function"],[["getVulnId",,[["csts.models.scans.comparison",,,,0,"File:models/Scans.js:csts.models.scans.comparison.getVulnId","JavaScriptClass:csts.models.scans.comparison:getVulnId"]]]]);

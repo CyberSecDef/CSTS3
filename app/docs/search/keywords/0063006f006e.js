@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("con",["Variable"],[["controllers",,[["CSTS",,,,0,"File:csts.js:CSTS.controllers","JavaScriptClass:CSTS:controllers"]]]]);
+NDSearch.OnPrefixDataLoaded("con",["Variable"],[["controllers",,[["csts",,,,0,"File:csts.js:csts.controllers","JavaScriptClass:csts:controllers"]]]]);

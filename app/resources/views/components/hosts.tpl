@@ -16,7 +16,7 @@
 			select : function(event, element){
 				console.log(event);
 				console.log(element);
-				csts.ad.ouChildren( $(element).find('input[type="checkbox"]').attr('data-path') )
+				csts.libs.ad.ouChildren( $(element).find('input[type="checkbox"]').attr('data-path') )
 					.invoke()
 					.then( output => {
 						console.log('Loading sub-nodes');
@@ -31,12 +31,12 @@
 			}
         });
 
-		hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox' data-path='' />" + csts.ad.fqdn().toLowerCase() } } ); 
+		hostTree.tree('addNode',{ span : {  'html' : "<input type='checkbox' data-path='' />" + csts.libs.ad.fqdn().toLowerCase() } } ); 
 
 
 		function addNode(path, node){ 
 			console.log(path);
-			ps = csts.ad.ouChildren(path) 
+			ps = csts.libs.ad.ouChildren(path) 
 			ps.invoke() 
 				.then( output => { 
 					$.each( JSON.parse( output ), function(index, item){  

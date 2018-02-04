@@ -143,3 +143,8 @@ h3 a{
 	background: #17a2b8;
 	color:#fff;
 }
+
+.span-dark {
+	background: #666;
+	color:#fff;
+}
