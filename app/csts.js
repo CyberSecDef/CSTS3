@@ -83,6 +83,7 @@ var csts = {
 		'os'		: require('os'),
 		'moment'	: require('moment'),
 		'navigo'	: require('navigo'),
+		'numeral'	: require('numeral'),
 		'path'		: require('path'),
 		'util'		: require('util'),
 		'zlib'		: require('zlib'),
@@ -155,6 +156,7 @@ var csts = {
 			'./public/js/fontawesome-all.min.js',
 			'./public/js/jquery.tree.js',
 			'./public/js/jquery.dataTables.js',
+			'./public/js/dataTables.bootstrap4.min.js',
 		], function(index, item){csts.require(item)});
 
 		//include routes
@@ -269,5 +271,8 @@ var csts = {
 			});
 
 		})
+		csts.plugins.win.resizeTo(1600,800);
+		csts.plugins.win.on('resize',function(){ csts.plugins.win.setPosition('center');  })
+		
 	},
 };

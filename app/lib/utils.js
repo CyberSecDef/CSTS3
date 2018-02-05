@@ -11,13 +11,13 @@ csts.libs['utils'] = {
 			dir - The path being scanned
 			filelist - a file list to pass between recursive calls.  Not needed for initial call
 	*/
-	walkSync : function(dir, filelist) {
+	walkSync : function(dir, filelist, showStatus) {
 		if( dir[dir.length-1] != '/') dir=dir.concat('/');
 		files = csts.plugins.fs.readdirSync(dir);
 		filelist = filelist || [];
 		files.forEach(function(file) {
 			if (csts.plugins.fs.statSync(dir + file).isDirectory()) {
-				filelist = csts.libs.utils.walkSync(dir + file + '/', filelist);
+				filelist = csts.libs.utils.walkSync(dir + file + '/', filelist), showStatus;
 			}else {
 				filelist.push(dir+file);
 			}

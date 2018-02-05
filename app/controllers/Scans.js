@@ -23,6 +23,18 @@ csts.controllers['Scans'] = ({
 	*/
 	
 	scans2poam : {
+		scanFiles : [],
+		scans : {
+			scap : {},
+			acas : {},
+			ckl : {}
+		},
+		$poamArr : {},
+		$poamKeys : [],
+		$scapOpen : [],
+		$cklOpen : [],
+
+
 		/*
 			Method: index
 			This is the function called from the router to load the scans2poam module
@@ -38,20 +50,66 @@ csts.controllers['Scans'] = ({
 		},
 		
 		/*
-			Method: execute
-			Executes the scans2poam function with submitted scan path
+			Method: csts.controllers.scans.scans2poam.parse
+			Grabs the files from the submitted path
 		*/
-		execute : function(){
+		grabFiles : function(){
+			var self = this;
+			$('#myModal').modal();
+			$('#myModalLabel').text('Please Wait...');
+			$('#myModalBody').text('Currently Loading the Scanfiles.  Please wait.');
+			$('#myModal').on('shown.bs.modal', function (e) {
+				this.scanFiles = self.getScanFiles();	
+				
+				//load into table
+				$('#tabScanFiles tbody').empty();
+				var table = $('table#tabScanFiles').DataTable({ destroy: true, searching: true , paging: 25});
+				table.clear();
+				this.scanFiles.forEach(function(file, index){
+					stats = csts.plugins.fs.statSync( file );
+					
+					table.row.add(
+						[
+							"<input type='checkbox' name='scan-file' value='" + file + "' checked='checked'/>",
+							csts.plugins.path.basename( file ),
+							csts.plugins.moment(stats.ctimeMs).format("MM/DD/YYYY HH:mm"), 
+							csts.plugins.moment(stats.atimeMs).format("MM/DD/YYYY HH:mm"),
+							csts.plugins.moment(stats.mtimeMs).format("MM/DD/YYYY HH:mm"),
+							csts.plugins.numeral(stats.size).format('0.0 b'),
+							csts.plugins.path.extname( file )
+						] 
+					)
+				
+				})
+				
+				table.rows().invalidate().draw();
+
+				
+				$('#myModal').modal('hide');
+			});
+
+			console.log('Executing');
+			this.scanFiles.forEach(function(val,index){
+				console.log(val);
+			});
+		},
+
+		getScanFiles : function(){
 			path = $("#files-scans")[0].files[0].path
 			if( $('#files-recurse').prop('checked') ){
 				files = csts.libs.utils.walkSync(path);
-				console.log(files);
 			}else{
 				files = csts.plugins.fs.readdirSync(path);
-				console.log(files);
 			}
-			
-			
+			//filter to just the types of scan files we need
+			scans = files.filter( scan => ( 
+				(scan.toLowerCase().indexOf('.xml') >= 0 && scan.toLowerCase().indexOf('xccdf') >= 0 ) || 
+				scan.toLowerCase().indexOf('.zip') >= 0 ||
+				scan.toLowerCase().indexOf('.ckl') >= 0 ) ||
+				scan.toLowerCase().indexOf('.nessus') >= 0 
+			)
+
+			return scans;
 		}
 	},
 	/*
@@ -65,6 +123,9 @@ csts.controllers['Scans'] = ({
 			This is the function called from the router to load the compareRAR/POAM functionality
 		*/
 		index : function(){
+			
+			csts.libs.ui.status('Loading RAR/POAM Comparison functions.');
+
 			csts.plugins.ejs.renderFile('app/resources/views/pages/scans/compare.tpl',{
 					fields : csts.models['Scans'].compareFields,
 				},

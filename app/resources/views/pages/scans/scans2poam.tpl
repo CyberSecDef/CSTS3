@@ -40,18 +40,61 @@
 											</div>
 											
 											<div class="input-group-append">
-												<button type="button" class="btn btn-primary float-right" id="scans2poam-execute-btn">Execute</button>	
+												<button type="button" class="btn btn-primary float-right" id="scans2poam-parse-btn">Parse</button>	
 											</div>
 										</div>
 																		
 									</form>
-									
 								</div>
 							</p>
 						</div>
 					</div>
 				</div>
 				
+				<div class="card">
+					<div class="card-header" id="headingTwo">
+						<h5 class="mb-0">
+							<button class="btn btn-link" data-toggle="collapse" data-target="#scans-scan-files" aria-expanded="true" aria-controls="scans-scan-files">
+								Selected Scan Files
+							</button>
+						</h5>
+					</div>
+					<div id="scans-scan-files" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+						<div class="card-body">
+							<p class="card-text">
+								<div class="container">
+									<table class="table table-striped table-sm table-small-text"  id="tabScanFiles">
+										<thead>
+											<tr>
+												<th style="width:25px !important;">#</th>
+												<th style="width:400px;">Name</th>
+												<th style="width:100px !important;">Created</th>
+												<th style="width:100px !important;">Accessed</th>
+												<th style="width:100px !important;">Modified</th>
+												<th style="width:50px !important;">Size</th>
+												<th style="width:50px !important;">File Type</th>
+											</tr>
+										</thead>
+										<tbody>
+										</tbody>
+										<tfoot>
+											<tr>
+												<th colspan="7">
+													<button class="btn btn-success float-right" type="button">Execute</button>
+												</th>
+											</tr>
+
+										</tfoot>
+									</table>
+								</div>
+								<br />
+								
+							</p>
+						</div>
+					</div>
+
+				</div>
+
 				<div class="card">
 					<div class="card-header" id="headingFour">
 						<h5 class="mb-0">
@@ -79,7 +122,7 @@
 								</div>
 							</form>
 
-							<table class="table table-sm table-striped table-small-text data-table" id="scans-files">
+							<table class="table table-sm table-striped table-small-text data-table " id="scans-files">
 							<thead>
 								<tr>
 									<th>#</th>
@@ -109,5 +152,7 @@
 		$('label[for="'+$(this).attr('id')+'"]').text( $("#files-scans")[0].files[0].path  );
 	});
 	
-	$('#scans2poam-execute-btn').on('click',function(){ csts.controllers.Scans.scans2poam.execute(); } ); 
+	$('#scans2poam-parse-btn').on('click',function(){
+		csts.controllers.Scans.scans2poam.grabFiles(); 
+	}); 
 </script>
