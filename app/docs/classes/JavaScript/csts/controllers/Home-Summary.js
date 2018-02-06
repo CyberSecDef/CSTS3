@@ -1,1 +1,0 @@
-NDFramePage.OnPageTitleLoaded("JavaScriptClass:csts.controllers.home","home");NDSummary.OnSummaryLoaded("JavaScriptClass:csts.controllers.home",[["JavaScript","JavaScript"]],[["Classes","Class"],["Groups","Group"],["Variables","Variable"]],[[14,0,0,"<span class=\"Qualifier\">csts.&#8203;controllers.</span>&#8203;home"],[15,0,1,"Variables","Variables"],[16,0,2,"name","name"]]);

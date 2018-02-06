@@ -1,1 +1,0 @@
-NDSummary.OnToolTipsLoaded("JavaScriptClass:csts.libs.ui",{70:"<div class=\"NDToolTip TClass LJavaScript\"><div class=\"TTSummary\">User Interface functions</div></div>",72:"<div class=\"NDToolTip TFunction LJavaScript\"><div class=\"TTSummary\">Updates, then fades the text on the status base</div></div>"});

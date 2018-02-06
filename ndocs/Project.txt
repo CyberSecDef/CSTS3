@@ -8,14 +8,11 @@
 # Project Information
 # ------------------------------------------------------------------------
 
+Title: CSTSv3
+Subtitle: Cyber Security Tool Suite v3
+
+
 # This is where you specify general information about your project.
-#
-# Title: [text]
-#    The name of your project.  (R) and (TM) will be converted to their
-#    respective symbols.
-#
-# Subtitle: [text]
-#    A subtitle for your project.
 #
 # Copyright: [text]
 #    The copyright notice for your project.  (C) will be converted to the
@@ -88,7 +85,7 @@ Source Folder: ..\app
 # Generated Documentation
 # ------------------------------------------------------------------------
 
-HTML Output Folder: ..\app\docs
+HTML Output Folder: ..\docs
 
 
 # This is where you specify what kind of documentation you want Natural Docs

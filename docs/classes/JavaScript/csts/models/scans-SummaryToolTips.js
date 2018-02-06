@@ -1,0 +1,1 @@
+NDSummary.OnToolTipsLoaded("JavaScriptClass:csts.models.scans",{45:"<div class=\"NDToolTip TClass LJavaScript\"><div class=\"TTSummary\">This is the model for handling \'Scan\' type functions</div></div>"});

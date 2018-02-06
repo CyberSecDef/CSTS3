@@ -109,6 +109,8 @@ const csts = {
   /*
       Method: require
       Used to include dynamic files in the browser
+
+      Return {void}
   */
   require(s) {
     $.ajax({
@@ -123,11 +125,12 @@ const csts = {
     });
   },
 
-
   /*
-      Method: init
-      This function initializes the csts class
-  */
+   * Method: init
+   * This function initializes the csts class
+   *
+   * Return {void}
+   */
   init() {
     this.jobs.push(new this.plugins.Cron({
       cronTime: '1-60/6 * * * * *',
