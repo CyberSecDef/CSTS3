@@ -1,3 +1,4 @@
 node_modules/
 app/database/
 csts.code-workspace
+app/database/config.db
