@@ -72,7 +72,7 @@ const csts = {
           tray - works with the systray and taskbar
           win - module to manage the application window
           reload - watches for changes in the file system and reloads the application
-          shell - allows nwjs to interface with powershell
+          Shell - allows nwjs to interface with powershell
           si - system information module
           xlsx - reads and writes various spreadsheet files
           Datastore - database module
@@ -100,7 +100,7 @@ const csts = {
     })),
     win: nw.Window.get(),
     reload: {},
-    shell: require('node-powershell'),
+    Shell: require('node-powershell'),
     si: require('systeminformation'),
     xlsx: require('xlsx'),
     Datastore: require('nedb'),

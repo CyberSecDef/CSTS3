@@ -161,7 +161,7 @@
 									<td data-bind="text: vulnId"></td>
 									<td data-bind="text: type"></td>
 									<td data-bind="text: rarRow"></td>
-									<td data-bind="text: rarVal"></td>
+									<td style="white-space:pre-wrap" data-bind="text: rarVal"></td>
 									<td class="input-group mb-3">
 										<div class="input-group-prepend">
 											<button type="button" class="btn btn-sm btn-compare-action" data-action="left"><i class="fas fa-long-arrow-alt-left"></i></button>
@@ -173,7 +173,7 @@
 									
 									</td>
 									<td data-bind="text: poamRow"></td>
-									<td data-bind="text: poamVal"></td>
+									<td style="white-space:pre-wrap" data-bind="text: poamVal"></td>
 								</tr>
 							</tbody>
 						</table>
@@ -220,7 +220,7 @@
 	});
 	
 	$('button#exportDOC').on('click',function(){
-		$results = $('#scans-compare-results')
+		$results = $('#scans-compare-results').clone();
 		$results.find('th').remove(':nth-child(6)');
 		$results.find('td').remove(':nth-child(6)');
 		csts.libs.export.doc($results.html(), 'rarPoamComparison.doc')

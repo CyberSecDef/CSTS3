@@ -23,7 +23,6 @@ csts.controllers.Scans = ({
       Namespace: csts.controllers.scans.scans2poam
       This is the scans2poam functionality
   */
-
   scans2poam: {
     scanFiles: [],
     scans: {
