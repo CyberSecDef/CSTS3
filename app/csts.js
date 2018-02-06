@@ -209,6 +209,7 @@ const csts = {
       filename: 'app/database/config.db',
       autoload: true,
     });
+    
     csts.db.config.count({
       viewCount: {
         $gt: 0,
@@ -279,14 +280,18 @@ const csts = {
         }
       });
 
-      csts.db.config.findOne({
-        viewCount: {
-          $gt: 0,
-        },
-      }, (err, res) => {
-        $('#viewCount').text(res.viewCount);
-        csts.plugins.ejs.cache.set('viewCount', res.viewCount);
-      });
+      if(typeof csts.db.config !== 'undefined'){
+        csts.db.config.findOne({
+          viewCount: {
+            $gt: 0,
+          },
+        }, (err, res) => {
+          if(typeof res !== 'undefined' && res !== null){
+            $('#viewCount').text(res.viewCount);
+            csts.plugins.ejs.cache.set('viewCount', res.viewCount);
+          }
+        });
+      }
 
 
       csts.plugins.ejs.renderFile('app/resources/views/layouts/default.tpl', {
