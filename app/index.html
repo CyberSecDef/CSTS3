@@ -15,8 +15,10 @@
 		<link rel="stylesheet" href="public/css/dataTables.bootstrap4.min.css">
 		<script>
 		//shortcuts
-		dbg = function(msg){ csts.libs.utils.debug(msg);}
-		csts.init();
+		$(document).ready(() => {
+			dbg = function(msg){ csts.libs.utils.log(msg);}
+			csts.init();
+		});
 		</script>
 	</head>
 	<body id='app'></body>

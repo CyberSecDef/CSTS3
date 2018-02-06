@@ -23,6 +23,7 @@
     "datatables.net": "^1.10.16",
     "datatables.net-dt": "^1.10.16",
     "ejs": "^2.5.7",
+    "eslint": "^4.17.0",
     "is-elevated": "^2.0.1",
     "jquery": "^3.2.1",
     "jquery-ui": "^1.12.1",
@@ -40,5 +41,9 @@
     "popper.js": "^1.12.9",
     "systeminformation": "^3.33.18",
     "xlsx": "^0.11.18"
+  },
+  "devDependencies": {
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.8.0"
   }
 }

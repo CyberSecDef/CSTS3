@@ -108,7 +108,7 @@ csts.controllers.Scans = ({
         getScanFiles: function () {
             path = $("#files-scans")[0].files[0].path;
             if ($('#files-recurse').prop('checked')) {
-                files = csts.libs.utils.walkSync(path);
+                files = csts.libs.utils.getRecursiveDir(path);
             } else {
                 files = csts.plugins.fs.readdirSync(path);
             }

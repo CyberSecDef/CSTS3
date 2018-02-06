@@ -1,0 +1,17 @@
+{
+    "extends": "airbnb-base",
+    "rules" : {
+        "global-require" : "off"
+    },
+    "globals" : {
+        "nw" : true,
+        "csts" : true,
+        "$" : true,
+        "window" : true,
+        "reloadWatcher" : true,
+        "document" : true,
+        "Blob" : true,
+        "navigator" : true,
+        "URL" : true    
+    }
+}
