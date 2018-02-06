@@ -209,7 +209,7 @@ const csts = {
       filename: 'app/database/config.db',
       autoload: true,
     });
-    
+
     csts.db.config.count({
       viewCount: {
         $gt: 0,
@@ -280,13 +280,13 @@ const csts = {
         }
       });
 
-      if(typeof csts.db.config !== 'undefined'){
+      if (typeof csts.db.config !== 'undefined') {
         csts.db.config.findOne({
           viewCount: {
             $gt: 0,
           },
         }, (err, res) => {
-          if(typeof res !== 'undefined' && res !== null){
+          if (typeof res !== 'undefined' && res !== null) {
             $('#viewCount').text(res.viewCount);
             csts.plugins.ejs.cache.set('viewCount', res.viewCount);
           }
