@@ -4,7 +4,7 @@
 */
 csts.libs.ad = {
   /*
-    Method: csts.libs.ad.fqdn
+    Method: fqdn
     Determines the hosts fully qualified domain name
 
     Parameters:
@@ -25,7 +25,7 @@ csts.libs.ad = {
   },
 
   /*
-    Method: csts.libs.ad.ouChildren
+    Method: ouChildren
     Returns the child nodes for a given OU
 
     Parameters:

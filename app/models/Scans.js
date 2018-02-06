@@ -46,13 +46,33 @@ csts.models.Scans = {
 
   },
   /*
-    Namespace: csts.models.scans.comparison
+    Namespace: csts.models.scans.compareRarPoam
     This is the container for the functions that deal with the poam/rar comparison module
   */
-  comparison: {
+  compareRarPoam: {
 
     /*
-      Method: execute
+      Method: compareVals
+      compares the value in a worksheet to the value submitted
+
+      Parameters:
+        workbook - the workbook being checked
+        sheet - the sheet in a workbook being checked
+        address - the address of the cell being checked
+        val - the value being checked
+    */
+    compareVals(workbook, sheet, address, val) {
+      if (!csts.models.Scans.workbooks[workbook].isBlank(sheet, address)) {
+        return (
+          csts.models.Scans.workbooks[workbook].Sheets[sheet][address].v.replace(/\s/g, '').toUpperCase()
+            .indexOf(val.replace(/\s/g, '').toUpperCase()) >= 0
+        );
+      }
+      return false;
+    },
+
+    /*
+      Method: compareWorkbooks
       This method will compare the data between a rar and a poam and return the differences
 
       Parameters:
@@ -60,7 +80,7 @@ csts.models.Scans = {
         poamTab - the tab in the poam workbook being checked
         fields - the fields being compared
     */
-    execute(rarTab, poamTab, fields) {
+    compareWorkbooks(rarTab, poamTab, fields) {
       let rarRow = 0;
       let $items = [];
       let resRow = 0;
@@ -68,7 +88,7 @@ csts.models.Scans = {
       rarRow = 8;
       while (rarRow < 3000 && (!csts.models.Scans.workbooks.rar.isBlank(rarTab, [`A${rarRow}`, `B${rarRow}`]))) {
         if (!csts.models.Scans.workbooks.rar.isBlank(rarTab, [`F${rarRow}`, `B${rarRow}`]) && csts.models.Scans.workbooks.rar.Sheets[rarTab][`F${rarRow}`].v !== 'IV') {
-          const vulnId = csts.models.Scans.comparison.getVulnId('rar', rarTab, `C${rarRow}`);
+          const vulnId = csts.models.Scans.compareRarPoam.getVulnId('rar', rarTab, `C${rarRow}`);
           $items.push({
             row: rarRow,
             vulnId,
@@ -99,12 +119,11 @@ csts.models.Scans = {
 
         // loop through all the poam until blanks are recieved
         while (poamRow < 3000 && (!csts.models.Scans.workbooks.poam.isBlank(poamTab, [`B${poamRow}`, `L${poamRow}`, `N${poamRow}`, `O${poamRow}`]))) {
-          if (csts.models.Scans.comparison.compareVals('poam', poamTab, `B${poamRow}`, element.vulnId) || csts.models.Scans.comparison.compareVals('poam', poamTab, `M${poamRow}`, element.vulnId)) {
+          if (this.compareVals('poam', poamTab, `B${poamRow}`, element.vulnId) || this.compareVals('poam', poamTab, `M${poamRow}`, element.vulnId)) {
             found = true;
-
-            if (!csts.models.Scans.comparison.compareVals('poam', poamTab, `N${poamRow}`, element.status) && $.grep(fields, n => n.value === 'Status').length > 0) {
+            if (!this.compareVals('poam', poamTab, `N${poamRow}`, element.status) && $.grep(fields, n => n.value === 'Status').length > 0) {
               resRow += 1;
-              csts.controllers.Scans.viewModels.comparison.push({
+              csts.controllers.Scans.viewModels.compareRarPoam.push({
                 rowId: resRow,
                 guid: csts.libs.utils.getGuid(),
                 vulnId: element.vulnId,
@@ -117,9 +136,9 @@ csts.models.Scans = {
               });
             }
 
-            if (!csts.models.Scans.comparison.compareVals('poam', poamTab, `C${poamRow}`, element.control) && $.grep(fields, n => n.value === 'Security Controls').length > 0) {
+            if (!this.compareVals('poam', poamTab, `C${poamRow}`, element.control) && $.grep(fields, n => n.value === 'Security Controls').length > 0) {
               resRow += 1;
-              csts.controllers.Scans.viewModels.comparison.push({
+              csts.controllers.Scans.viewModels.compareRarPoam.push({
                 rowId: resRow,
                 guid: csts.libs.utils.getGuid(),
                 vulnId: element.vulnId,
@@ -132,9 +151,9 @@ csts.models.Scans = {
               });
             }
 
-            if (!csts.models.Scans.comparison.compareVals('poam', poamTab, `M${poamRow}`, element.source) && $.grep(fields, n => n.value === 'Source').length > 0) {
+            if (!this.compareVals('poam', poamTab, `M${poamRow}`, element.source) && $.grep(fields, n => n.value === 'Source').length > 0) {
               resRow += 1;
-              csts.controllers.Scans.viewModels.comparison.push({
+              csts.controllers.Scans.viewModels.compareRarPoam.push({
                 rowId: resRow,
                 guid: csts.libs.utils.getGuid(),
                 vulnId: element.vulnId,
@@ -147,12 +166,12 @@ csts.models.Scans = {
               });
             }
 
-            if (!csts.models.Scans.comparison.compareVals('poam', poamTab, `F${poamRow}`, element.rawRisk) &&
+            if (!this.compareVals('poam', poamTab, `F${poamRow}`, element.rawRisk) &&
             element.rawRisk.toUpperCase().replace('CAT', '') !== csts.models.Scans.workbooks.poam.val(poamTab, `F${poamRow}`) &&
               $.grep(fields, n => n.value === 'Raw Risk').length > 0
             ) {
               resRow += 1;
-              csts.controllers.Scans.viewModels.comparison.push({
+              csts.controllers.Scans.viewModels.compareRarPoam.push({
                 rowId: resRow,
                 guid: csts.libs.utils.getGuid(),
                 vulnId: element.vulnId,
@@ -165,12 +184,12 @@ csts.models.Scans = {
               });
             }
 
-            if (!csts.models.Scans.comparison.compareVals('poam', poamTab, `H${poamRow}`, element.residualRisk) &&
+            if (!this.compareVals('poam', poamTab, `H${poamRow}`, element.residualRisk) &&
             element.residualRisk.toUpperCase().replace('CAT', '') !== csts.models.Scans.workbooks.poam.val(poamTab, `H${poamRow}`) &&
               $.grep(fields, n => n.value === 'Residual Risk').length > 0
             ) {
               resRow += 1;
-              csts.controllers.Scans.viewModels.comparison.push({
+              csts.controllers.Scans.viewModels.compareRarPoam.push({
                 rowId: resRow,
                 guid: csts.libs.utils.getGuid(),
                 vulnId: element.vulnId,
@@ -184,7 +203,7 @@ csts.models.Scans = {
             }
 
             if (
-              (!csts.models.Scans.comparison.compareVals('poam', poamTab, `B${poamRow}`, element.description) &&
+              (!this.compareVals('poam', poamTab, `B${poamRow}`, element.description) &&
                 ([$.trim(element.vulnId), ' - ', $.trim(element.description)].join()).toUpperCase() !== $.trim(csts.models.Scans.workbooks.poam.val(poamTab, `B${poamRow}`)).toUpperCase() &&
                 (['(', $.trim(element.vulnId), ')', ' - ', $.trim(element.description)].join()).toUpperCase() !== $.trim(csts.models.Scans.workbooks.poam.val(poamTab, `B${poamRow}`)).toUpperCase() &&
                 $.trim(csts.models.Scans.workbooks.poam.val(poamTab, `B${poamRow}`).toUpperCase()).replace(/\W/g, '').indexOf(element.description.toUpperCase().replace(/\W/g, '')) === -1
@@ -192,7 +211,7 @@ csts.models.Scans = {
               $.grep(fields, n => n.value === 'Residual Risk').length > 0
             ) {
               resRow += 1;
-              csts.controllers.Scans.viewModels.comparison.push({
+              csts.controllers.Scans.viewModels.compareRarPoam.push({
                 rowId: resRow,
                 guid: csts.libs.utils.getGuid(),
                 vulnId: element.vulnId,
@@ -206,13 +225,13 @@ csts.models.Scans = {
             }
 
             if (
-              (!csts.models.Scans.comparison.compareVals('poam', poamTab, `G${poamRow}`, element.mitigation) &&
+              (!this.compareVals('poam', poamTab, `G${poamRow}`, element.mitigation) &&
                 (csts.models.Scans.workbooks.poam.val(poamTab, `G${poamRow}`).toUpperCase()).replace(/\W/g, '').indexOf(element.mitigation.toUpperCase().replace(/\W/g, '')) === -1
               ) &&
               $.grep(fields, n => n.value === 'Mitigations').length > 0
             ) {
               resRow += 1;
-              csts.controllers.Scans.viewModels.comparison.push({
+              csts.controllers.Scans.viewModels.compareRarPoam.push({
                 rowId: resRow,
                 guid: csts.libs.utils.getGuid(),
                 vulnId: element.vulnId,
@@ -226,13 +245,13 @@ csts.models.Scans = {
             }
 
             if (
-              (!csts.models.Scans.comparison.compareVals('poam', poamTab, `O${poamRow}`, element.comment) &&
+              (!this.compareVals('poam', poamTab, `O${poamRow}`, element.comment) &&
                 (csts.models.Scans.workbooks.poam.val(poamTab, `O${poamRow}`).toUpperCase()).replace(/\W/g, '').indexOf(element.comment.toUpperCase().replace(/\W/g, '')) === -1
               ) &&
               $.grep(fields, n => n.value === 'Comments').length > 0
             ) {
               resRow += 1;
-              csts.controllers.Scans.viewModels.comparison.push({
+              csts.controllers.Scans.viewModels.compareRarPoam.push({
                 rowId: resRow,
                 guid: csts.libs.utils.getGuid(),
                 vulnId: element.vulnId,
@@ -250,7 +269,7 @@ csts.models.Scans = {
         if (!found) {
           if (element.status !== 'Completed') {
             resRow += 1;
-            csts.controllers.Scans.viewModels.comparison.push({
+            csts.controllers.Scans.viewModels.compareRarPoam.push({
               rowId: resRow,
               guid: csts.libs.utils.getGuid(),
               vulnId: element.vulnId,
@@ -270,7 +289,7 @@ csts.models.Scans = {
       let poamRow = 8;
       while (poamRow < 3000 && !csts.models.Scans.workbooks.poam.isBlank(poamTab, [`B${poamRow}`, `N${poamRow}`])) {
         if (csts.models.Scans.workbooks.poam.val(poamTab, `F${poamRow}`) !== 'IV') {
-          const vulnId = csts.models.Scans.comparison.getVulnId('poam', poamTab, `M${poamRow}`);
+          const vulnId = csts.models.Scans.compareRarPoam.getVulnId('poam', poamTab, `M${poamRow}`);
 
           $items.push({
             row: poamRow,
@@ -293,7 +312,7 @@ csts.models.Scans = {
         let found = false;
 
         while (rarRow < 3000 && !csts.models.Scans.workbooks.poam.isBlank(poamTab, [`B${rarRow}`, `C${rarRow}`, `F${rarRow}`, `M${rarRow}`, `N${rarRow}`])) {
-          if (!csts.models.Scans.comparison.compareVals('rar', rarTab, `C${rarRow}`, element.vulnId)) {
+          if (!this.compareVals('rar', rarTab, `C${rarRow}`, element.vulnId)) {
             found = true;
           }
           rarRow += 1;
@@ -301,7 +320,8 @@ csts.models.Scans = {
 
         if (!found) {
           if (element.status !== 'Completed') {
-            csts.controllers.Scans.viewModels.comparison.push({
+            resRow += 1;
+            csts.controllers.Scans.viewModels.compareRarPoam.push({
               rowId: resRow,
               guid: csts.libs.utils.getGuid(),
               vulnId: element.vulnId,
@@ -344,26 +364,6 @@ csts.models.Scans = {
         }
       }
       return vulnId;
-    },
-
-    /*
-      Method: compareVals
-      compares the value in a worksheet to the value submitted
-
-      Parameters:
-        workbook - the workbook being checked
-        sheet - the sheet in a workbook being checked
-        address - the address of the cell being checked
-        val - the value being checked
-    */
-    compareVals(workbook, sheet, address, val) {
-      if (!csts.models.Scans.workbooks[workbook].isBlank(sheet, address)) {
-        return (
-          csts.models.Scans.workbooks[workbook].Sheets[sheet][address].v.replace(/\s/g, '').toUpperCase()
-            .indexOf(val.replace(/\s/g, '').toUpperCase()) >= 0
-        );
-      }
-      return false;
     },
 
     /*

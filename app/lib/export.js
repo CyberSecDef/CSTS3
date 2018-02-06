@@ -3,41 +3,6 @@
   This object is responsible for exporting reports in DOC, PDF and CSV formats
 */
 csts.libs.export = {
-  /*
-    Method: doc
-    Exports reports in DOC formats
-
-    Parameters:
-      content - The html content being exported
-      filename - The name of the file to save as
-  */
-  doc(content, filename) {
-    const css = [];
-    for (let sheeti = 0; sheeti < document.styleSheets.length; sheeti += 1) {
-      const sheet = document.styleSheets[sheeti];
-      const rules = ('cssRules' in sheet) ? sheet.cssRules : sheet.rules;
-      if (rules) {
-        for (let rulei = 0; rulei < rules.length; rulei += 1) {
-          const rule = rules[rulei];
-          if ('cssText' in rule) {
-            css.push(rule.cssText);
-          } else {
-            css.push([rule.selectorText, ' {\n', rule.style.cssText, '\n}\n'].join());
-          }
-        }
-      }
-    }
-    const styles = css.join('\n');
-    csts.plugins.ejs.renderFile('app/resources/views/components/export/doc.tpl', {
-      styles,
-    }, {}, (err, str) => {
-      const parser = new DOMParser();
-      const el = parser.parseFromString(str, 'text/xml');
-      $(el).find('body').append(content);
-
-      csts.libs.utils.blob('text/html', el.documentElement.outerHTML, filename);
-    });
-  },
 
   /*
     Method: csv
@@ -73,6 +38,42 @@ csts.libs.export = {
       csvFile += processRow(r);
     });
     csts.libs.utils.blob('text/csv', csvFile, filename);
+  },
+
+  /*
+    Method: doc
+    Exports reports in DOC formats
+
+    Parameters:
+      content - The html content being exported
+      filename - The name of the file to save as
+  */
+  doc(content, filename) {
+    const css = [];
+    for (let sheeti = 0; sheeti < document.styleSheets.length; sheeti += 1) {
+      const sheet = document.styleSheets[sheeti];
+      const rules = ('cssRules' in sheet) ? sheet.cssRules : sheet.rules;
+      if (rules) {
+        for (let rulei = 0; rulei < rules.length; rulei += 1) {
+          const rule = rules[rulei];
+          if ('cssText' in rule) {
+            css.push(rule.cssText);
+          } else {
+            css.push([rule.selectorText, ' {\n', rule.style.cssText, '\n}\n'].join());
+          }
+        }
+      }
+    }
+    const styles = css.join('\n');
+    csts.plugins.ejs.renderFile('app/resources/views/components/export/doc.tpl', {
+      styles,
+    }, {}, (err, str) => {
+      const parser = new DOMParser();
+      const el = parser.parseFromString(str, 'text/xml');
+      $(el).find('body').append(content);
+
+      csts.libs.utils.blob('text/html', el.documentElement.outerHTML, filename);
+    });
   },
 
   /*

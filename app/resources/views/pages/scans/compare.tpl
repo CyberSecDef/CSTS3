@@ -83,11 +83,11 @@
 									
 										<div class="form-group row">
 											<label class="col-sm-2 col-form-label"><h4>Fields:</h4> </label>
-											<div class="col-sm-10" id="fieldComparison">
+											<div class="col-sm-10" id="fieldcompareRarPoam">
 												<% fields.forEach(function(field) { %>
 													<div class="form-check form-check-inline">
 														<label class="form-check-label">
-															<input class="form-check-input" type="checkbox" value="<%= field %>" name="comparisonFields" checked="checked" /><%= field %>
+															<input class="form-check-input" type="checkbox" value="<%= field %>" name="compareRarPoamnFields" checked="checked" /><%= field %>
 														</label>
 													</div>
 												<% }); %>
@@ -103,7 +103,7 @@
 											</div>
 											<select class="form-control" aria-label="POAM Tab" name="poamTabSel" id="poamTabSel"></select>
 											<div class="input-group-append">
-												<button type="button" class="btn btn-primary float-right" id="scans-comparison-execute-btn">Execute</button>	
+												<button type="button" class="btn btn-primary float-right" id="scans-compareRarPoam-execute-btn">Execute</button>	
 											</div>
 										</div>
 										
@@ -155,7 +155,7 @@
 									<th style="width: 20% !important;">POAM Value</th>
 								</tr>
 							</thead>
-							<tbody data-bind="foreach: comparison" >
+							<tbody data-bind="foreach: compareRarPoam" >
 								<tr data-bind="attr: { 'data-guid': guid, 'data-mismatch': mismatch }">
 									<td data-bind="text: rowId"></td>
 									<td data-bind="text: vulnId"></td>
@@ -188,42 +188,42 @@
 <script>
 
 	$(document).ready(function(){
-		csts.controllers['Scans'].viewModels.comparison.removeAll();
+		csts.controllers['Scans'].viewModels.compareRarPoam.removeAll();
 		$.each( $("*[data-bind]"), function(){ 
 			ko.removeNode( $(this) ); 
 		});
-		ko.applyBindings({ comparison: csts.controllers.Scans.viewModels.comparison }, $('table#scans-compare-results tbody')[0] );
+		ko.applyBindings({ compareRarPoam: csts.controllers.Scans.viewModels.compareRarPoam }, $('table#scans-compare-results tbody')[0] );
 	});
 	
 	$(window).bind('beforeunload', function(){
 		$('#scans-compare-results tbody tr').remove();
-		ko.removeNode( csts.controllers['Scans'].viewModels.comparison ); 
-		ko.cleanNode( csts.controllers['Scans'].viewModels.comparison ); 
+		ko.removeNode( csts.controllers['Scans'].viewModels.compareRarPoam ); 
+		ko.cleanNode( csts.controllers['Scans'].viewModels.compareRarPoam ); 
 		ko.removeNode( $('#scans-compare-results tbody tr')[0] );
 		ko.cleanNode( $('#scans-compare-results tbody tr')[0] );
-		csts.controllers['Scans'].viewModels.comparison.destroy()
-		csts.controllers['Scans'].viewModels.comparison = {};
-		csts.controllers['Scans'].viewModels.comparison.removeAll();
+		csts.controllers['Scans'].viewModels.compareRarPoam.destroy()
+		csts.controllers['Scans'].viewModels.compareRarPoam = {};
+		csts.controllers['Scans'].viewModels.compareRarPoam.removeAll();
 	});
 
 	$("#fileRar, #filePoam").on("change",function(){
 		$('label[for="'+$(this).attr('id')+'"]').text( csts.plugins.path.basename( $(this).val() ) );
 		if($('#fileRar').val().trim() != '' && $('#filePoam').val().trim() != ''){
-			csts.controllers['Scans'].comparison.parseFiles();
+			csts.controllers['Scans'].compareRarPoam.parseFiles();
 		}
 	});
 	
-	$('button#scans-comparison-execute-btn').on('click',function(){
+	$('button#scans-compareRarPoam-execute-btn').on('click',function(){
 		$('#scans-compare-results tbody tr').remove();
-		csts.controllers['Scans'].comparison.execute(  $("input:checked[type='checkbox'][name='comparisonFields']").serializeArray() );
-		$('button.btn-compare-action').on('click', function(){ csts.controllers['Scans'].comparison.fieldMove( $(this) ); } );
+		csts.controllers.Scans.compareRarPoam.executeComparison(  $("input:checked[type='checkbox'][name='compareRarPoamnFields']").serializeArray() );
+		$('button.btn-compare-action').on('click', function(){ csts.controllers['Scans'].compareRarPoam.moveField( $(this) ); } );
 	});
 	
 	$('button#exportDOC').on('click',function(){
 		$results = $('#scans-compare-results').clone();
 		$results.find('th').remove(':nth-child(6)');
 		$results.find('td').remove(':nth-child(6)');
-		csts.libs.export.doc($results.html(), 'rarPoamComparison.doc')
+		csts.libs.export.doc($results.html(), 'compareRarPoam.doc')
 	});
 	
 	$('button#exportPDF').on('click',function(){
@@ -248,7 +248,7 @@
 		})
 		console.log(data);
 			
-		csts.libs.export.pdf(data, 'rarPoamComparison.pdf')
+		csts.libs.export.pdf(data, 'compareRarPoam.pdf')
 	});
 	
 	$('button#exportCSV').on('click',function(){
@@ -266,7 +266,7 @@
 				$(el).find('td:nth-child(8)').text()
 			] )
 		})
-		csts.libs.export.csv(data, 'rarPoamComparison.csv')
+		csts.libs.export.csv(data, 'compareRarPoam.csv')
 	});
 	
 	

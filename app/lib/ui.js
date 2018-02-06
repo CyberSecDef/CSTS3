@@ -4,7 +4,7 @@
 */
 csts.libs.ui = {
   /*
-    Method: csts.libs.ui.status
+    Method: status
     Updates, then fades the text on the status base
 
     Parameters:

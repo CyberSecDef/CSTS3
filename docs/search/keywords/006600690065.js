@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("fie",["Function"],[["fieldMove",,[["csts.controllers.scans.comparison",,,,0,"File:controllers/Scans.js:csts.controllers.scans.comparison.fieldMove","JavaScriptClass:csts.controllers.scans.comparison:fieldMove"]]]]);

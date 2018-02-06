@@ -1,17 +1,18 @@
 /*
-  Namespace: csts.controllers.home
+  Namespace: csts.controllers.Home
   This is the baseline controller for the CSTS
 */
 csts.controllers.Home = ({
 
 /*
-  Variable: name
-  The name of the controller
+  Variables: Properties
+
+  controllerName - the name of the controller
 */
-  name: 'Home',
+  controllerName: 'Home',
 
   /*
-    Namespace: csts.controllers.home.main
+    Namespace: csts.controllers.Home.main
     This is the container for the main homepage functions
   */
   main: {
