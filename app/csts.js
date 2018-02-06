@@ -317,7 +317,7 @@ const csts = {
         return false;
       });
 
-      csts.controllers.Home.main.index();
+      csts.controllers.Home.main.showHome();
 
       csts.plugins.isElevated().then((elevated) => {
         $('footer.footer div div.status-bar-r').html(elevated ? '<i class="fas fa-chess-king"></i>' : '<i class="fas fa-user"></i>');

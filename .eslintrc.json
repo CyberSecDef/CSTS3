@@ -4,6 +4,7 @@
         "global-require" : "off"
     },
     "globals" : {
+        "ko" : true,
         "nw" : true,
         "csts" : true,
         "$" : true,
