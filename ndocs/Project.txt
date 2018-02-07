@@ -11,6 +11,8 @@
 Title: CSTSv3
 Subtitle: Cyber Security Tool Suite v3
 
+Style: Dark
+
 
 # This is where you specify general information about your project.
 #
@@ -31,11 +33,6 @@ Subtitle: Cyber Security Tool Suite v3
 #    yy    - Double digit year.  2017 is "17".
 #    yyyy  - Four digit year.  2017 is "2017".
 #    year  - Four digit year.  2017 is "2017".
-#
-# Style: [style]
-#    The style to apply to the generated documentation.  It can be the name of
-#    a CSS file in the project configuration folder or a subfolder that
-#    contains Style.txt.  Do not include ".css" if using a CSS file.
 
 
 # Source Code
