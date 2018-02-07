@@ -8,3 +8,4 @@ $.extend(csts.routes, {
   '/Scans/compareRarPoam': 'Scans@compareRarPoam.showIndex',
   '/Scans/scans2Poam': 'Scans@scans2poam.showIndex',
 });
+

@@ -28,30 +28,29 @@ const csts = {
   routes: {},
 
   /*
-      Objects: plugins
-      wrapper for all the plugins the CSTS uses from node modules
+    Objects: plugins
+    wrapper for all the plugins the CSTS uses from node modules
 
-      crypto - cryptographic functions
-      cpu - cpu statistics
-      cron - cron jobs
-      dns - dns framework
-      fs - file system module
-      ejs - Embedded JavaScript templates
-      isElevated - determins if the user is elevated
-      os - pulls information from the os
-      moment - used for managing time objects
-      navigo - the router used for navigating the site
-      path - module to handle filesystem paths
-      util - utility module
-      zlib - zlib compression
-      tray - works with the systray and taskbar
-      win - module to manage the application window
-      reload - watches for changes in the file system and reloads the application
-      Shell - allows nwjs to interface with powershell
-      si - system information module
-      xlsx - reads and writes various spreadsheet files
-      Datastore - database module
-
+    crypto - cryptographic functions
+    cpu - cpu statistics
+    cron - cron jobs
+    dns - dns framework
+    fs - file system module
+    ejs - Embedded JavaScript templates
+    isElevated - determins if the user is elevated
+    os - pulls information from the os
+    moment - used for managing time objects
+    navigo - the router used for navigating the site
+    path - module to handle filesystem paths
+    util - utility module
+    zlib - zlib compression
+    tray - works with the systray and taskbar
+    win - module to manage the application window
+    reload - watches for changes in the file system and reloads the application
+    Shell - allows nwjs to interface with powershell
+    si - system information module
+    xlsx - reads and writes various spreadsheet files
+    Datastore - database module
   */
   plugins: {
     crypto: require('crypto'),
@@ -306,3 +305,4 @@ const csts = {
     });
   },
 };
+
