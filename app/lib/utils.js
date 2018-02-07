@@ -5,32 +5,6 @@
 csts.libs.utils = {
 
   /*
-    Method: getRecursiveDir
-
-    Parameters:
-      dir - The path being scanned
-      filelist - a file list to pass between recursive calls.  Not needed for initial call
-  */
-  getRecursiveDir: (d, f, s) => {
-    let dir = d;
-    let filelist = f;
-    const showStatus = s;
-    if (dir[dir.length - 1] !== '/') {
-      dir = dir.concat('/');
-    }
-    const files = csts.plugins.fs.readdirSync(dir);
-    filelist = filelist || [];
-    files.forEach((file) => {
-      if (csts.plugins.fs.statSync(dir + file).isDirectory()) {
-        filelist = csts.libs.utils.getRecursiveDir(`${dir}${file}/`, filelist, showStatus);
-      } else {
-        filelist.push(dir + file);
-      }
-    });
-    return filelist;
-  },
-
-  /*
     Method: blob
     This method will allow files to be saved from the CSTS app (file save dialog)
 
@@ -58,26 +32,38 @@ csts.libs.utils = {
   },
 
   /*
-    Method: toggleHosts
-    Shows or hides the hosts column of the CSTS application
-  */
-  toggleHosts() {
-    if ($('#main-right-col').is(':visible')) {
-      $('#main-right-col').hide();
-      $('#main-center-col').removeClass('col-10').addClass('col-12');
-    } else {
-      $('#main-right-col').show();
-      $('#main-center-col').removeClass('col-12').addClass('col-10');
-    }
-  },
-
-  /*
     Method: getGuid
     Generates a GUID like string
   */
   getGuid() {
     // eslint-disable-next-line
     return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>  (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
+  },
+
+  /*
+    Method: getRecursiveDir
+
+    Parameters:
+      dir - The path being scanned
+      filelist - a file list to pass between recursive calls.  Not needed for initial call
+  */
+  getRecursiveDir: (d, f, s) => {
+    let dir = d;
+    let filelist = f;
+    const showStatus = s;
+    if (dir[dir.length - 1] !== '/') {
+      dir = dir.concat('/');
+    }
+    const files = csts.plugins.fs.readdirSync(dir);
+    filelist = filelist || [];
+    files.forEach((file) => {
+      if (csts.plugins.fs.statSync(dir + file).isDirectory()) {
+        filelist = csts.libs.utils.getRecursiveDir(`${dir}${file}/`, filelist, showStatus);
+      } else {
+        filelist.push(dir + file);
+      }
+    });
+    return filelist;
   },
 
   /*
@@ -93,4 +79,19 @@ csts.libs.utils = {
       console.log(msg);
     }
   },
+
+  /*
+    Method: toggleHosts
+    Shows or hides the hosts column of the CSTS application
+  */
+  toggleHosts() {
+    if ($('#main-right-col').is(':visible')) {
+      $('#main-right-col').hide();
+      $('#main-center-col').removeClass('col-10').addClass('col-12');
+    } else {
+      $('#main-right-col').show();
+      $('#main-center-col').removeClass('col-12').addClass('col-10');
+    }
+  },
+
 };

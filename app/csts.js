@@ -6,76 +6,51 @@
 const csts = {
 
   /*
-      Variable: startTime
-      The time the application started
-  */
-  startTime: (Date.now()),
+    Variables: objects and properties
+    Various properties and objects within the main CSTS object
 
-  /*
-    Variable: jobs
-    container for any cronjobs
+    controllers - contains all controllers
+    db - contains all database objects
+    jobs - contains all cronJobs
+    libs - contains all library modules
+    models - contains all models
+    startTime - the timestamp for when this instance was executed
+    router - the Router object
+    routes - the various routes within the application
   */
-  jobs: [],
-  /*
-      Variable: db
-      Wrapper to hold all the database collections
-  */
+  controllers: {},
   db: {},
-
-  /*
-      Object: routes
-      Wrapper to hold all the routes used in application navigation
-  */
+  jobs: [],
+  libs: {},
+  models: {},
+  startTime: (Date.now()),
+  router: {},
   routes: {},
 
   /*
-      Object: router
-      This holds the router object
-  */
-  router: {},
-
-  /*
-      Object: models
-      Wrapper to hold all the model objects
-  */
-  models: {},
-
-  /*
-      Object: libs
-      Wrapper to hold all the generic library objects
-  */
-  libs: {},
-
-  /*
-      Object: controllers
-      Wrapper to hold all the controller objects
-  */
-  controllers: {},
-
-  /*
-      Object: plugins
+      Objects: plugins
       wrapper for all the plugins the CSTS uses from node modules
 
-          crypto - cryptographic functions
-          cpu - cpu statistics
-          cron - cron jobs
-          dns - dns framework
-          fs - file system module
-          ejs - Embedded JavaScript templates
-          isElevated - determins if the user is elevated
-          os - pulls information from the os
-          moment - used for managing time objects
-          navigo - the router used for navigating the site
-          path - module to handle filesystem paths
-          util - utility module
-          zlib - zlib compression
-          tray - works with the systray and taskbar
-          win - module to manage the application window
-          reload - watches for changes in the file system and reloads the application
-          shell - allows nwjs to interface with powershell
-          si - system information module
-          xlsx - reads and writes various spreadsheet files
-          Datastore - database module
+      crypto - cryptographic functions
+      cpu - cpu statistics
+      cron - cron jobs
+      dns - dns framework
+      fs - file system module
+      ejs - Embedded JavaScript templates
+      isElevated - determins if the user is elevated
+      os - pulls information from the os
+      moment - used for managing time objects
+      navigo - the router used for navigating the site
+      path - module to handle filesystem paths
+      util - utility module
+      zlib - zlib compression
+      tray - works with the systray and taskbar
+      win - module to manage the application window
+      reload - watches for changes in the file system and reloads the application
+      Shell - allows nwjs to interface with powershell
+      si - system information module
+      xlsx - reads and writes various spreadsheet files
+      Datastore - database module
 
   */
   plugins: {
@@ -100,17 +75,20 @@ const csts = {
     })),
     win: nw.Window.get(),
     reload: {},
-    shell: require('node-powershell'),
+    Shell: require('node-powershell'),
     si: require('systeminformation'),
     xlsx: require('xlsx'),
     Datastore: require('nedb'),
   },
 
   /*
-      Method: require
+      Method: requireFile
       Used to include dynamic files in the browser
+
+      Returns:
+      {void}
   */
-  require(s) {
+  requireFile(s) {
     $.ajax({
       url: s,
       dataType: 'script',
@@ -123,12 +101,14 @@ const csts = {
     });
   },
 
-
   /*
-      Method: init
-      This function initializes the csts class
-  */
-  init() {
+   * Method: initializeCsts
+   * This function initializes the csts class
+   *
+   * Returns:
+   * {void}
+   */
+  initializeCsts() {
     this.jobs.push(new this.plugins.Cron({
       cronTime: '1-60/6 * * * * *',
       onTick() {
@@ -156,10 +136,10 @@ const csts = {
     }
 
     require('knockout');
-    csts.require('../node_modules/knockout/build/output/knockout-latest.js');
-    csts.require('../node_modules/chart.js/dist/Chart.bundle.min.js');
-    csts.require('../node_modules/jspdf/dist/jspdf.min.js');
-    csts.require('../node_modules/jspdf-autotable/dist/jspdf.plugin.autotable.min.js');
+    this.requireFile('../node_modules/knockout/build/output/knockout-latest.js');
+    this.requireFile('../node_modules/chart.js/dist/Chart.bundle.min.js');
+    this.requireFile('../node_modules/jspdf/dist/jspdf.min.js');
+    this.requireFile('../node_modules/jspdf-autotable/dist/jspdf.plugin.autotable.min.js');
 
     // include library files.  These are individually listed for ordering purposes
     $.each([
@@ -170,14 +150,14 @@ const csts = {
       './public/js/jquery.dataTables.js',
       './public/js/dataTables.bootstrap4.min.js',
     ], (index, item) => {
-      csts.require(item);
+      this.requireFile(item);
     });
 
     // include routes
     $.each(
       csts.plugins.fs.readdirSync('./app/routes/'),
       (index, item) => {
-        csts.require(`./routes/${item}`);
+        this.requireFile(`./routes/${item}`);
       },
     );
 
@@ -185,7 +165,7 @@ const csts = {
     $.each(
       csts.plugins.fs.readdirSync('./app/controllers/'),
       (index, item) => {
-        csts.require(`./controllers/${item}`);
+        this.requireFile(`./controllers/${item}`);
       },
     );
 
@@ -193,7 +173,7 @@ const csts = {
     $.each(
       csts.plugins.fs.readdirSync('./app/models/'),
       (index, item) => {
-        csts.require(`./models/${item}`);
+        this.requireFile(`./models/${item}`);
       },
     );
 
@@ -201,7 +181,7 @@ const csts = {
     $.each(
       csts.plugins.fs.readdirSync('./app/lib/'),
       (index, item) => {
-        csts.require(`./lib/${item}`);
+        this.requireFile(`./lib/${item}`);
       },
     );
 
@@ -209,6 +189,7 @@ const csts = {
       filename: 'app/database/config.db',
       autoload: true,
     });
+
     csts.db.config.count({
       viewCount: {
         $gt: 0,
@@ -260,7 +241,7 @@ const csts = {
 
         function index(obj, i) {
           return obj[i];
-        } // magic that allows dynamic dot objects for grouping routes (scans.comparison.index)
+        } // magic that allows dynamic dot objects for grouping routes (scans.compareRarPoam.index)
         switch (typeof val) {
           case 'string':
             c = val.substring(0, val.indexOf('@'));
@@ -279,14 +260,18 @@ const csts = {
         }
       });
 
-      csts.db.config.findOne({
-        viewCount: {
-          $gt: 0,
-        },
-      }, (err, res) => {
-        $('#viewCount').text(res.viewCount);
-        csts.plugins.ejs.cache.set('viewCount', res.viewCount);
-      });
+      if (typeof csts.db.config !== 'undefined') {
+        csts.db.config.findOne({
+          viewCount: {
+            $gt: 0,
+          },
+        }, (err, res) => {
+          if (typeof res !== 'undefined' && res !== null) {
+            $('#viewCount').text(res.viewCount);
+            csts.plugins.ejs.cache.set('viewCount', res.viewCount);
+          }
+        });
+      }
 
 
       csts.plugins.ejs.renderFile('app/resources/views/layouts/default.tpl', {
@@ -309,7 +294,7 @@ const csts = {
         return false;
       });
 
-      csts.controllers.Home.main.index();
+      csts.controllers.Home.main.showHome();
 
       csts.plugins.isElevated().then((elevated) => {
         $('footer.footer div div.status-bar-r').html(elevated ? '<i class="fas fa-chess-king"></i>' : '<i class="fas fa-user"></i>');

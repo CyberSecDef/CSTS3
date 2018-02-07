@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("get",["Function"],[["getVulnId",,[["csts.models.scans.comparison",,,,0,"File:models/Scans.js:csts.models.scans.comparison.getVulnId","JavaScriptClass:csts.models.scans.comparison:getVulnId"]]]]);

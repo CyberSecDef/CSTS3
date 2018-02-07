@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("ejs",["Variable"],[["ejs",,[["csts",,,,0,"File:csts.js:csts.ejs","JavaScriptClass:csts:ejs"]]]]);

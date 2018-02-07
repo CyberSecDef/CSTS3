@@ -153,6 +153,7 @@
 	});
 	
 	$('#scans2poam-parse-btn').on('click',function(){
-		csts.controllers.Scans.scans2poam.grabFiles(); 
+		console.log( $(this) );
+		csts.controllers.Scans.scans2poam.invokeFileScan( $('#files-scans')[0].files[0].path ); 
 	}); 
 </script>

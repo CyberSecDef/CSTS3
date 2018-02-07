@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("pat",["Variable"],[["path",,[["csts",,,,0,"File:csts.js:csts.path","JavaScriptClass:csts:path"]]]]);

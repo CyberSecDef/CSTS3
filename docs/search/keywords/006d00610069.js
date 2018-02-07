@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("mai",["Class"],[["main",,[["csts.controllers.Home",,,,0,"File:controllers/Home.js:csts.controllers.Home.main","JavaScriptClass:csts.controllers.Home.main"]]]]);

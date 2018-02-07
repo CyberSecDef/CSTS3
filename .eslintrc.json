@@ -4,6 +4,7 @@
         "global-require" : "off"
     },
     "globals" : {
+        "ko" : true,
         "nw" : true,
         "csts" : true,
         "$" : true,
@@ -12,6 +13,8 @@
         "document" : true,
         "Blob" : true,
         "navigator" : true,
-        "URL" : true    
+        "URL" : true ,
+        "DOMParser" : true ,
+        "jsPDF" : true
     }
 }

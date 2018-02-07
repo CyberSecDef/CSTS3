@@ -2,3 +2,4 @@ node_modules/
 app/database
 csts.code-workspace
 package-lock.json
+app/database/config.db
