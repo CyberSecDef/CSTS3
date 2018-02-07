@@ -1,5 +1,5 @@
 #NDHeader{
-	background:#333333;
+	background:#343a40!important;
 }
 
 #NDSummary{
@@ -15,6 +15,16 @@
 }
 
 .CTitle {
-	font-size:.6em;
 	color: #333;
+}
+
+body.NDHomePage{
+	background-image: -webkit-gradient(linear,left top,left bottom,from(#707070),to(#E0E0E0));
+}
+
+#HTitle{
+	font-size: 20px;
+}
+#HTitle, .HTitle, .HSubtitle{
+	font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol" !important;
 }

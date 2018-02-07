@@ -1,0 +1,1 @@
+NDFramePage.OnPageTitleLoaded("File:database/config.txt","config.txt");NDSummary.OnSummaryLoaded("File:database/config.txt",[["Text File","TextFile"]],[["Databases","Database"],["Tables","DatabaseTable"],["Sections","Section"]],[[114,0,2,"Configurations","Configurations"],[113,0,0,"CodeDb","CodeDb"],[76,0,1,"config","config"]]);

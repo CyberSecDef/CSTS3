@@ -1,1 +1,1 @@
-NDContentPage.OnToolTipsLoaded({});
+NDContentPage.OnToolTipsLoaded({112:"<div class=\"NDToolTip TFunction LJavaScript\"><div id=\"NDPrototype112\" class=\"NDPrototype NoParameterForm\">initializeCsts()</div><div class=\"TTSummary\">This function initializes the csts class</div></div>"});

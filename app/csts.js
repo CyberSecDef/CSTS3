@@ -1,5 +1,15 @@
 /*
-    Namespace: csts
+  File: Information
+    Summary - The main csts global object
+    path - /app/csts.js
+    Version - 3.0.0a
+    Copyright - 2018
+    Author - Robert Weber <wwwdaze2000@gmail.com>
+    Created at - 2018-01-01
+    Last modified - 2018-02-07
+*/
+/*
+    Struct: csts
     This is the main CSTS class that bootstraps and loads everything.  This class also creates a
     global object that everything can be attached to.
 */
@@ -84,8 +94,18 @@ const csts = {
       Method: requireFile
       Used to include dynamic files in the browser
 
+      --- Prototype ---
+      void requireFile( string s )
+      -----------------
+
+      Parameters:
+        @param {string} s - path to file to require
+
+      See Also:
+        <initializeCSTS()>
+
       Returns:
-      {void}
+        void
   */
   requireFile(s) {
     $.ajax({
