@@ -54,7 +54,7 @@
 				<div class="card">
 					<div class="card-header" id="headingTwo">
 						<h5 class="mb-0">
-							<button class="btn btn-link" data-toggle="collapse" data-target="#scans-scan-files" aria-expanded="true" aria-controls="scans-scan-files">
+							<button class="btn btn-link" data-toggle="collapse" data-target="#scans-scan-files" aria-expanded="true" aria-controls="scans-scan-files" id="select-scan-files-card">
 								Selected Scan Files
 							</button>
 						</h5>
@@ -67,7 +67,7 @@
 										<thead>
 											<tr>
 												<th style="width:25px !important;">#</th>
-												<th style="width:400px;">Name</th>
+												<th style="width:200px;">Name</th>
 												<th style="width:100px !important;">Created</th>
 												<th style="width:100px !important;">Accessed</th>
 												<th style="width:100px !important;">Modified</th>
@@ -80,7 +80,7 @@
 										<tfoot>
 											<tr>
 												<th colspan="7">
-													<button class="btn btn-success float-right" type="button">Execute</button>
+													<button class="btn btn-success float-right" type="button" id="btn-scans2poam-execute">Execute</button>
 												</th>
 											</tr>
 
@@ -153,7 +153,10 @@
 	});
 	
 	$('#scans2poam-parse-btn').on('click',function(){
-		console.log( $(this) );
 		csts.controllers.Scans.scans2poam.invokeFileScan( $('#files-scans')[0].files[0].path ); 
 	}); 
+
+	$("button#btn-scans2poam-execute").on('click', function(){
+		csts.controllers.Scans.scans2poam.execute( $('#files-scans') ); 
+	});
 </script>

@@ -5,8 +5,10 @@
 		}
 	],
 	"settings": {
-		"files.eol" : "\n"
+		"files.eol" : "\n",
+			"files.associations" :{
+				"*.tpl" : "html"
+		}
 
-	},
-	
+	}
 }

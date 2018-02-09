@@ -3,7 +3,16 @@
   Object that contains utility type functions for the CSTS
 */
 csts.libs.utils = {
-
+  /*
+    Method: isBlank
+    determines if submitted object exists and is not blank
+  */
+  isBlank(obj) {
+    if (obj === null || obj === '' || typeof obj === 'undefined') {
+      return true;
+    }
+    return false;
+  },
   /*
     Method: blob
     This method will allow files to be saved from the CSTS app (file save dialog)
@@ -93,6 +102,5 @@ csts.libs.utils = {
       $('#main-center-col').removeClass('col-12').addClass('col-10');
     }
   },
-
 };
 

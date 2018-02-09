@@ -6,3 +6,4 @@
 [0203/191807.489:ERROR:process_info.cc(632)] range at 0x27aa3f4400000000, size 0x284 fully unreadable
 [0203/191807.489:ERROR:process_info.cc(632)] range at 0x0, size 0x284 fully unreadable
 [0203/191807.708:ERROR:http_transport_win.cc(170)] WinHttpCrackUrl: The URL does not use a recognized protocol  (0x2ee6)
+[0209/142859.890:ERROR:registration_protocol_win.cc(56)] CreateFile: The system cannot find the file specified. (0x2)

@@ -26,14 +26,180 @@ csts.controllers.Scans = ({
   scans2poam: {
     scanFiles: [],
     scans: {
-      scap: {},
-      acas: {},
-      ckl: {},
+      scap: [],
+      acas: [],
+      ckl: [],
     },
     poamArr: {},
     poamKeys: [],
     scapOpen: [],
     cklOpen: [],
+
+    /*
+      Method: parseXccdf
+      This method will parse a SCAP XCCDF File
+
+      Parameters:
+        file - string to the file being parsed
+    */
+    parseXccdf(file) {
+      console.log("parsing XCCDF: " + file);
+      const xccdfData = {};
+      csts.plugins.xml2js.parseString(csts.plugins.fs.readFileSync(file, 'utf8'), (err, result) => {
+        //console.log(result);
+        xccdfData.host = csts.plugins.jsonPath.value(result, "$['cdf:Benchmark']['cdf:TestResult'][0]['cdf:target'][0]");
+        xccdfData.title = csts.plugins.jsonPath.flatValue(result, "$['cdf:Benchmark']['cdf:title']");
+        xccdfData.version = csts.plugins.jsonPath.flatValue(result, "$['cdf:Benchmark']['cdf:version']");
+        xccdfData.release = csts.plugins.jsonPath.flatValue(result, "$['cdf:Benchmark']['cdf:plain-text']")['_'].match(new RegExp('Release: ([0-9]+)'))[1];
+        xccdfData.scanDate = csts.plugins.moment(csts.plugins.jsonPath.value(result, "$['cdf:Benchmark']['cdf:TestResult'][*]['$']['start-time']")).format('MM/DD/YYYY HH:mm');
+        xccdfData.scanType = 'scap';
+        xccdfData.openFindings = {
+          cat1: result['cdf:Benchmark']['cdf:TestResult'][0]['cdf:rule-result'].filter( element => element['cdf:result'] != 'pass').filter( element => element['$'].severity == 'high').length,
+          cat2: result['cdf:Benchmark']['cdf:TestResult'][0]['cdf:rule-result'].filter( element => element['cdf:result'] != 'pass').filter( element => element['$'].severity == 'medium').length,
+          cat3: result['cdf:Benchmark']['cdf:TestResult'][0]['cdf:rule-result'].filter( element => element['cdf:result'] != 'pass').filter( element => element['$'].severity == 'low').length
+        };
+        xccdfData.requirements = [];
+        csts.plugins.jsonPath.value(result, "$..['cdf:rule-result']").forEach((element, index) => {
+          const ruleData = csts.plugins.jsonPath.query(result, `$..['cdf:Rule'][?(@.$.id=='${element['$'].idref}')]`);
+          // console.log(ruleData);
+          const vulnerability = {};
+          vulnerability.comments = '';
+          vulnerability.findingDetails = JSON.stringify(element);
+
+          vulnerability.cci = [];
+          if (!csts.libs.utils.isBlank(ruleData[0]['cdf:ident'])) {
+            ruleData[0]['cdf:ident'].forEach((cci) => { vulnerability.cci.push(cci['_']) });
+          }
+
+          vulnerability.description = ruleData[0]['cdf:description'].reduce(a => a);
+          vulnerability.fixId = ruleData[0]['cdf:fix'][0]['$']['id'];
+          vulnerability.grpId = element['$'].version;
+          vulnerability.pluginId = '';
+          vulnerability.resources = '';
+          vulnerability.ruleId = element['$'].idref;
+          vulnerability.solution = ruleData[0]['cdf:fixtext'][0]['_'];
+          vulnerability.references = JSON.stringify(ruleData[0]['cdf:reference']);
+          vulnerability.severity = ruleData[0]['$']['severity'];
+          vulnerability.title = ruleData[0]['cdf:title'].reduce(a => a);
+
+          switch (element['cdf:result'].reduce(a => a)) {
+            case 'pass':
+              vulnerability.status = 'Completed';
+              break;
+            case 'fail':
+              vulnerability.status = 'Ongoing';
+              break;
+            case 'error':
+              vulnerability.status = 'error';
+              break;
+            default:
+              vulnerability.status = 'Ongoing';
+          }
+
+          xccdfData.requirements.push(vulnerability);
+        });
+
+        this.scans.scap.push(xccdfData);
+      });
+    },
+
+    /*
+      Method: parseCkl
+      This method will parse a checklist file
+
+      Paramters:
+        file - string to the file being parsed
+    */
+    parseCkl(file) {
+      const cklData = {};
+
+      csts.plugins.xml2js.parseString(csts.plugins.fs.readFileSync(file, 'utf8'), (err, result) => {
+        cklData.scanType = 'ckl';
+        cklData.host = [csts.plugins.jsonPath.value(result, '$..HOST_NAME')];
+        cklData.title = csts.plugins.jsonPath.flatValue(result, "$..STIG_INFO[0].SI_DATA[?(@.SID_NAME=='title')].SID_DATA");
+
+        const vrMatch = csts.plugins.path.basename(file).match(new RegExp('V([0-9]+)R([0-9]+)'));
+        if (csts.libs.utils.isBlank(vrMatch)) {
+          cklData.version = '0';
+          cklData.release = '0';
+        } else {
+          cklData.version = `${vrMatch[1]}`;
+          cklData.release = `${vrMatch[2]}`;
+        }
+
+        const stats = csts.plugins.fs.statSync(file);
+        cklData.scanDate = csts.plugins.moment(stats.mtimeMs).format('MM/DD/YYYY HH:mm');
+
+        cklData.openFindings = {
+          cat1: csts.plugins.jsonPath.query(result, "$..VULN[?(@.STATUS!='NotAFinding' && @.STATUS!='Not_Applicable' )].STIG_DATA[?(@.VULN_ATTRIBUTE=='Severity' && @.ATTRIBUTE_DATA=='high')]").length,
+          cat2: csts.plugins.jsonPath.query(result, "$..VULN[?(@.STATUS!='NotAFinding' && @.STATUS!='Not_Applicable' )].STIG_DATA[?(@.VULN_ATTRIBUTE=='Severity' && @.ATTRIBUTE_DATA=='medium')]").length,
+          cat3: csts.plugins.jsonPath.query(result, "$..VULN[?(@.STATUS!='NotAFinding' && @.STATUS!='Not_Applicable' )].STIG_DATA[?(@.VULN_ATTRIBUTE=='Severity' && @.ATTRIBUTE_DATA=='low')]").length,
+        };
+
+        cklData.requirements = [];
+        csts.plugins.jsonPath.value(result, '$..VULN').forEach((element, index) => {
+          const vulnerability = {};
+          vulnerability.vulnId = csts.plugins.jsonPath.value(element, "$..STIG_DATA[?(@.VULN_ATTRIBUTE=='Vuln_Num')].ATTRIBUTE_DATA").reduce(a => a);
+          vulnerability.comments = csts.plugins.jsonPath.value(element, '$..COMMENTS').reduce(a => a);
+          vulnerability.findingDetails = csts.plugins.jsonPath.value(element, '$..FINDING_DETAILS').reduce(a => a);
+
+          vulnerability.cci = [];
+          csts.plugins.jsonPath.query(element, "$..STIG_DATA[?(@.VULN_ATTRIBUTE=='CCI_REF')].ATTRIBUTE_DATA").forEach(cci => vulnerability.cci.push(cci.reduce(a => a)));
+
+          vulnerability.description = csts.plugins.jsonPath.flatValue(element, "$..STIG_DATA[?(@.VULN_ATTRIBUTE=='Vuln_Discuss')].ATTRIBUTE_DATA");
+          vulnerability.fixId = '';
+          vulnerability.grpId = csts.plugins.jsonPath.flatValue(element, "$..STIG_DATA[?(@.VULN_ATTRIBUTE=='Group_Title')].ATTRIBUTE_DATA");
+          vulnerability.iaControls = csts.plugins.jsonPath.flatValue(element, "$..STIG_DATA[?(@.VULN_ATTRIBUTE=='IA_Controls')].ATTRIBUTE_DATA");
+          vulnerability.pluginId ='';
+          vulnerability.resources = csts.plugins.jsonPath.flatValue(element, "$..STIG_DATA[?(@.VULN_ATTRIBUTE=='Responsibility')].ATTRIBUTE_DATA");
+          vulnerability.ruleId = csts.plugins.jsonPath.flatValue(element, "$..STIG_DATA[?(@.VULN_ATTRIBUTE=='Rule_ID')].ATTRIBUTE_DATA");
+          vulnerability.solution = csts.plugins.jsonPath.flatValue(element, "$..STIG_DATA[?(@.VULN_ATTRIBUTE=='Fix_Text')].ATTRIBUTE_DATA");
+          vulnerability.references = csts.plugins.jsonPath.flatValue(element, "$..STIG_DATA[?(@.VULN_ATTRIBUTE=='STIGRef')].ATTRIBUTE_DATA");
+          vulnerability.severity = csts.plugins.jsonPath.flatValue(element, "$..STIG_DATA[?(@.VULN_ATTRIBUTE=='Severity')].ATTRIBUTE_DATA");
+          vulnerability.title = csts.plugins.jsonPath.flatValue(element, "$..STIG_DATA[?(@.VULN_ATTRIBUTE=='Rule_Title')].ATTRIBUTE_DATA");
+
+          const s = csts.plugins.jsonPath.value(element, '$..STATUS').reduce(a => a);
+          vulnerability.status = (s === 'NotAFinding' || s === 'Not_Applicable' ? 'Completed' : 'Ongoing');
+
+          cklData.requirements.push(vulnerability);
+        });
+
+        this.scans.ckl.push(cklData);
+      });
+    },
+
+    /*
+      Method: parseScanRow
+      sends each submitted file to the proper file parse
+    */
+    parseScanRow(rowId) {
+      const table = $('table#tabScanFiles').DataTable();
+      const currentFile = $(table.row(rowId).node()).attr('file-path')
+      switch (csts.plugins.path.extname(currentFile)) {
+        case '.zip':
+          break;
+        case '.ckl':
+          this.parseCkl(currentFile);
+          break;
+        case '.nessus':
+          break;
+        case '.xml':
+          this.parseXccdf(currentFile);
+          break;
+        default:
+      }
+    },
+
+    /*
+      Method: execute
+      executes the scans2poam function
+    */
+    execute() {
+      const table = $('table#tabScanFiles').DataTable();
+      table.rows().every(rowIdx => this.parseScanRow(rowIdx));
+      console.log(this.scans);
+    },
+
 
     /*
         Method: invokeFileScan
@@ -58,23 +224,25 @@ csts.controllers.Scans = ({
           paging: 25,
         });
         table.clear();
+        let fileIndex = 0;
         this.scanFiles.forEach((file) => {
+          fileIndex += 1;
           const stats = csts.plugins.fs.statSync(file);
 
-          table.row.add([
-            `<input type='checkbox' name='scan-file' value='${file}' checked='checked'/>`,
-            csts.plugins.path.basename(file),
-            csts.plugins.moment(stats.ctimeMs).format('MM/DD/YYYY HH:mm'),
-            csts.plugins.moment(stats.atimeMs).format('MM/DD/YYYY HH:mm'),
-            csts.plugins.moment(stats.mtimeMs).format('MM/DD/YYYY HH:mm'),
-            csts.plugins.numeral(stats.size).format('0.0 b'),
-            csts.plugins.path.extname(file),
-          ]);
+          const rowNode = table.row.add($(`<tr>
+            <td>${fileIndex}</td>
+            <td>${csts.plugins.path.basename(file)}</td>
+            <td>${csts.plugins.moment(stats.ctimeMs).format('MM/DD/YYYY HH:mm')}</td>
+            <td>${csts.plugins.moment(stats.atimeMs).format('MM/DD/YYYY HH:mm')}</td>
+            <td>${csts.plugins.moment(stats.mtimeMs).format('MM/DD/YYYY HH:mm')}</td>
+            <td>${csts.plugins.numeral(stats.size).format('0.0 b')}</td>
+            <td>${csts.plugins.path.extname(file)}</td>
+            </tr>`)).draw(false).node();
+          $(rowNode).attr('file-path', file);
         });
-
         table.rows().invalidate().draw();
 
-
+        $('#select-scan-files-card').click();
         $('#myModal').modal('hide');
       });
     },

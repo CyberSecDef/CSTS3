@@ -27,6 +27,7 @@ const csts = {
     startTime - the timestamp for when this instance was executed
     router - the Router object
     routes - the various routes within the application
+    shells - any active shell objects used by the application
   */
   controllers: {},
   db: {},
@@ -36,6 +37,7 @@ const csts = {
   startTime: (Date.now()),
   router: {},
   routes: {},
+  shells: {},
 
   /*
     Objects: plugins
@@ -71,6 +73,8 @@ const csts = {
     fs: require('fs'),
     ejs: require('ejs'),
     isElevated: require('is-elevated'),
+    jsonQuery: require('json-query'),
+    jsonPath: require('jsonpath'),
     os: require('os'),
     moment: require('moment'),
     Navigo: require('navigo'),
@@ -87,6 +91,7 @@ const csts = {
     Shell: require('node-powershell'),
     si: require('systeminformation'),
     xlsx: require('xlsx'),
+    xml2js: require('xml2js'),
     Datastore: require('nedb'),
   },
 
@@ -319,9 +324,53 @@ const csts = {
         $('footer.footer div div.status-bar-r').html(elevated ? '<i class="fas fa-chess-king"></i>' : '<i class="fas fa-user"></i>');
       });
     });
-    csts.plugins.win.resizeTo(1600, 800);
-    csts.plugins.win.on('resize', () => {
-      csts.plugins.win.setPosition('center');
+
+    csts.plugins.jsonPath.flatValue = function flatValue(element, path) {
+      const v = this.value(element, path);
+      if (typeof v !== 'undefined') {
+        return v.reduce(a => a);
+      }
+      return null;
+    };
+
+    csts.plugins.win.resizeTo(1200, 800);
+
+    // clean up an existing child processes
+    csts.plugins.win.on('unload', () => {
+      const childProcesses = nw.process._getActiveHandles().filter( process => process.constructor.name === 'ChildProcess');
+      for (let i = 0; i < childProcesses.length; i += 1) { 
+        if (!csts.libs.utils.isBlank(childProcesses[i].pid)) {
+          try {
+            nw.process.kill(childProcesses[i].pid);
+          } catch(e) {
+            console.log(`Could not kill PID: ${childProcesses[i].pid}`);
+          }
+        }
+      }
+    });
+    csts.plugins.win.on('loaded', () => {
+      const childProcesses = nw.process._getActiveHandles().filter( process => process.constructor.name === 'ChildProcess');
+      for (let i = 0; i < childProcesses.length; i += 1) { 
+        if (!csts.libs.utils.isBlank(childProcesses[i].pid)) {
+          try {
+            nw.process.kill(childProcesses[i].pid);
+          } catch(e) {
+            console.log(`Could not kill PID: ${childProcesses[i].pid}`);
+          }
+        }
+      }
+    });
+    csts.plugins.win.on('loading', () => {
+      const childProcesses = nw.process._getActiveHandles().filter( process => process.constructor.name === 'ChildProcess');
+      for (let i = 0; i < childProcesses.length; i += 1) { 
+        if (!csts.libs.utils.isBlank(childProcesses[i].pid)) {
+          try {
+            nw.process.kill(childProcesses[i].pid);
+          } catch(e) {
+            console.log(`Could not kill PID: ${childProcesses[i].pid}`);
+          }
+        }
+      }
     });
   },
 };
