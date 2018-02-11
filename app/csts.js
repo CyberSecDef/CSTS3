@@ -92,6 +92,7 @@ const csts = {
     si: require('systeminformation'),
     xlsx: require('xlsx'),
     xml2js: require('xml2js'),
+    zip: require('zip-local'),
     Datastore: require('nedb'),
   },
 
@@ -337,36 +338,36 @@ const csts = {
 
     // clean up an existing child processes
     csts.plugins.win.on('unload', () => {
-      const childProcesses = nw.process._getActiveHandles().filter( process => process.constructor.name === 'ChildProcess');
-      for (let i = 0; i < childProcesses.length; i += 1) { 
+      const childProcesses = nw.process._getActiveHandles().filter(process => process.constructor.name === 'ChildProcess');
+      for (let i = 0; i < childProcesses.length; i += 1) {
         if (!csts.libs.utils.isBlank(childProcesses[i].pid)) {
           try {
             nw.process.kill(childProcesses[i].pid);
-          } catch(e) {
+          } catch (e) {
             console.log(`Could not kill PID: ${childProcesses[i].pid}`);
           }
         }
       }
     });
     csts.plugins.win.on('loaded', () => {
-      const childProcesses = nw.process._getActiveHandles().filter( process => process.constructor.name === 'ChildProcess');
-      for (let i = 0; i < childProcesses.length; i += 1) { 
+      const childProcesses = nw.process._getActiveHandles().filter(process => process.constructor.name === 'ChildProcess');
+      for (let i = 0; i < childProcesses.length; i += 1) {
         if (!csts.libs.utils.isBlank(childProcesses[i].pid)) {
           try {
             nw.process.kill(childProcesses[i].pid);
-          } catch(e) {
+          } catch (e) {
             console.log(`Could not kill PID: ${childProcesses[i].pid}`);
           }
         }
       }
     });
     csts.plugins.win.on('loading', () => {
-      const childProcesses = nw.process._getActiveHandles().filter( process => process.constructor.name === 'ChildProcess');
-      for (let i = 0; i < childProcesses.length; i += 1) { 
+      const childProcesses = nw.process._getActiveHandles().filter(process => process.constructor.name === 'ChildProcess');
+      for (let i = 0; i < childProcesses.length; i += 1) {
         if (!csts.libs.utils.isBlank(childProcesses[i].pid)) {
           try {
             nw.process.kill(childProcesses[i].pid);
-          } catch(e) {
+          } catch (e) {
             console.log(`Could not kill PID: ${childProcesses[i].pid}`);
           }
         }

@@ -43,24 +43,34 @@ csts.controllers.Scans = ({
         file - string to the file being parsed
     */
     parseXccdf(file) {
-      console.log("parsing XCCDF: " + file);
       const xccdfData = {};
-      csts.plugins.xml2js.parseString(csts.plugins.fs.readFileSync(file, 'utf8'), (err, result) => {
-        //console.log(result);
+      let fileData = '';
+      let fileName = '';
+      if (file.indexOf('<') > -1) {
+        fileData = file;
+        fileName = 'UNKNOWN';
+      } else {
+        fileData = csts.plugins.fs.readFileSync(file, 'utf8');
+        fileName = file;
+      }
+
+      csts.plugins.xml2js.parseString(fileData, (err, result) => {
+        xccdfData.credentialed = true;
+        xccdfData.fileName = fileName;
         xccdfData.host = csts.plugins.jsonPath.value(result, "$['cdf:Benchmark']['cdf:TestResult'][0]['cdf:target'][0]");
         xccdfData.title = csts.plugins.jsonPath.flatValue(result, "$['cdf:Benchmark']['cdf:title']");
         xccdfData.version = csts.plugins.jsonPath.flatValue(result, "$['cdf:Benchmark']['cdf:version']");
-        xccdfData.release = csts.plugins.jsonPath.flatValue(result, "$['cdf:Benchmark']['cdf:plain-text']")['_'].match(new RegExp('Release: ([0-9]+)'))[1];
+        xccdfData.release = csts.plugins.jsonPath.flatValue(result, "$['cdf:Benchmark']['cdf:plain-text']")._.match(new RegExp('Release: ([0-9]+)'))[1];
         xccdfData.scanDate = csts.plugins.moment(csts.plugins.jsonPath.value(result, "$['cdf:Benchmark']['cdf:TestResult'][*]['$']['start-time']")).format('MM/DD/YYYY HH:mm');
         xccdfData.scanType = 'scap';
         xccdfData.openFindings = {
-          cat1: result['cdf:Benchmark']['cdf:TestResult'][0]['cdf:rule-result'].filter( element => element['cdf:result'] != 'pass').filter( element => element['$'].severity == 'high').length,
-          cat2: result['cdf:Benchmark']['cdf:TestResult'][0]['cdf:rule-result'].filter( element => element['cdf:result'] != 'pass').filter( element => element['$'].severity == 'medium').length,
-          cat3: result['cdf:Benchmark']['cdf:TestResult'][0]['cdf:rule-result'].filter( element => element['cdf:result'] != 'pass').filter( element => element['$'].severity == 'low').length
+          cat1: result['cdf:Benchmark']['cdf:TestResult'][0]['cdf:rule-result'].filter(element => element['cdf:result'].reduce(a => a) !== 'pass').filter(element => element.$.severity === 'high').length,
+          cat2: result['cdf:Benchmark']['cdf:TestResult'][0]['cdf:rule-result'].filter(element => element['cdf:result'].reduce(a => a) !== 'pass').filter(element => element.$.severity === 'medium').length,
+          cat3: result['cdf:Benchmark']['cdf:TestResult'][0]['cdf:rule-result'].filter(element => element['cdf:result'].reduce(a => a) !== 'pass').filter(element => element.$.severity === 'low').length,
         };
         xccdfData.requirements = [];
-        csts.plugins.jsonPath.value(result, "$..['cdf:rule-result']").forEach((element, index) => {
-          const ruleData = csts.plugins.jsonPath.query(result, `$..['cdf:Rule'][?(@.$.id=='${element['$'].idref}')]`);
+        csts.plugins.jsonPath.value(result, "$..['cdf:rule-result']").forEach((element) => {
+          const ruleData = csts.plugins.jsonPath.query(result, `$..['cdf:Rule'][?(@.$.id=='${element.$.idref}')]`);
           // console.log(ruleData);
           const vulnerability = {};
           vulnerability.comments = '';
@@ -68,18 +78,18 @@ csts.controllers.Scans = ({
 
           vulnerability.cci = [];
           if (!csts.libs.utils.isBlank(ruleData[0]['cdf:ident'])) {
-            ruleData[0]['cdf:ident'].forEach((cci) => { vulnerability.cci.push(cci['_']) });
+            ruleData[0]['cdf:ident'].forEach((cci) => { vulnerability.cci.push(cci._); });
           }
 
           vulnerability.description = ruleData[0]['cdf:description'].reduce(a => a);
-          vulnerability.fixId = ruleData[0]['cdf:fix'][0]['$']['id'];
-          vulnerability.grpId = element['$'].version;
+          vulnerability.fixId = ruleData[0]['cdf:fix'][0].$.id;
+          vulnerability.grpId = element.$.version;
           vulnerability.pluginId = '';
           vulnerability.resources = '';
-          vulnerability.ruleId = element['$'].idref;
-          vulnerability.solution = ruleData[0]['cdf:fixtext'][0]['_'];
+          vulnerability.ruleId = element.$.idref;
+          vulnerability.solution = ruleData[0]['cdf:fixtext'][0]._;
           vulnerability.references = JSON.stringify(ruleData[0]['cdf:reference']);
-          vulnerability.severity = ruleData[0]['$']['severity'];
+          vulnerability.severity = ruleData[0].$.severity;
           vulnerability.title = ruleData[0]['cdf:title'].reduce(a => a);
 
           switch (element['cdf:result'].reduce(a => a)) {
@@ -112,9 +122,19 @@ csts.controllers.Scans = ({
     */
     parseCkl(file) {
       const cklData = {};
-
-      csts.plugins.xml2js.parseString(csts.plugins.fs.readFileSync(file, 'utf8'), (err, result) => {
+      let fileData = '';
+      let fileName = '';
+      if (file.indexOf('<') > -1) {
+        fileData = file;
+        fileName = 'UNKNOWN';
+      } else {
+        fileData = csts.plugins.fs.readFileSync(file, 'utf8');
+        fileName = file;
+      }
+      csts.plugins.xml2js.parseString(fileData, (err, result) => {
         cklData.scanType = 'ckl';
+        cklData.credentialed = true;
+        cklData.scanFile = fileName;
         cklData.host = [csts.plugins.jsonPath.value(result, '$..HOST_NAME')];
         cklData.title = csts.plugins.jsonPath.flatValue(result, "$..STIG_INFO[0].SI_DATA[?(@.SID_NAME=='title')].SID_DATA");
 
@@ -137,7 +157,7 @@ csts.controllers.Scans = ({
         };
 
         cklData.requirements = [];
-        csts.plugins.jsonPath.value(result, '$..VULN').forEach((element, index) => {
+        csts.plugins.jsonPath.value(result, '$..VULN').forEach((element) => {
           const vulnerability = {};
           vulnerability.vulnId = csts.plugins.jsonPath.value(element, "$..STIG_DATA[?(@.VULN_ATTRIBUTE=='Vuln_Num')].ATTRIBUTE_DATA").reduce(a => a);
           vulnerability.comments = csts.plugins.jsonPath.value(element, '$..COMMENTS').reduce(a => a);
@@ -150,7 +170,7 @@ csts.controllers.Scans = ({
           vulnerability.fixId = '';
           vulnerability.grpId = csts.plugins.jsonPath.flatValue(element, "$..STIG_DATA[?(@.VULN_ATTRIBUTE=='Group_Title')].ATTRIBUTE_DATA");
           vulnerability.iaControls = csts.plugins.jsonPath.flatValue(element, "$..STIG_DATA[?(@.VULN_ATTRIBUTE=='IA_Controls')].ATTRIBUTE_DATA");
-          vulnerability.pluginId ='';
+          vulnerability.pluginId = '';
           vulnerability.resources = csts.plugins.jsonPath.flatValue(element, "$..STIG_DATA[?(@.VULN_ATTRIBUTE=='Responsibility')].ATTRIBUTE_DATA");
           vulnerability.ruleId = csts.plugins.jsonPath.flatValue(element, "$..STIG_DATA[?(@.VULN_ATTRIBUTE=='Rule_ID')].ATTRIBUTE_DATA");
           vulnerability.solution = csts.plugins.jsonPath.flatValue(element, "$..STIG_DATA[?(@.VULN_ATTRIBUTE=='Fix_Text')].ATTRIBUTE_DATA");
@@ -168,26 +188,119 @@ csts.controllers.Scans = ({
       });
     },
 
-    /*
-      Method: parseScanRow
-      sends each submitted file to the proper file parse
-    */
-    parseScanRow(rowId) {
-      const table = $('table#tabScanFiles').DataTable();
-      const currentFile = $(table.row(rowId).node()).attr('file-path')
+    parseNessus(file) {
+      const nessusData = {};
+      let fileData = '';
+      let fileName = '';
+      if (file.indexOf('<') > -1) {
+        fileData = file;
+        fileName = 'UNKNOWN';
+      } else {
+        fileData = csts.plugins.fs.readFileSync(file, 'utf8');
+        fileName = file;
+      }
+      csts.plugins.xml2js.parseString(fileData, (err, result) => {
+        nessusData.scanType = 'acas';
+        nessusData.scanFile = fileName;
+        nessusData.hosts = [];
+        result.NessusClientData_v2.Report[0].ReportHost.forEach((host) => {
+          const hostData = {};
+          hostData.hostname = host.HostProperties[0].tag.filter(a => a.$.name === 'host-fqdn')[0]._;
+          hostData.scanDate = csts.plugins.moment(host.HostProperties[0].tag.filter(a => a.$.name === 'HOST_START')[0]._).format('MM/DD/YYYY HH:mm');
+          hostData.credentialed = host.HostProperties[0].tag.filter(a => a.$.name === 'Credentialed_Scan')[0]._;
+          hostData.scanEngine = host.ReportItem.filter(a => a.$.pluginID === '19506')[0].plugin_output[0].match(new RegExp('Nessus version : ([0-9.]+)'))[1];
+
+          hostData.openFindings = {
+            cat1: host.ReportItem.filter(a => a.$.severity >= '3').length,
+            cat2: host.ReportItem.filter(a => a.$.severity === '2').length,
+            cat3: host.ReportItem.filter(a => a.$.severity === '1').length,
+          };
+
+          hostData.requirements = [];
+          host.ReportItem.forEach( (report) => {
+            const vulnerability = {};
+            vulnerability.cci = [];
+            vulnerability.comments = typeof report.plugin_output !== 'undefined' ? report.plugin_output[0] : '';
+            vulnerability.mitigation = '';
+            vulnerability.findingDetails = '';
+            vulnerability.description = report.synopsis[0];
+            vulnerability.fixId = '';
+            vulnerability.grpId = report.$.pluginFamily;
+            vulnerability.pluginId = report.$.pluginID;
+            vulnerability.resources = '';
+            vulnerability.ruleId = '';
+            vulnerability.solution = report.solution[0];
+            vulnerability.references = '';
+            vulnerability.severity = report.$.severity;
+            vulnerability.title = report.$.pluginName;
+            vulnerability.vulnId = '';
+            vulnerability.iaControls = [];
+            vulnerability.status = 'Ongoing';
+
+            hostData.requirements.push(vulnerability);
+          });
+          nessusData.hosts.push(hostData);
+        });
+
+        this.scans.acas.push(nessusData);
+      });
+    },
+
+    /* eslint-disable */
+    parseZip(file) {
+      const unzippedFs = csts.plugins.zip.sync.unzip(file).memory();
+      console.log(unzippedFs.contents());
+      self = this;
+      unzippedFs.contents().forEach( (file) => {
+        var currentFile = unzippedFs.read(file, "buffer");
+        switch (csts.plugins.path.extname(file)) {
+          case '.zip':
+            self.parseZip(currentFile);
+            break;
+          case '.ckl':
+            self.parseCkl(currentFile);
+            break;
+          case '.nessus':
+            self.parseNessus(currentFile);
+            break;
+          case '.xml':
+            self.parseXccdf(currentFile);
+            break;
+          default:
+        }  
+
+      })
+      
+
+      
+    },
+  /* eslint-enable */
+
+    parseFile(currentFile) {
       switch (csts.plugins.path.extname(currentFile)) {
         case '.zip':
+          this.parseZip(currentFile);
           break;
         case '.ckl':
           this.parseCkl(currentFile);
           break;
         case '.nessus':
+          this.parseNessus(currentFile);
           break;
         case '.xml':
           this.parseXccdf(currentFile);
           break;
         default:
       }
+    },
+    /*
+      Method: parseScanRow
+      gets filepath from selected data row
+    */
+    parseScanRow(rowId) {
+      const table = $('table#tabScanFiles').DataTable();
+      const currentFile = $(table.row(rowId).node()).attr('file-path');
+      this.parseFile(currentFile);
     },
 
     /*
@@ -199,7 +312,6 @@ csts.controllers.Scans = ({
       table.rows().every(rowIdx => this.parseScanRow(rowIdx));
       console.log(this.scans);
     },
-
 
     /*
         Method: invokeFileScan
