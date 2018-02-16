@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("cla",["Variable"],[["Class",,[["csts.controllers.Scans","Class Variables",,,0,"File:controllers/Scans.js:csts.controllers.Scans.Class_Variables","JavaScriptClass:csts.controllers.Scans:Class_Variables"]]]]);

@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("inv",["Function"],[["invokeFileScan",,[["csts.controllers.Scans.scans2poam",,,,0,"File:controllers/Scans.js:csts.controllers.Scans.scans2poam.invokeFileScan","JavaScriptClass:csts.controllers.Scans.scans2poam:invokeFileScan"]]]]);
+NDSearch.OnPrefixDataLoaded("inv",["Function"],[["invokeFileScan",,[[,,,,0,"File:controllers/Scans.js:invokeFileScan"]]]]);

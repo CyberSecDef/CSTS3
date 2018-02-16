@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("mov",["Function"],[["moveField",,[["csts.controllers.Scans.compareRarPoam",,,,0,"File:controllers/Scans.js:csts.controllers.Scans.compareRarPoam.moveField","JavaScriptClass:csts.controllers.Scans.compareRarPoam:moveField"]]]]);
+NDSearch.OnPrefixDataLoaded("mov",["Function"],[["moveField",,[[,,,,0,"File:controllers/Scans.js:moveField"]]]]);

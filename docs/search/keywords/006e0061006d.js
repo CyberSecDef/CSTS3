@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("nam",["Variable"],[["name",,[["csts.models.scans",,,,0,"File:models/Scans.js:csts.models.scans.name","JavaScriptClass:csts.models.scans:name"]]]]);
+NDSearch.OnPrefixDataLoaded("nam",["Variable"],[["name",,[["csts.models.Scans",,,,0,"File:models/Scans.js:csts.models.Scans.name","JavaScriptClass:csts.models.Scans:name"]]]]);

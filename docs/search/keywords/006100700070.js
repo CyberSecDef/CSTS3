@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("app",["Variable"],[["Applet",,[["csts.controllers.Scans.scans2poam","Applet Variables",,,0,"File:controllers/Scans.js:csts.controllers.Scans.scans2poam.Applet_Variables","JavaScriptClass:csts.controllers.Scans.scans2poam:Applet_Variables"]]]]);

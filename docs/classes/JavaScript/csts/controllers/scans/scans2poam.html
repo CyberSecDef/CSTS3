@@ -8,55 +8,18 @@
 
 <body onload="NDLoader.OnLoad('Content');" class="NDPage NDContentPage">
 
-<a name="Topic19"></a><div class="CTopic TClass LJavaScript first">
+<a name="Topic15"></a><div class="CTopic TClass LJavaScript first">
  <div class="CTitle"><span class="Qualifier">csts.&#8203;controllers.&#8203;Scans.</span>&#8203;scans2poam</div>
- <div class="CBody"><p>This is the scans2poam functionality</p></div>
+ <div class="CBody"><p>This is the scans2poam applet</p><div class="CHeading">See Also</div><p><a href="../../../../../index.html#JavaScriptClass:csts.models.Scans.scans2poam" target="_top" onmouseover="NDContentPage.OnLinkMouseOver(event,139);" onmouseout="NDContentPage.OnLinkMouseOut(event);" >csts.models.Scans.scans2poam</a></p></div>
 </div>
 
-<a name="Functions"></a><a name="Topic20"></a><div class="CTopic TGroup LJavaScript">
- <div class="CTitle">Functions</div>
+<a name="Variables"></a><a name="Topic16"></a><div class="CTopic TGroup LJavaScript">
+ <div class="CTitle">Variables</div>
 </div>
 
-<a name="parseXccdf"></a><a name="Topic79"></a><div class="CTopic TFunction LJavaScript">
- <div class="CTitle">parseXccdf</div>
- <div id="NDPrototype79" class="NDPrototype WideForm CStyle"><table><tr><td class="PBeforeParameters">parseXccdf(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">file</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div>
- <div class="CBody"><p>This method will parse a SCAP XCCDF File</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">file</td><td class="CDLDefinition"><p>string to the file being parsed</p></td></tr></table></div>
-</div>
-
-<a name="parseCkl"></a><a name="Topic118"></a><div class="CTopic TFunction LJavaScript">
- <div class="CTitle">parseCkl</div>
- <div id="NDPrototype118" class="NDPrototype WideForm CStyle"><table><tr><td class="PBeforeParameters">parseCkl(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">file</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div>
- <div class="CBody"><p>This method will parse a checklist file</p><div class="CHeading">Paramters</div><table class="CDefinitionList"><tr><td class="CDLEntry">file</td><td class="CDLDefinition"><p>string to the file being parsed</p></td></tr></table></div>
-</div>
-
-<a name="parseScanRow"></a><a name="Topic119"></a><div class="CTopic TFunction LJavaScript">
- <div class="CTitle">parseScanRow</div>
- <div id="NDPrototype119" class="NDPrototype WideForm CStyle"><table><tr><td class="PBeforeParameters">parseScanRow(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">rowId</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div>
- <div class="CBody"><p>sends each submitted file to the proper file parse</p></div>
-</div>
-
-<a name="execute"></a><a name="Topic120"></a><div class="CTopic TFunction LJavaScript">
- <div class="CTitle">execute</div>
- <div id="NDPrototype120" class="NDPrototype NoParameterForm">execute()</div>
- <div class="CBody"><p>executes the scans2poam function</p></div>
-</div>
-
-<a name="invokeFileScan"></a><a name="Topic21"></a><div class="CTopic TFunction LJavaScript">
- <div class="CTitle">invokeFileScan</div>
- <div id="NDPrototype21" class="NDPrototype WideForm CStyle"><table><tr><td class="PBeforeParameters">invokeFileScan(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">path</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div>
- <div class="CBody"><p>Grabs the files from the submitted path</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">path</td><td class="CDLDefinition"><p>the path for the directory being scanned</p></td></tr></table></div>
-</div>
-
-<a name="getScanFiles"></a><a name="Topic22"></a><div class="CTopic TFunction LJavaScript">
- <div class="CTitle">getScanFiles</div>
- <div id="NDPrototype22" class="NDPrototype WideForm CStyle"><table><tr><td class="PBeforeParameters">getScanFiles(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">path</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div>
- <div class="CBody"><p>This method will get file information for submitted files</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">path</td><td class="CDLDefinition"><p>the path for the file being analyzed</p></td></tr></table></div>
-</div>
-
-<a name="showIndex"></a><a name="Topic23"></a><div class="CTopic TFunction LJavaScript last">
- <div class="CTitle">showIndex</div>
- <div id="NDPrototype23" class="NDPrototype NoParameterForm">showIndex()</div>
- <div class="CBody"><p>This is the function called from the router to load the scans2poam module</p></div>
+<a name="Applet_Variables"></a><a name="Topic17"></a><div class="CTopic TVariable LJavaScript last">
+ <div class="CTitle">Applet Variables</div>
+ <div class="CBody"><table class="CDefinitionList"><tr><td class="CDLEntry"><a name="scanFiles"></a><a name="Topic18"></a>scanFiles</td><td class="CDLDefinition"><p>the scan files that are being combined into the scans2poam report</p></td></tr><tr><td class="CDLEntry"><a name="scans"></a><a name="Topic19"></a>scans</td><td class="CDLDefinition"><p>the findings from the various SCAP, ACAS and CKL scans</p></td></tr><tr><td class="CDLEntry"><a name="poamArr"></a><a name="Topic20"></a>poamArr</td><td class="CDLDefinition"><p>The array of findings that will populate the poam and the rar</p></td></tr></table></div>
 </div>
 
 </body></html>
