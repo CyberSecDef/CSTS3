@@ -1,7 +1,10 @@
 {
     "extends": "airbnb-base",
     "rules" : {
-        "global-require" : "off"
+        "global-require" : "off",
+        "prefer-destructuring" : "off",
+        "no-console" : "off",
+        "no-underscore-dangle" : "off"
     },
     "globals" : {
         "ko" : true,
