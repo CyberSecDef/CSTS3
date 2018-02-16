@@ -1,5 +1,5 @@
 /*
-  Namespace: csts.models.scans
+  Namespace: csts.models.Scans
   This is the model for handling 'Scan' type functions
 */
 csts.models.Scans = {
@@ -39,8 +39,11 @@ csts.models.Scans = {
   workbooks: {},
 
   /*
-    Namespace: csts.models.scans.scans2poam
+    Namespace: csts.models.Scans.scans2poam
     This is the container for the functions that deal with the scans2poam module
+
+    See Also:
+    <csts.controllers.Scans.scans2poam>
   */
   scans2poam: {
 
@@ -48,8 +51,15 @@ csts.models.Scans = {
   /*
     Namespace: csts.models.scans.compareRarPoam
     This is the container for the functions that deal with the poam/rar comparison module
+
+    See Also:
+    <csts.controllers.Scans.compareRarPoam>
   */
   compareRarPoam: {
+
+    /**
+     * Section: Helper
+     */
 
     /*
       Method: compareVals
@@ -350,7 +360,7 @@ csts.models.Scans = {
       let vulnId = '';
       if (!csts.models.Scans.workbooks[workbook].isBlank(sheet, address)) {
         vulnId = csts.models.Scans.workbooks[workbook].Sheets[sheet][address].v;
-        if (vulnId.indexOf('Vuln ID:') > 0) {
+        if (vulnId.indexOf('Vuln ID:') >= 0) {
           const temp = vulnId.split('\n');
           $.each(temp, (index, item) => {
             const i = item.split(':');

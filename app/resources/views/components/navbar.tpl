@@ -114,6 +114,7 @@
 						<a class="dropdown-item" href="/Systems/restart">Restart</a>
 						<a class="dropdown-item" href="/Systems/secureWipe">Secure Wipe</a>
 						<a class="dropdown-item" href="/Systems/updateHost">Update Host</a>
+						<a class="dropdown-item" href="/Systems/windowsUpdates">Windows Updates</a>
 						<div class="dropdown-divider"></div>
 						<a class="dropdown-item" href="/Systems/parseEventLogs">Parse Event Logs</a>
 						<a class="dropdown-item" href="/Systems/archiveEventLogs">Archive Event Logs</a>

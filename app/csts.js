@@ -271,7 +271,7 @@ const csts = {
           case 'string':
             c = val.substring(0, val.indexOf('@'));
             f = val.substring(val.indexOf('@') + 1);
-            if (f.indexOf('.') > 0) {
+            if (f.indexOf('.') >= 0) {
               csts.router.on(name, f.split('.').reduce(index, csts.controllers[c]));
             } else {
               csts.router.on(name, csts.controllers[c][f]);
