@@ -1,23 +1,41 @@
 /*
-  File: Information
-    Summary - The main csts global object
-    path - /app/csts.js
-    Version - 3.0.0a
-    Copyright - 2018
-    Author - Robert Weber <wwwdaze2000@gmail.com>
-    Created at - 2018-01-01
-    Last modified - 2018-02-07
-*/
-/*
-    Struct: csts
+  Class: CSTS
+
+  Description:
     This is the main CSTS class that bootstraps and loads everything.  This class also creates a
     global object that everything can be attached to.
+
+  License:
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+  Category:
+    Controller
+
+  Package:
+    CSTSv3
+
+  Author:
+    Robert Weber <wwwdaze2000@gmail.com>
+
+  Copyright:
+    2018 - Robert F Weber, Jr.
+
 */
 const csts = {
 
   /*
-    Variables: objects and properties
-    Various properties and objects within the main CSTS object
+    Variables: Props
 
     controllers - contains all controllers
     db - contains all database objects
@@ -40,8 +58,7 @@ const csts = {
   shells: {},
 
   /*
-    Objects: plugins
-    wrapper for all the plugins the CSTS uses from node modules
+    Objects: Plugins
 
     crypto - cryptographic functions
     cpu - cpu statistics
@@ -98,17 +115,12 @@ const csts = {
 
   /*
       Method: requireFile
-      Used to include dynamic files in the browser
 
-      --- Prototype ---
-      void requireFile( string s )
-      -----------------
+      Description:
+        Used to include dynamic files in the browser
 
       Parameters:
         @param {string} s - path to file to require
-
-      See Also:
-        <initializeCSTS()>
 
       Returns:
         void
@@ -118,8 +130,7 @@ const csts = {
       url: s,
       dataType: 'script',
       async: false, // <-- This is the key
-      success() {
-      },
+      success() {},
       error() {
         throw new Error(`Could not load script ${s}`);
       },
@@ -128,7 +139,9 @@ const csts = {
 
   /*
    * Method: initializeCsts
-   * This function initializes the csts class
+   *
+   * Description:
+   *  This function initializes the csts class
    *
    * Returns:
    * {void}
@@ -298,7 +311,6 @@ const csts = {
         });
       }
 
-
       csts.plugins.ejs.renderFile('app/resources/views/layouts/default.tpl', {
         username: process.env.USERNAME,
         url: window.location.valueOf().pathname.replace('/app', '').replace('index.html', ''),
@@ -338,41 +350,38 @@ const csts = {
 
     // clean up an existing child processes
     csts.plugins.win.on('unload', () => {
-      const childProcesses = nw.process._getActiveHandles().filter(process => process.constructor.name === 'ChildProcess');
-      for (let i = 0; i < childProcesses.length; i += 1) {
-        if (!csts.libs.utils.isBlank(childProcesses[i].pid)) {
-          try {
-            nw.process.kill(childProcesses[i].pid);
-          } catch (e) {
-            console.log(`Could not kill PID: ${childProcesses[i].pid}`);
-          }
-        }
-      }
+      this.killChildProcesses();
     });
     csts.plugins.win.on('loaded', () => {
-      const childProcesses = nw.process._getActiveHandles().filter(process => process.constructor.name === 'ChildProcess');
-      for (let i = 0; i < childProcesses.length; i += 1) {
-        if (!csts.libs.utils.isBlank(childProcesses[i].pid)) {
-          try {
-            nw.process.kill(childProcesses[i].pid);
-          } catch (e) {
-            console.log(`Could not kill PID: ${childProcesses[i].pid}`);
-          }
-        }
-      }
+      this.killChildProcesses();
     });
     csts.plugins.win.on('loading', () => {
-      const childProcesses = nw.process._getActiveHandles().filter(process => process.constructor.name === 'ChildProcess');
-      for (let i = 0; i < childProcesses.length; i += 1) {
-        if (!csts.libs.utils.isBlank(childProcesses[i].pid)) {
-          try {
-            nw.process.kill(childProcesses[i].pid);
-          } catch (e) {
-            console.log(`Could not kill PID: ${childProcesses[i].pid}`);
-          }
-        }
-      }
+      this.killChildProcesses();
     });
   },
-};
 
+  /*
+    Method: killChildProcesses
+
+    Description:
+      This will clean up an child processes spawned from the
+      main application.  Used when the application reloads.
+
+    Parameters:
+
+    Returns:
+      {void}
+  */
+  killChildProcesses() {
+    const childProcesses = nw.process._getActiveHandles().filter(process => process.constructor.name === 'ChildProcess');
+    for (let i = 0; i < childProcesses.length; i += 1) {
+      if (!csts.libs.utils.isBlank(childProcesses[i].pid)) {
+        try {
+          nw.process.kill(childProcesses[i].pid);
+        } catch (e) {
+          console.log(`Could not kill PID: ${childProcesses[i].pid}`);
+        }
+      }
+    }
+  },
+};

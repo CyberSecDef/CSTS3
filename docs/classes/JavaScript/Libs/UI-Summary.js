@@ -1,0 +1,1 @@
+NDFramePage.OnPageTitleLoaded("JavaScriptClass:Libs.UI","UI");NDSummary.OnSummaryLoaded("JavaScriptClass:Libs.UI",[["JavaScript","JavaScript"]],[["Classes","Class"],["Functions","Function"],["Groups","Group"]],[[1,0,0,"<span class=\"Qualifier\">Libs.</span>&#8203;UI"],[30,0,2,"Functions","Functions"],[16,0,1,"setStatus","setStatus"]]);

@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("plu",["Variable"],[["plugins",,[["csts",,,,0,"File:csts.js:csts.plugins","JavaScriptClass:csts:plugins"]]]]);
+NDSearch.OnPrefixDataLoaded("plu",["Variable"],[["Plugins",,[["CSTS",,,,0,"File:csts.js:CSTS.Plugins","JavaScriptClass:CSTS:Plugins"]]]]);

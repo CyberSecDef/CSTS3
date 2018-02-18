@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("nav",["Variable"],[["navigo",,[["csts",,,,0,"File:csts.js:csts.navigo","JavaScriptClass:csts:navigo"]]]]);
+NDSearch.OnPrefixDataLoaded("nav",["Variable"],[["navigo",,[["CSTS",,,,0,"File:csts.js:CSTS.navigo","JavaScriptClass:CSTS:navigo"]]]]);

@@ -1,6 +1,34 @@
 /*
-  Namespace: csts.models.Scans
-  This is the model for handling 'Scan' type functions
+  Namespace: Models.Scans
+
+  Description:
+    This is the model for handling 'Scan' type functions
+
+  License:
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+  Category:
+    Model
+
+  Package:
+    CSTSv3
+
+  Author:
+    Robert Weber <wwwdaze2000@gmail.com>
+
+  Copyright:
+    2018 - RFW
 */
 csts.models.Scans = {
   /*
@@ -39,31 +67,28 @@ csts.models.Scans = {
   workbooks: {},
 
   /*
-    Namespace: csts.models.Scans.scans2poam
+    Class: Models.Scans.scans2poam
     This is the container for the functions that deal with the scans2poam module
 
     See Also:
-    <csts.controllers.Scans.scans2poam>
+    <Controllers.Scans.scans2poam>
   */
   scans2poam: {
 
   },
   /*
-    Namespace: csts.models.scans.compareRarPoam
+    Class: Models.Scans.compareRarPoam
     This is the container for the functions that deal with the poam/rar comparison module
 
     See Also:
-    <csts.controllers.Scans.compareRarPoam>
+    <Controllers.Scans.compareRarPoam>
   */
   compareRarPoam: {
-
-    /**
-     * Section: Helper
-     */
-
     /*
       Method: compareVals
-      compares the value in a worksheet to the value submitted
+
+      Description:
+        compares the value in a worksheet to the value submitted
 
       Parameters:
         workbook - the workbook being checked
@@ -83,7 +108,9 @@ csts.models.Scans = {
 
     /*
       Method: compareWorkbooks
-      This method will compare the data between a rar and a poam and return the differences
+
+      Description:
+        This method will compare the data between a rar and a poam and return the differences
 
       Parameters:
         rarTab - the tab in the rar workbook being checked
@@ -349,7 +376,9 @@ csts.models.Scans = {
 
     /*
       Method: getVulnId
-      parses a cell and returns the vulnerability id
+
+      Description:
+        parses a cell and returns the vulnerability id
 
       Parameters:
         workbook - the workbook being checked
@@ -378,7 +407,9 @@ csts.models.Scans = {
 
     /*
       Method: parseFile
-      gets the filesystem statistics for the submitted file pathname
+
+      Description:
+        gets the filesystem statistics for the submitted file pathname
 
       Parameters:
         file - The file path being checked

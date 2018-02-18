@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("zli",["Variable"],[["zlib",,[["csts",,,,0,"File:csts.js:csts.zlib","JavaScriptClass:csts:zlib"]]]]);
+NDSearch.OnPrefixDataLoaded("zli",["Variable"],[["zlib",,[["CSTS",,,,0,"File:csts.js:CSTS.zlib","JavaScriptClass:CSTS:zlib"]]]]);

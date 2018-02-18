@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("dat",["Variable"],[["Datastore",,[["csts",,,,0,"File:csts.js:csts.Datastore","JavaScriptClass:csts:Datastore"]]]]);
+NDSearch.OnPrefixDataLoaded("dat",["Variable"],[["Datastore",,[["CSTS",,,,0,"File:csts.js:CSTS.Datastore","JavaScriptClass:CSTS:Datastore"]]]]);

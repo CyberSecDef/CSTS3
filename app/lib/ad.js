@@ -1,6 +1,34 @@
 /*
-  Namespace: csts.libs.ad
-  Active Directory functions
+  Namespace: Libs.AD
+
+  Description:
+    Active Directory Functions
+
+  License:
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+  Category:
+    Library
+
+  Package:
+    CSTSv3
+
+  Author:
+    Robert Weber <wwwdaze2000@gmail.com>
+
+  Copyright:
+    2018 - RFW
 */
 csts.libs.ad = {
   /*
@@ -10,18 +38,18 @@ csts.libs.ad = {
   shells: {},
 
   /*
-    Method: fqdn
-    Determines the hosts fully qualified domain name
+    Method: getFqdn
+
+    Description:
+      Determines the hosts fully qualified domain name
 
     Parameters:
 
     Returns:
-      String - FQDN of host
+      {String} - FQDN of host
 
-    See Also:
-      <ouChildren>
   */
-  fqdn() {
+  getFqdn() {
     if (typeof process.env.USERDNSDOMAIN !== 'undefined') {
       return process.env.USERDNSDOMAIN;
     } else if (typeof process.env.USERDOMAIN !== 'undefined') {
@@ -31,8 +59,10 @@ csts.libs.ad = {
   },
 
   /*
-    Method: ouChildren
-    Returns the child nodes for a given OU
+    Method: getOuChildren
+
+    Description:
+      Returns the child nodes for a given OU
 
     Parameters:
       ou - String of path to OU
@@ -40,10 +70,8 @@ csts.libs.ad = {
     Returns:
       String - JSON object of OU children
 
-    See Also:
-      <fqdn>
   */
-  ouChildren(ou) {
+  getOuChildren(ou) {
     if (csts.libs.utils.isBlank(csts.shells.ou)) {
       csts.shells.ou = (new csts.plugins.Shell({ executionPolicy: 'Bypass', noProfile: true }));
     }

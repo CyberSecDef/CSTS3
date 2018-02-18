@@ -223,7 +223,7 @@
 		$results = $('#scans-compare-results').clone();
 		$results.find('th').remove(':nth-child(6)');
 		$results.find('td').remove(':nth-child(6)');
-		csts.libs.export.doc($results.html(), 'compareRarPoam.doc')
+		csts.libs.export.saveDoc($results.html(), 'compareRarPoam.doc')
 	});
 	
 	$('button#exportPDF').on('click',function(){
@@ -248,7 +248,7 @@
 		})
 		console.log(data);
 			
-		csts.libs.export.pdf(data, 'compareRarPoam.pdf')
+		csts.libs.export.savePdf(data, 'compareRarPoam.pdf')
 	});
 	
 	$('button#exportCSV').on('click',function(){
@@ -266,7 +266,7 @@
 				$(el).find('td:nth-child(8)').text()
 			] )
 		})
-		csts.libs.export.csv(data, 'compareRarPoam.csv')
+		csts.libs.export.saveCsv(data, 'compareRarPoam.csv')
 	});
 	
 	

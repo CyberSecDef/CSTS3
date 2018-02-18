@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("hel",["Section"],[["Helper",,[[,,,,0,"File:controllers/Scans.js:Helper"]]]]);

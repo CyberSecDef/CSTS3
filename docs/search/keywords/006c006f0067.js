@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("log",["Function"],[["log",,[["csts.libs.utils",,,,0,"File:lib/utils.js:csts.libs.utils.log","JavaScriptClass:csts.libs.utils:log"]]]]);
+NDSearch.OnPrefixDataLoaded("log",["Function"],[["log",,[["Libs.Utils",,,,0,"File:lib/utils.js:Libs.Utils.log","JavaScriptClass:Libs.Utils:log"]]]]);

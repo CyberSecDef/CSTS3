@@ -1,6 +1,34 @@
 /*
-    Namespace: csts.controllers.Scans
+  Namespace: Controllers.Scans
+
+  Description:
     This is the baseline controller for Scan type functions
+
+  License:
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+  Category:
+    Controller
+
+  Package:
+    CSTSv3
+
+  Author:
+    Robert Weber <wwwdaze2000@gmail.com>
+
+  Copyright:
+    2018 - RFW
 */
 csts.controllers.Scans = ({
   /*
@@ -19,11 +47,11 @@ csts.controllers.Scans = ({
   },
 
   /*
-      Namespace: csts.controllers.Scans.scans2poam
+      Class: Controllers.Scans.scans2poam
       This is the scans2poam applet
 
       See Also:
-      <csts.models.Scans.scans2poam>
+      <Models.Scans.scans2poam>
   */
   scans2poam: {
     /**
@@ -43,14 +71,11 @@ csts.controllers.Scans = ({
     scapOpen: [],
     cklOpen: [],
 
-    /**
-     * Section: UI
-     * Methods that interface directly with the User Interface
-     */
-
     /*
       Method: showIndex
-      This is the function called from the router to load the scans2poam module
+
+      Description:
+        This is the function called from the router to load the scans2poam module
     */
     showIndex() {
       csts.plugins.ejs.renderFile(
@@ -59,36 +84,46 @@ csts.controllers.Scans = ({
         },
         (err, str) => {
           if (err) {
-            $('#errors')
-              .html(err);
+            $('#errors').html(err);
           }
-          $('#main-center-col')
-            .html(str);
+          $('#main-center-col').html(str);
         },
       );
     },
 
-    /**
-     * Section: Execution
-     * Methods involved in the execution of the applet
-     */
-
     /*
       Method: execute
-      executes the scans2poam function
+
+      Description:
+        executes the scans2poam function
     */
     execute() {
       const table = $('table#tabScanFiles').DataTable();
-      table.rows().every(rowIdx => this.parseScanRow(rowIdx));
-      console.log(this.scans);
+      const files = [];
+      table.rows().every(rowIdx => files.push($(table.row(rowIdx).node()).attr('file-path')));
+      const me = this;
+
+      $('#myModal').modal();
+      $('#myModalLabel').text('Please Wait...');
+      $('#myModalBody').text('Currently Loading the Scanfiles.  Please wait.');
+      $('#myModal')
+        .one('shown.bs.modal', () => {
+          for (let i = 0; i < files.length; i += 1) {
+            me.parseFile(files[i]);
+          }
+          $('#myModal').modal('hide');
+          console.log(this.scans);
+        });
     },
 
     /*
         Method: invokeFileScan
-        Grabs the files from the submitted path
+
+        Description:
+          Grabs the files from the submitted path
 
         Parameters:
-        path - the path for the directory being scanned
+          {string} path - the path for the directory being scanned
     */
     invokeFileScan(path) {
       const self = this;
@@ -141,10 +176,12 @@ csts.controllers.Scans = ({
 
     /*
       Method: getScanFiles
-      This method will get file information for submitted files
+
+      Description:
+        This method will get file information for submitted files
 
       Parameters:
-      path - the path for the file being analyzed
+        {string} path - the path for the file being analyzed
     */
     getScanFiles(path) {
       // eslint-disable-next-line
@@ -166,17 +203,14 @@ csts.controllers.Scans = ({
       return scans;
     },
 
-    /**
-     * Section: Helper
-     * These methods support the execution of the applet
-     */
-
     /*
       Method: parseXccdf
-      This method will parse a SCAP XCCDF File
+
+      Description:
+        This method will parse a SCAP XCCDF File
 
       Parameters:
-        file - string to the file being parsed
+        {string} file - string to the file being parsed
     */
     parseXccdf(file) {
       const xccdfData = {};
@@ -262,10 +296,12 @@ csts.controllers.Scans = ({
 
     /*
       Method: parseCkl
-      This method will parse a checklist file
+
+      Description:
+        This method will parse a checklist file
 
       Paramters:
-        file - string to the file being parsed
+        {string} file - string to the file being parsed
     */
     parseCkl(file) {
       const cklData = {};
@@ -346,6 +382,15 @@ csts.controllers.Scans = ({
       });
     },
 
+    /**
+     * Method: parseNessus
+     *
+     * Description:
+     *  This method will parse a Nessus scan result
+     *
+     * Parameters:
+     *  {string} file - path to the scan file to be parse
+     */
     parseNessus(file) {
       const nessusData = {};
       let fileData = '';
@@ -408,6 +453,15 @@ csts.controllers.Scans = ({
       });
     },
 
+    /**
+     * Method: parseZip
+     *
+     * Description:
+     *  This method will parse the files in a ZIP
+     *
+     * Parameters:
+     *  {string} f - path to the scan file to be parse
+     */
     parseZip(f) {
       const unzippedFs = csts.plugins.zip.sync.unzip(f).memory();
       console.log(unzippedFs.contents());
@@ -433,6 +487,15 @@ csts.controllers.Scans = ({
         });
     },
 
+    /**
+     * Method: parseFile
+     *
+     * Description:
+     *  This method will call the applicable parse method for a file
+     *
+     * Parameters:
+     *  {string} currentFile - path to the scan file to be parse
+     */
     parseFile(currentFile) {
       switch (csts.plugins.path.extname(currentFile)) {
         case '.zip':
@@ -450,39 +513,25 @@ csts.controllers.Scans = ({
         default:
       }
     },
-    /*
-      Method: parseScanRow
-      gets filepath from selected data row
-    */
-    parseScanRow(rowId) {
-      const table = $('table#tabScanFiles')
-        .DataTable();
-      const currentFile = $(table.row(rowId)
-        .node())
-        .attr('file-path');
-      this.parseFile(currentFile);
-    },
+
   },
 
   /*
-      Namespace: csts.controllers.Scans.compareRarPoam
+      Class: Controllers.Scans.compareRarPoam
       Methods and variables related to the RAR/POAM comparison applet
 
       See Also:
-      <csts.models.Scans.compareRarPoam>
+      <Models.Scans.compareRarPoam>
   */
   compareRarPoam: {
     /*
-      Section: UI
-      Methods that interface directly with the User Interface
-    */
+      Method: showIndex
 
-    /*
-        Method: showIndex
+      Description:
         This is the function called from the router to load the compareRAR/POAM functionality
     */
     showIndex() {
-      csts.libs.ui.status('Loading RAR/POAM Comparison functions.');
+      csts.libs.ui.setStatus('Loading RAR/POAM Comparison functions.');
 
       csts.plugins.ejs.renderFile(
         'app/resources/views/pages/scans/compare.tpl', {
@@ -502,20 +551,23 @@ csts.controllers.Scans = ({
     },
 
     /*
-      Section: Execution
-      Methods involved in the execution of the applet
-    */
-
-    /*
       Method: executeComparison
-      This method executes the comparison between a RAR and a POAM by calling the appropriate
-      method in the Scans model.
+
+      Description:
+        This method executes the comparison between a RAR and a POAM by calling the appropriate
+        method in the Scans model.
 
       Parameters:
-          fields - the fields that should be compared between the RAR and POAM
+        {object[]} fields - the fields that should be compared between the RAR and POAM
+
+      Access:
+        Public
+
+      Returns:
+        {void}
 
       See Also:
-          <csts.models.scans.compareRarPoam.compareWorkbooks>
+          <Models.Scans.compareRarPoam.compareWorkbooks>
     */
     executeComparison(fields) {
       $('#headingFour button').click();
@@ -527,16 +579,13 @@ csts.controllers.Scans = ({
     },
 
     /*
-      Section: Helper
-      These methods support the execution of the applet
-    */
+      Method: moveField
 
-    /*
-        Method: moveField
+      Description:
         Handles moving data from the RAR to the POAM or vice versa
 
-        Parameters:
-            el - The calling element
+      Parameters:
+        {DOM Element} el - The calling element
     */
     moveField(el) {
       const guid = $(el).parents('tr').data('guid');
@@ -632,12 +681,10 @@ csts.controllers.Scans = ({
                   threat: csts.models.Scans.workbooks.poam.val(
                     $('#poamTabSel').val(),
                     (csts.models.Scans.poamFields.Source) + fields.poamRow,
-                  ).substring(
-                    csts.models.Scans.workbooks.poam.val(
-                      $('#poamTabSel').val(),
-                      (csts.models.Scans.poamFields.Source) + fields.poamRow,
-                    ).indexOf('Group ID:'),
-                  ),
+                  ).substring(csts.models.Scans.workbooks.poam.val(
+                    $('#poamTabSel').val(),
+                    (csts.models.Scans.poamFields.Source) + fields.poamRow,
+                  ).indexOf('Group ID:')),
                   description: csts.models.Scans.workbooks.poam.val(
                     $('#poamTabSel').val(),
                     (csts.models.Scans.poamFields.Description) + fields.poamRow,
@@ -805,7 +852,7 @@ csts.controllers.Scans = ({
               comment: csts.models.Scans.workbooks.rar.val($('#rarTabSel')
                 .val(), (csts.models.Scans.rarFields.Comment) + fields.rarRow),
             }], {
-              header: ['blank', 'description', 'control', 'office', 'security', 'rawrisk', 'mitigation', 'residualrisk', 'resources', 'scd', 'milestonesWD', 'milestronsWC', 'source', 'status', 'comment'],
+              header: ['blank', 'description', 'control', 'office', 'security', 'rawrisk', 'mitigation', 'residualrisk', 'resources', 'scd', 'milestonesWD', 'milestonesWC', 'source', 'status', 'comment'],
               origin: -1,
               skipHeader: true,
             });
@@ -840,10 +887,13 @@ csts.controllers.Scans = ({
 
     /**
      * Method: parseFiles
-     * This method loads the file information for the selected RAR and POAM for the comparison
-     * functions
      *
-     * @return {void}
+     * Description:
+     *  This method loads the file information for the selected RAR and POAM for the comparison
+     *  functions
+     *
+     * Returns:
+     *  {void}
      */
     parseFiles() {
       $('#myModal').modal();

@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("cst",["Struct"],[["csts",,[[,,,,0,"File:csts.js:csts","JavaScriptClass:csts"]]]]);
+NDSearch.OnPrefixDataLoaded("cst",["Class"],[["CSTS",,[[,,,,0,"File:csts.js:CSTS","JavaScriptClass:CSTS"]]]]);

@@ -1,0 +1,1 @@
+NDSummary.OnToolTipsLoaded("JavaScriptClass:Controllers.Scans",{54:"<div class=\"NDToolTip TClass LJavaScript\"><div class=\"TTSummary\">This is the baseline controller for Scan type functions</div></div>"});

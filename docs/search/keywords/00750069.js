@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("ui",["Class","Section"],[["ui",,[["csts.libs",,,,0,"File:lib/ui.js:csts.libs.ui","JavaScriptClass:csts.libs.ui"],[,"UI",,,1,"File:controllers/Scans.js:UI"]]]]);
+NDSearch.OnPrefixDataLoaded("ui",["Class"],[["UI",,[["Libs",,,,0,"File:lib/ui.js:Libs.UI","JavaScriptClass:Libs.UI"]]]]);

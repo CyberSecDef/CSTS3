@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("uti",["Variable","Class"],[["util",,[["csts",,,,0,"File:csts.js:csts.util","JavaScriptClass:csts:util"]]],["utils",,[["csts.libs",,,,1,"File:lib/utils.js:csts.libs.utils","JavaScriptClass:csts.libs.utils"]]]]);
+NDSearch.OnPrefixDataLoaded("uti",["Variable","Class"],[["util",,[["CSTS",,,,0,"File:csts.js:CSTS.util","JavaScriptClass:CSTS:util"]]],["Utils",,[["Libs",,,,1,"File:lib/utils.js:Libs.Utils","JavaScriptClass:Libs.Utils"]]]]);

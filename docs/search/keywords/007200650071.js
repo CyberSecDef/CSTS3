@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("req",["Function"],[["requireFile",,[["csts",,,,0,"File:csts.js:csts.requireFile","JavaScriptClass:csts:requireFile"]]]]);
+NDSearch.OnPrefixDataLoaded("req",["Function"],[["requireFile",,[["CSTS",,,,0,"File:csts.js:CSTS.requireFile","JavaScriptClass:CSTS:requireFile"]]]]);

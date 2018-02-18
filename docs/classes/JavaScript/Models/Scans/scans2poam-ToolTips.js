@@ -1,0 +1,1 @@
+NDContentPage.OnToolTipsLoaded({43:"<div class=\"NDToolTip TClass LJavaScript\"><div class=\"TTSummary\">This is the scans2poam applet</div></div>"});

@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("fs",["Variable"],[["fs",,[["csts",,,,0,"File:csts.js:csts.fs","JavaScriptClass:csts:fs"]]]]);
+NDSearch.OnPrefixDataLoaded("fs",["Variable"],[["fs",,[["CSTS",,,,0,"File:csts.js:CSTS.fs","JavaScriptClass:CSTS:fs"]]]]);

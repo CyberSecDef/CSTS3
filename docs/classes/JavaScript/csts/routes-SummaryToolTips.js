@@ -1,1 +1,0 @@
-NDSummary.OnToolTipsLoaded("JavaScriptClass:csts.routes",{101:"<div class=\"NDToolTip TClass LJavaScript\"><div class=\"TTSummary\">This is the set of routes used by the csts application</div></div>"});

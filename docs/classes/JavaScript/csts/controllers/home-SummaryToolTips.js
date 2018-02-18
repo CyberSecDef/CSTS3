@@ -1,1 +1,0 @@
-NDSummary.OnToolTipsLoaded("JavaScriptClass:csts.controllers.Home",{1:"<div class=\"NDToolTip TClass LJavaScript\"><div class=\"TTSummary\">This is the baseline controller for the CSTS</div></div>"});

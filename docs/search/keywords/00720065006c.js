@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("rel",["Variable"],[["reload",,[["csts",,,,0,"File:csts.js:csts.reload","JavaScriptClass:csts:reload"]]]]);
+NDSearch.OnPrefixDataLoaded("rel",["Variable"],[["reload",,[["CSTS",,,,0,"File:csts.js:CSTS.reload","JavaScriptClass:CSTS:reload"]]]]);

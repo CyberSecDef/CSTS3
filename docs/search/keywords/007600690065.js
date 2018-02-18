@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("vie",["Variable"],[["viewModels",,[["csts.controllers.Scans",,,,0,"File:controllers/Scans.js:csts.controllers.Scans.viewModels","JavaScriptClass:csts.controllers.Scans:viewModels"]]]]);
+NDSearch.OnPrefixDataLoaded("vie",["Variable"],[["viewModels",,[["Controllers.Scans",,,,0,"File:controllers/Scans.js:Controllers.Scans.viewModels","JavaScriptClass:Controllers.Scans:viewModels"]]]]);

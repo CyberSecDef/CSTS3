@@ -1,11 +1,41 @@
 /*
-  Namespace: csts.libs.utils
-  Object that contains utility type functions for the CSTS
+  Namespace: Libs.Utils
+
+  Description:
+    Object that contains utility type functions for the CSTS
+
+  License:
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+  Category:
+    Library
+
+  Package:
+    CSTSv3
+
+  Author:
+    Robert Weber <wwwdaze2000@gmail.com>
+
+  Copyright:
+    2018 - RFW
 */
 csts.libs.utils = {
   /*
     Method: isBlank
-    determines if submitted object exists and is not blank
+
+    Description:
+      determines if submitted object exists and is not blank
   */
   isBlank(obj) {
     if (obj === null || obj === '' || typeof obj === 'undefined') {
@@ -14,15 +44,17 @@ csts.libs.utils = {
     return false;
   },
   /*
-    Method: blob
-    This method will allow files to be saved from the CSTS app (file save dialog)
+    Method: getBlob
+
+    Description:
+      This method will allow files to be saved from the CSTS app (file save dialog)
 
     Parameters:
       mime - The mime type of the file to save
       content - The data to be saved
       filename - The name of the file to save asin
   */
-  blob(mime, content, filename) {
+  getBlob(mime, content, filename) {
     const blob = new Blob([content], { type: `${mime};charset=utf-8;` });
     if (navigator.msSaveBlob) {
       navigator.msSaveBlob(blob, filename);
@@ -42,7 +74,9 @@ csts.libs.utils = {
 
   /*
     Method: getGuid
-    Generates a GUID like string
+
+    Description:
+      Generates a GUID like string
   */
   getGuid() {
     // eslint-disable-next-line
@@ -51,6 +85,9 @@ csts.libs.utils = {
 
   /*
     Method: getRecursiveDir
+
+    Description:
+      Recursively scans for files in a folder
 
     Parameters:
       dir - The path being scanned
@@ -77,7 +114,9 @@ csts.libs.utils = {
 
   /*
     Method: log
-    Will log a message to the console if the application environment is set to developmental
+
+    Description:
+      Will log a message to the console if the application environment is set to developmental
 
     Parameters:
       msg - A String or object to be logged
@@ -91,7 +130,9 @@ csts.libs.utils = {
 
   /*
     Method: toggleHosts
-    Shows or hides the hosts column of the CSTS application
+
+    Description:
+      Shows or hides the hosts column of the CSTS application
   */
   toggleHosts() {
     if ($('#main-right-col').is(':visible')) {

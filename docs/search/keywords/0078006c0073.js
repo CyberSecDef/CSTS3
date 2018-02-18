@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("xls",["Variable"],[["xlsx",,[["csts",,,,0,"File:csts.js:csts.xlsx","JavaScriptClass:csts:xlsx"]]]]);
+NDSearch.OnPrefixDataLoaded("xls",["Variable"],[["xlsx",,[["CSTS",,,,0,"File:csts.js:CSTS.xlsx","JavaScriptClass:CSTS:xlsx"]]]]);

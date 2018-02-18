@@ -1,1 +1,0 @@
-NDContentPage.OnToolTipsLoaded({24:"<div class=\"NDToolTip TClass LJavaScript\"><div class=\"TTSummary\">This is the container for the functions that deal with the poam/rar comparison module</div></div>"});

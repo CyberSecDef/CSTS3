@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("cro",["Variable"],[["cron",,[["csts",,,,0,"File:csts.js:csts.cron","JavaScriptClass:csts:cron"]]]]);
+NDSearch.OnPrefixDataLoaded("cro",["Variable"],[["cron",,[["CSTS",,,,0,"File:csts.js:CSTS.cron","JavaScriptClass:CSTS:cron"]]]]);

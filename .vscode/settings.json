@@ -4,6 +4,7 @@
     "files.eol" : "\n",
     "files.associations" :{
         "*.tpl" : "html"
-    }
+    },
+    "sonarlint.ls.javaHome": "c:/program files/java/jdk-9.0.1"
     
 }

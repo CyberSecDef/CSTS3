@@ -1,18 +1,48 @@
 /*
-  Namespace: csts.libs.export
-  This object is responsible for exporting reports in DOC, PDF and CSV formats
+  Namespace: Libs.Export
+
+  Description:
+    This object is responsible for exporting reports in DOC, PDF and CSV formats
+
+  License:
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+  Category:
+    Library
+
+  Package:
+    CSTSv3
+
+  Author:
+    Robert Weber <wwwdaze2000@gmail.com>
+
+  Copyright:
+    2018 - RFW
 */
 csts.libs.export = {
 
   /*
-    Method: csv
+    Method: saveCSV
+
+    Description:
     Exports reports in CSV formats
 
     Parameters:
       data - JSON Object containing data to export
       filename - The name of the file to save as
   */
-  csv(data, filename) {
+  saveCSV(data, filename) {
     const processRow = (row) => {
       let finalVal = '';
       for (let j = 0; j < row.length; j += 1) {
@@ -37,18 +67,20 @@ csts.libs.export = {
     $.each(data.rows, (i, r) => {
       csvFile += processRow(r);
     });
-    csts.libs.utils.blob('text/csv', csvFile, filename);
+    csts.libs.utils.getBlob('text/csv', csvFile, filename);
   },
 
   /*
-    Method: doc
-    Exports reports in DOC formats
+    Method: saveDOC
+
+    Description:
+      Exports reports in DOC formats
 
     Parameters:
       content - The html content being exported
       filename - The name of the file to save as
   */
-  doc(content, filename) {
+  saveDOC(data, filename) {
     const css = [];
     for (let sheeti = 0; sheeti < document.styleSheets.length; sheeti += 1) {
       const sheet = document.styleSheets[sheeti];
@@ -70,21 +102,23 @@ csts.libs.export = {
     }, {}, (err, str) => {
       const parser = new DOMParser();
       const el = parser.parseFromString(str, 'text/xml');
-      $(el).find('body').append(content);
+      $(el).find('body').append(data);
 
-      csts.libs.utils.blob('text/html', el.documentElement.outerHTML, filename);
+      csts.libs.utils.getBlob('text/html', el.documentElement.outerHTML, filename);
     });
   },
 
   /*
-    Method: pdf
-    Exports reports in PDF formats
+    Method: savePDF
+
+    Description:
+      Exports reports in PDF formats
 
     Parameters:
       content - JSON Object containing data to export
       filename - The name of the file to save as
   */
-  pdf(data, filename) {
+  savePDF(data, filename) {
     // eslint-disable-next-line
     const pdf = new jsPDF('l', 'pt', 'letter');
     pdf.autoTable(data.columns, data.rows, data.styles);

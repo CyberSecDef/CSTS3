@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("tog",["Function"],[["toggleHosts",,[["csts.libs.utils",,,,0,"File:lib/utils.js:csts.libs.utils.toggleHosts","JavaScriptClass:csts.libs.utils:toggleHosts"]]]]);
+NDSearch.OnPrefixDataLoaded("tog",["Function"],[["toggleHosts",,[["Libs.Utils",,,,0,"File:lib/utils.js:Libs.Utils.toggleHosts","JavaScriptClass:Libs.Utils:toggleHosts"]]]]);
