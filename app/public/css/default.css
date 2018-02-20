@@ -30,6 +30,7 @@ main {
 div#main-center-col{
 	overflow:scroll;
 	padding-bottom:20px;
+	padding-top:20px;
 }
 
 div#main-right-col{

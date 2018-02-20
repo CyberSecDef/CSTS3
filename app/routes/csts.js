@@ -41,5 +41,6 @@ $.extend(csts.routes, {
   '/Home': 'Home@main.showHome',
   '/Scans/compareRarPoam': 'Scans@compareRarPoam.showIndex',
   '/Scans/scans2Poam': 'Scans@scans2poam.showIndex',
+  '/Stig/scap': () => { $('#main-center-col').html('<iframe style="margin-top:10px; width:100%; height:98%;" src="resources/views/STIG/U_Windows_10_STIG_V1R6_Manual-xccdf.html"></iframe>'); },
 });
 
