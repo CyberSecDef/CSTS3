@@ -35,35 +35,9 @@ csts.models.Scans = {
     Variables: Properties
 
     name - the name of the model
-    compareFields - fields that can be compared
-    rarFields - Mapping between fields and columns in a RAR spreadsheet
-    poamFields - Mapping between fields and columns in a POAM spreadsheet
     workbooks - a container for any excel workbooks that are opened
   */
   name: 'Scans',
-  compareFields: ['Mitigation', 'Comment', 'Description', 'Raw Risk', 'Residual Risk', 'Security Control', 'Source', 'Status'],
-  rarFields: {
-    Mitigation: 'J',
-    Comment: 'N',
-    Description: 'D',
-    'Raw Risk': 'F',
-    'Residual Risk': 'L',
-    'Security Control': 'A',
-    Source: 'B',
-    Status: 'M',
-    'Test Id': 'C',
-    Likelihood: 'H',
-  },
-  poamFields: {
-    Mitigation: 'G',
-    Comment: 'O',
-    Description: 'B',
-    'Raw Risk': 'F',
-    'Residual Risk': 'H',
-    'Security Control': 'C',
-    Source: 'M',
-    Status: 'N',
-  },
   workbooks: {},
 
   /*
@@ -84,6 +58,38 @@ csts.models.Scans = {
     <Controllers.Scans.compareRarPoam>
   */
   compareRarPoam: {
+    /*
+    Variables: Properties
+    
+      compareFields - fields that can be compared
+      rarFields - Mapping between fields and columns in a RAR spreadsheet
+      poamFields - Mapping between fields and columns in a POAM spreadsheet
+      workbooks - a container for any excel workbooks that are opened
+    */
+    fields: ['Mitigation', 'Comment', 'Description', 'Raw Risk', 'Residual Risk', 'Security Control', 'Source', 'Status'],
+    rarFields: {
+      Mitigation: 'J',
+      Comment: 'N',
+      Description: 'D',
+      'Raw Risk': 'F',
+      'Residual Risk': 'L',
+      'Security Control': 'A',
+      Source: 'B',
+      Status: 'M',
+      'Test Id': 'C',
+      Likelihood: 'H',
+    },
+    poamFields: {
+      Mitigation: 'G',
+      Comment: 'O',
+      Description: 'B',
+      'Raw Risk': 'F',
+      'Residual Risk': 'H',
+      'Security Control': 'C',
+      Source: 'M',
+      Status: 'N',
+    },
+
     /*
       Method: compareVals
 

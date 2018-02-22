@@ -113,6 +113,8 @@ csts.controllers.Scans = ({
           }
           $('#myModal').modal('hide');
           console.log(this.scans);
+
+          console.log( csts.plugins.jsonQuery('acas[*].hosts[*].requirements[*].pluginId', {data: csts.controllers.Scans.scans2poam.scans}).value.sort().filter(function(el,i,a){if(i==a.indexOf(el))return 1;return 0}) );
         });
     },
 
@@ -535,7 +537,7 @@ csts.controllers.Scans = ({
 
       csts.plugins.ejs.renderFile(
         'app/resources/views/pages/scans/compare.tpl', {
-          fields: csts.models.Scans.compareFields,
+          fields: csts.models.Scans.compareRarPoam.fields,
         }, {
           rmWhitespace: true,
         },
@@ -608,9 +610,9 @@ csts.controllers.Scans = ({
             // workbook
             csts.models.Scans.workbooks.rar.val(
               $('#rarTabSel')
-                .val(), (csts.models.Scans.rarFields[fields.type]) + fields.rarRow,
+                .val(), (csts.models.Scans.compareRarPoam.rarFields[fields.type]) + fields.rarRow,
               csts.models.Scans.workbooks.poam.val($('#poamTabSel')
-                .val(), (csts.models.Scans.poamFields[fields.type]) + fields.poamRow),
+                .val(), (csts.models.Scans.compareRarPoam.poamFields[fields.type]) + fields.poamRow),
             );
 
             // excel
@@ -635,7 +637,7 @@ csts.controllers.Scans = ({
               .text(fields.poamVal);
           } else {
             const r = csts.models.Scans.workbooks.poam.val($('#poamTabSel')
-              .val(), (csts.models.Scans.poamFields['Raw Risk']) + fields.poamRow);
+              .val(), (csts.models.Scans.compareRarPoam.poamFields['Raw Risk']) + fields.poamRow);
             let i = '';
             let l = '';
 
@@ -666,28 +668,28 @@ csts.controllers.Scans = ({
                 {
                   control: csts.models.Scans.workbooks.poam.val(
                     $('#poamTabSel').val(),
-                    (csts.models.Scans.poamFields['Security Control']) + fields.poamRow,
+                    (csts.models.Scans.compareRarPoam.poamFields['Security Control']) + fields.poamRow,
                   ),
                   source: csts.models.Scans.workbooks.poam.val(
                     $('#poamTabSel').val(),
-                    (csts.models.Scans.poamFields.Source) + fields.poamRow,
+                    (csts.models.Scans.compareRarPoam.poamFields.Source) + fields.poamRow,
                   ).substring(
                     0,
                     csts.models.Scans.workbooks.poam.val(
                       $('#poamTabSel').val(),
-                      (csts.models.Scans.poamFields.Source) + fields.poamRow,
+                      (csts.models.Scans.compareRarPoam.poamFields.Source) + fields.poamRow,
                     ).indexOf('Group ID:'),
                   ),
                   threat: csts.models.Scans.workbooks.poam.val(
                     $('#poamTabSel').val(),
-                    (csts.models.Scans.poamFields.Source) + fields.poamRow,
+                    (csts.models.Scans.compareRarPoam.poamFields.Source) + fields.poamRow,
                   ).substring(csts.models.Scans.workbooks.poam.val(
                     $('#poamTabSel').val(),
-                    (csts.models.Scans.poamFields.Source) + fields.poamRow,
+                    (csts.models.Scans.compareRarPoam.poamFields.Source) + fields.poamRow,
                   ).indexOf('Group ID:')),
                   description: csts.models.Scans.workbooks.poam.val(
                     $('#poamTabSel').val(),
-                    (csts.models.Scans.poamFields.Description) + fields.poamRow,
+                    (csts.models.Scans.compareRarPoam.poamFields.Description) + fields.poamRow,
                   ),
                   risk: '',
                   rawrisk: r,
@@ -696,23 +698,23 @@ csts.controllers.Scans = ({
                   correction: '',
                   mitigation: csts.models.Scans.workbooks.poam.val(
                     $('#poamTabSel').val(),
-                    (csts.models.Scans.poamFields.Mitigation) + fields.poamRow,
+                    (csts.models.Scans.compareRarPoam.poamFields.Mitigation) + fields.poamRow,
                   ),
                   remediation: csts.models.Scans.workbooks.poam.val(
                     $('#poamTabSel').val(),
-                    (csts.models.Scans.poamFields.Mitigation) + fields.poamRow,
+                    (csts.models.Scans.compareRarPoam.poamFields.Mitigation) + fields.poamRow,
                   ),
                   residualrisk: csts.models.Scans.workbooks.poam.val(
                     $('#poamTabSel').val(),
-                    (csts.models.Scans.poamFields['Residual Risk']) + fields.poamRow,
+                    (csts.models.Scans.compareRarPoam.poamFields['Residual Risk']) + fields.poamRow,
                   ),
                   status: csts.models.Scans.workbooks.poam.val(
                     $('#poamTabSel').val(),
-                    (csts.models.Scans.poamFields.Status) + fields.poamRow,
+                    (csts.models.Scans.compareRarPoam.poamFields.Status) + fields.poamRow,
                   ),
                   comment: csts.models.Scans.workbooks.poam.val(
                     $('#poamTabSel').val(),
-                    (csts.models.Scans.poamFields.Comment) + fields.poamRow,
+                    (csts.models.Scans.compareRarPoam.poamFields.Comment) + fields.poamRow,
                   ),
                   devices: '',
                 },
@@ -754,12 +756,12 @@ csts.controllers.Scans = ({
 
           csts.models.Scans.workbooks.rar.val(
             $('#rarTabSel').val(),
-            (csts.models.Scans.rarFields[fields.type]) + fields.rarRow,
+            (csts.models.Scans.compareRarPoam.rarFields[fields.type]) + fields.rarRow,
             text,
           );
           csts.models.Scans.workbooks.poam.val(
             $('#poamTabSel').val(),
-            (csts.models.Scans.poamFields[fields.type]) + fields.poamRow,
+            (csts.models.Scans.compareRarPoam.poamFields[fields.type]) + fields.poamRow,
             text,
           );
 
@@ -797,10 +799,10 @@ csts.controllers.Scans = ({
           if (fields.mismatch !== 'POAM' && fields.mismatch !== 'RAR') {
             csts.models.Scans.workbooks.poam.val(
               $('#poamTabSel').val(),
-              (csts.models.Scans.poamFields[fields.type]) + fields.poamRow,
+              (csts.models.Scans.compareRarPoam.poamFields[fields.type]) + fields.poamRow,
               csts.models.Scans.workbooks.rar.val(
                 $('#rarTabSel').val(),
-                (csts.models.Scans.rarFields[fields.type]) + fields.rarRow,
+                (csts.models.Scans.compareRarPoam.rarFields[fields.type]) + fields.rarRow,
               ),
             );
             csts.plugins.xlsx.writeFile(
@@ -821,36 +823,36 @@ csts.controllers.Scans = ({
               .text(fields.rarVal);
           } else {
             const r = csts.models.Scans.workbooks.rar.val($('#rarTabSel')
-              .val(), (csts.models.Scans.rarFields['Raw Risk']) + fields.rarRow);
+              .val(), (csts.models.Scans.compareRarPoam.rarFields['Raw Risk']) + fields.rarRow);
 
             csts.plugins.xlsx.utils.sheet_add_json(csts.models.Scans.workbooks.rar.Sheets.RAR, [{
               blank: '',
               description: csts.models.Scans.workbooks.rar.val($('#rarTabSel')
-                .val(), (csts.models.Scans.rarFields.Description) + fields.rarRow),
+                .val(), (csts.models.Scans.compareRarPoam.rarFields.Description) + fields.rarRow),
               control: csts.models.Scans.workbooks.rar.val($('#rarTabSel')
-                .val(), (csts.models.Scans.rarFields['Security Control']) + fields.rarRow),
+                .val(), (csts.models.Scans.compareRarPoam.rarFields['Security Control']) + fields.rarRow),
               office: '',
               security: '',
               rawrisk: r,
               mitigation: csts.models.Scans.workbooks.poam.val($('#poamTabSel')
-                .val(), (csts.models.Scans.poamFields.Mitigation) + fields.poamRow),
+                .val(), (csts.models.Scans.compareRarPoam.poamFields.Mitigation) + fields.poamRow),
               residualrisk: csts.models.Scans.workbooks.poam.val($('#poamTabSel')
-                .val(), (csts.models.Scans.poamFields['Residual Risk']) + fields.poamRow),
+                .val(), (csts.models.Scans.compareRarPoam.poamFields['Residual Risk']) + fields.poamRow),
               resources: '',
               scd: '',
               milestonesWD: '',
               milestronsWC: '',
               source: [
                 csts.models.Scans.workbooks.rar.val($('#rarTabSel')
-                  .val(), csts.models.Scans.rarFields.Source + fields.rarRow),
+                  .val(), csts.models.Scans.compareRarPoam.rarFields.Source + fields.rarRow),
                 '\n',
                 csts.models.Scans.workbooks.rar.val($('#rarTabSel')
-                  .val(), (csts.models.Scans.rarFields['Test Id']) + fields.rarRow),
+                  .val(), (csts.models.Scans.compareRarPoam.rarFields['Test Id']) + fields.rarRow),
               ].join(),
               status: csts.models.Scans.workbooks.rar.val($('#rarTabSel')
-                .val(), (csts.models.Scans.rarFields.Status) + fields.rarRow),
+                .val(), (csts.models.Scans.compareRarPoam.rarFields.Status) + fields.rarRow),
               comment: csts.models.Scans.workbooks.rar.val($('#rarTabSel')
-                .val(), (csts.models.Scans.rarFields.Comment) + fields.rarRow),
+                .val(), (csts.models.Scans.compareRarPoam.rarFields.Comment) + fields.rarRow),
             }], {
               header: ['blank', 'description', 'control', 'office', 'security', 'rawrisk', 'mitigation', 'residualrisk', 'resources', 'scd', 'milestonesWD', 'milestonesWC', 'source', 'status', 'comment'],
               origin: -1,
