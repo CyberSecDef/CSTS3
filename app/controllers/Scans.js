@@ -111,10 +111,93 @@ csts.controllers.Scans = ({
           for (let i = 0; i < files.length; i += 1) {
             me.parseFile(files[i]);
           }
-          $('#myModal').modal('hide');
-          console.log(this.scans);
 
+          const results = {
+            summary: [], issues: [], testPlan: [], poam: [], rar: [],
+          };
+          const cats = ['CAT I', 'CAT II', 'CAT III', 'CAT IV'];
+          const acasSummary = [];
+          const testPlan = [];
+
+          csts.plugins.jsonQuery('acas[*]', {data: csts.controllers.Scans.scans2poam.scans }).value.forEach((scanItem) => {
+            testPlan.push({
+              title: 'Assured Compliance Assessment Solution (ACAS) Nessus Scanner',
+              version: scanItem.hosts[0].scanEngine,
+              host: scanItem.hosts.map(host => host.hostname).sort().join(', '),
+              fileName: scanItem.scanFile,
+              date: scanItem.hosts[0].scanDate,
+            });
+            csts.plugins.jsonQuery('hosts[*]', {data: scanItem }).value.forEach((hostItem) =>{
+              
+              acasSummary.push({
+                type: 'ACAS',
+                host: hostItem.hostname,
+                os: hostItem.os,
+                fileName: scanItem.scanFile,
+                cat1: hostItem.openFindings.cat1,
+                cat2: hostItem.openFindings.cat2,
+                cat3: hostItem.openFindings.cat3,
+                cat4: hostItem.openFindings.cat4,
+                total: hostItem.openFindings.cat1 +
+                  hostItem.openFindings.cat2 +
+                  hostItem.openFindings.cat3 +
+                  hostItem.openFindings.cat4,
+                score: (10 * hostItem.openFindings.cat1) + (3 * hostItem.openFindings.cat2) + hostItem.openFindings.cat3,
+                credentialed: hostItem.credentialed,
+              });
+            });
+          });
+
+          // each unique plugin id
+          csts.plugins.jsonQuery('acas[*].hosts[*].requirements[*].pluginId', {data: csts.controllers.Scans.scans2poam.scans }).value.sort().filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; }).forEach( (element) => {
+            const acasPlugin = csts.plugins.jsonQuery(`acas[*].hosts[*].requirements[pluginId = ${element}` , {data: csts.controllers.Scans.scans2poam.scans }).value;
+            results.rar.push({
+              iaControl: '',
+              cci: '',
+              source: 'Assured Compliance Assessment Solution (ACAS) Nessus Scanner',
+              vulnId: `Group ID: ${acasPlugin.grpId}
+Vuln ID: 
+Rule ID: 
+Plugin ID: ${element}`,
+              vulnDescription: acasPlugin.title,
+              devicesAffected: csts.plugins.jsonQuery(
+                `acas[*].hosts[*hostname!='']`, { data: csts.controllers.Scans.scans2poam.scans }
+              ).value.filter(
+                host => host.requirements.filter(
+                  req => req.pluginId === element,
+                ).length,
+              ).map(h => h.hostname).sort().join(', '),
+              objectives: '',
+              rawTestResult: cats[3 - acasPlugin.severity],
+              predisposingConditions: '',
+              technicalMitigations: '',
+              pervasiveness: '',
+              relevance: '',
+              threatDescription: acasPlugin.description,
+              resources: acasPlugin.resources,
+              likelihood: '',
+              impact: '',
+              impactDescription: '',
+              risk: '',
+              proposedMitigations: acasPlugin.solution,
+              residualRisk:  cats[3 - acasPlugin.severity],
+              status: 'Ongoing',
+              recommendations: acasPlugin.comments,
+              pluginId: element,
+            });
+          });
+
+
+
+
+
+
+          results.summary = acasSummary;
+          results.testPlan = testPlan;
+          console.log(this.scans);
           console.log( csts.plugins.jsonQuery('acas[*].hosts[*].requirements[*].pluginId', {data: csts.controllers.Scans.scans2poam.scans}).value.sort().filter(function(el,i,a){if(i==a.indexOf(el))return 1;return 0}) );
+          console.log(results);
+          $('#myModal').modal('hide');
         });
     },
 
@@ -393,13 +476,13 @@ csts.controllers.Scans = ({
      * Parameters:
      *  {string} file - path to the scan file to be parse
      */
-    parseNessus(file) {
+    parseNessus(file, filename) {
       const nessusData = {};
       let fileData = '';
       let fileName = '';
       if (file.indexOf('<') > -1) {
         fileData = file;
-        fileName = 'UNKNOWN';
+        fileName = (typeof filename !== 'undefined' ? filename : 'UNKNOWN');
       } else {
         fileData = csts.plugins.fs.readFileSync(file, 'utf8');
         fileName = file;
@@ -411,17 +494,24 @@ csts.controllers.Scans = ({
         result.NessusClientData_v2.Report[0].ReportHost.forEach((host) => {
           const hostData = {};
           hostData.hostname = host.HostProperties[0].tag.filter(a => a.$.name === 'host-fqdn')[0]._;
+          if (hostData.hostname.indexOf('.') >= 0) {
+            hostData.hostname = hostData.hostname.substr(0, hostData.hostname.indexOf('.'));
+          }
           hostData.scanDate = csts.plugins.moment(host.HostProperties[0].tag.filter(a => a.$.name === 'HOST_START')[0]._)
             .format('MM/DD/YYYY HH:mm');
           hostData.credentialed = host.HostProperties[0].tag.filter(a => a.$.name === 'Credentialed_Scan')[0]._;
-          hostData.scanEngine = host.ReportItem.filter(a => a.$.pluginID === '19506')[0].plugin_output[0].match(new RegExp('Nessus version : ([0-9.]+)'))[1];
 
+          const os = host.HostProperties[0].tag.filter(a => a.$.name === 'operating-system')[0];
+          hostData.os = typeof os !== 'undefined' ? typeof os._ !== 'undefined' ? os._ : os : '';
+          hostData.scanEngine = host.ReportItem.filter(a => a.$.pluginID === '19506')[0].plugin_output[0].match(new RegExp('Nessus version : ([0-9.]+)'))[1];
           hostData.openFindings = {
             cat1: host.ReportItem.filter(a => a.$.severity >= '3')
               .length,
             cat2: host.ReportItem.filter(a => a.$.severity === '2')
               .length,
             cat3: host.ReportItem.filter(a => a.$.severity === '1')
+              .length,
+            cat4: host.ReportItem.filter(a => a.$.severity === '0')
               .length,
           };
 
@@ -479,7 +569,7 @@ csts.controllers.Scans = ({
               self.parseCkl(currentFile);
               break;
             case '.nessus':
-              self.parseNessus(currentFile);
+              self.parseNessus(currentFile, file);
               break;
             case '.xml':
               self.parseXccdf(currentFile);
