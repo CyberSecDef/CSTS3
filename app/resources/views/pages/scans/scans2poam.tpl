@@ -40,7 +40,7 @@
 											</div>
 											
 											<div class="input-group-append">
-												<button type="button" class="btn btn-primary float-right" id="scans2poam-parse-btn">Parse</button>	
+												<button type="button" class="btn btn-primary float-right" id="scans2poam-parse-btn">Scan</button>	
 											</div>
 										</div>
 																		

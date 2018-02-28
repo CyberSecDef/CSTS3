@@ -149,3 +149,11 @@ h3 a{
 	background: #666;
 	color:#fff;
 }
+
+#loading {
+	font-size:24pt;
+	margin-left:auto;
+	margin-right:auto;
+	text-align:center;
+	margin-top: 30%;
+}
