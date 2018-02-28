@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("rar",["Variable"],[["rarFields",,[["Models.Scans",,,,0,"File:models/Scans.js:Models.Scans.rarFields","JavaScriptClass:Models.Scans:rarFields"]]]]);
+NDSearch.OnPrefixDataLoaded("rar",["Variable"],[["rarFields",,[["Models.Scans.compareRarPoam",,,,0,"File:models/Scans.js:Models.Scans.compareRarPoam.rarFields","JavaScriptClass:Models.Scans.compareRarPoam:rarFields"]]]]);

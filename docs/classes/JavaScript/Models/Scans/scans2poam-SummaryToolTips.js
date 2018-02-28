@@ -1,1 +1,1 @@
-NDSummary.OnToolTipsLoaded("JavaScriptClass:Models.Scans.scans2poam",{31:"<div class=\"NDToolTip TClass LJavaScript\"><div class=\"TTSummary\">This is the container for the functions that deal with the scans2poam module</div></div>"});
+NDSummary.OnToolTipsLoaded("JavaScriptClass:Models.Scans.scans2poam",{73:"<div class=\"NDToolTip TClass LJavaScript\"><div class=\"TTSummary\">This is the container for the functions that deal with the scans2poam module</div></div>"});
