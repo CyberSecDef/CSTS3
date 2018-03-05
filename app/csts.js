@@ -264,7 +264,7 @@ const csts = {
     csts.plugins.reload = csts.plugins.fs.watch('./app', {
       recursive: true,
     }, (eventType, filename) => {
-      if (filename.substring(0, 8) !== 'database' && filename.substring(0, 4) !== 'docs') {
+      if (filename.substring(0, 8) !== 'database' && filename.substring(0, 4) !== 'docs' && filename.indexOf('storage') < 0) {
         window.location.href = '/app/index.html';
         reloadWatcher.close();
       }
@@ -273,6 +273,33 @@ const csts = {
     csts.router = new csts.plugins.Navigo(window.location.origin, false, '#');
 
     $(document).ready(() => {
+
+      csts.plugins.ejs.renderFile('app/resources/views/layouts/default.tpl', {
+        username: process.env.USERNAME,
+        url: window.location.valueOf().pathname.replace('/app', '').replace('index.html', ''),
+      }, {}, (err, str) => {
+        $('body').html(str);
+      });
+
+      // load any routes that are specified in the controllers
+      Object.keys(csts.controllers).forEach((c) => {  
+        Object.keys(csts.controllers[c]).filter(m => typeof csts.controllers[c][m] === 'object').forEach((m) => {
+          if (typeof csts.controllers[c][m].default !== 'undefined') {
+
+            // add to route
+            const r = {};
+            r[`/${c}/${m}`] = `${c}@${m}.${csts.controllers[c][m].default}`;
+            $.extend(csts.routes, r);
+
+            // add to navbar
+            $("header nav.navbar div ul li").find(`a:contains('${c}')`).parent().find("div.dropdown-menu").append(
+              $('<a></a>').addClass('dropdown-item').attr('href',`/${c}/${m}`).text(csts.controllers[c][m].name)
+            );
+          }
+        });
+      });
+
+      console.log(csts.routes);
       $.each(csts.routes, (name, val) => {
         let c = '';
         let f = '';
@@ -311,26 +338,24 @@ const csts = {
         });
       }
 
-      csts.plugins.ejs.renderFile('app/resources/views/layouts/default.tpl', {
-        username: process.env.USERNAME,
-        url: window.location.valueOf().pathname.replace('/app', '').replace('index.html', ''),
-      }, {}, (err, str) => {
-        $('body').html(str);
-      });
-
       // this function calls the routing without actually navigating away
       csts.plugins.win.on('navigation', (frame, url, policy) => {
-        $('#main-center-col *').remove();
+        
 
         window.onbeforeunload = null;
         policy.ignore();
         const req = url.replace(window.location.origin, '');
-        $('#main-center-col').html('');
-        csts.router.navigate(req);
 
+        // only naviate if this is going to a new page. (double tapping same link causes page to blank out)
+        if (csts.router.lastRouteResolved() == null || typeof csts.router.lastRouteResolved() === 'undefined' || req !== csts.router.lastRouteResolved().url) {
+          $('#main-center-col *').remove();
+          $('#main-center-col').html('');
+          csts.router.navigate(req);
+        }
         return false;
       });
 
+      // default route
       csts.controllers.Home.main.showHome();
 
       csts.plugins.isElevated().then((elevated) => {

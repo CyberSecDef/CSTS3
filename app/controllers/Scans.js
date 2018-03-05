@@ -57,8 +57,12 @@ csts.controllers.Scans = ({
     /**
      * Variables: Applet Variables
      * scanFiles - the scan files that are being combined into the scans2poam report
+     * name - The name of this module
+     * default - the default method to call when this module is executed
     */
     scanFiles: [],
+    name: 'Scans2Poam',
+    default: 'showIndex',
 
     /*
       Method: showIndex
@@ -102,16 +106,49 @@ csts.controllers.Scans = ({
           }
 
           const results = {};
+          const cols = {};
 
-          results.issues = csts.models.Scans.scans2poam.getIssues();
-          results.summary = csts.models.Scans.scans2poam.getSummary();
-          results.testPlan = csts.models.Scans.scans2poam.getTestPlan();
-          results.rar = csts.models.Scans.scans2poam.getRar();
-          results.poam = csts.models.Scans.scans2poam.getPoam();
+          results.Summary = csts.models.Scans.scans2poam.getSummary();
+
+
+
+          results.Issues = csts.models.Scans.scans2poam.getIssues();
+          cols.Issues = [
+            { width: 75 },
+            { width: 25 },
+            { width: 50 },
+            { width: 25 },
+            { width: 15 },
+            { width: 15 },
+            { width: 15 },
+            { width: 25 },
+            { width: 25 },
+            { width: 75 },
+            { width: 75 },
+          ];
+          
+          results['Test Plan'] = csts.models.Scans.scans2poam.getTestPlan();
+          results.RAR = csts.models.Scans.scans2poam.getRar();
+          results.POAM = csts.models.Scans.scans2poam.getPoam();
 
           console.log(csts.models.Scans.scans2poam.scans);
-          console.log(csts.plugins.jsonQuery('acas[*].hosts[*].requirements[*].pluginId', { data: csts.models.Scans.scans2poam.scans }).value.sort().filter((el, i, a) => { if (i === a.indexOf(el)){ return 1; } return 0; }));
+          console.log(csts.plugins.jsonQuery('acas[*].hosts[*].requirements[*].pluginId', { data: csts.models.Scans.scans2poam.scans }).value.sort().filter((el, i, a) => { if (i === a.indexOf(el)) { return 1; } return 0; }));
           console.log(results);
+
+          const filename = `./app/storage/results/${this.name}_${csts.plugins.moment().format('YYYYMMDD_HHmmss')}.xlsx`;
+          csts.wb = csts.plugins.xlsx.utils.book_new();
+          
+          Object.keys(results).forEach((k) => {
+            const ws = csts.plugins.xlsx.utils.json_to_sheet(results[k]);
+            ws['!cols'] = cols[k];
+            csts.plugins.xlsx.utils.book_append_sheet(csts.wb, ws, k);
+          });
+          
+          csts.plugins.xlsx.writeFile(csts.wb, filename);
+          
+          $('#scans2poamResults').html($('<a></a>').attr('href', filename.replace('./app/', './')).attr('target','_blank').text(filename.replace('./app/', '/')));
+          
+          $('#select-scan-results-card').click();
           $('#myModal').modal('hide');
         });
     },
@@ -182,6 +219,8 @@ csts.controllers.Scans = ({
       <Models.Scans.compareRarPoam>
   */
   compareRarPoam: {
+    name: 'Scan Comparison',
+    default: 'showIndex',
     /*
       Method: showIndex
 

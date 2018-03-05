@@ -79,12 +79,11 @@
 					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
 						<a class="dropdown-item" href="/Scans/CleanScap">Clean Scap Folder</a>
 						<a class="dropdown-item" href="/Scans/HwSwList">Hardware/Software List</a>
-						<a class="dropdown-item" href="/Scans/scans2Poam">Scans2Poam</a>
 						<a class="dropdown-item" href="/Scans/software2Stig">Software To Stig</a>
 						<a class="dropdown-item" href="/Scans/vramOpenFindings">Vram Open Findings</a>
-						<div class="dropdown-divider"></div>
-						<a class="dropdown-item" href="/Scans/compareRarPoam">Scan Comparison</a>
 						<a class="dropdown-item" href="/Scans/resourceComparison">Report Source Comparison</a>
+						
+						<div class="dropdown-divider"></div>
 					</div>
 				</li>
 				

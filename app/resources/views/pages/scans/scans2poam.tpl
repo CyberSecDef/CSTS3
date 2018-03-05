@@ -98,46 +98,14 @@
 				<div class="card">
 					<div class="card-header" id="headingFour">
 						<h5 class="mb-0">
-							<button class="btn btn-link collapsed" data-toggle="collapse" data-target="#scans-compare-results" aria-expanded="false" aria-controls="scans-compare-results">
+							<button class="btn btn-link collapsed" data-toggle="collapse" data-target="#scans-compare-results" aria-expanded="false" aria-controls="scans-compare-results"  id="select-scan-results-card">
 								Results
 							</button>
 						</h5>
 					</div>
 					<div id="scans-compare-results" class="collapse" aria-labelledby="headingFour" data-parent="#accordion">
-						<div class="card-body">
-							
-							<form class="form-inline float-right">
-								<div class="form-group mb-2">
-									<div class="btn-group" role="group">
-										<button class="btn btn-outline-primary" type="button" id="exportDOC">
-											<i class="fas fa-file-word"></i>
-										</button>
-										<button class="btn btn-outline-danger" type="button" id="exportPDF">
-											<i class="fas fa-file-pdf"></i>
-										</button>
-										<button class="btn btn-outline-success" type="button" id="exportCSV">
-											<i class="fas fa-file-excel"></i>
-										</button>
-									</div>
-								</div>
-							</form>
-
-							<table class="table table-sm table-striped table-small-text data-table " id="scans-files">
-							<thead>
-								<tr>
-									<th>#</th>
-									<th>Security Controls</th>
-									<th>Source</th>
-									<th>Vuln Id</th>
-									<th>Description</th>
-									<th>Raw Risk</th>
-									<th>Status</th>
-									<th>Devices</th>
-								</tr>
-							</thead>
-							<tbody>
-							</tbody>
-						</table>
+						<div class="card-body" id="scans2poamResults">
+														
 						</div>
 					</div>
 				</div>

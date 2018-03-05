@@ -69,63 +69,63 @@ csts.models.Scans = {
       csts.plugins.jsonQuery('acas[*]', { data: this.scans }).value.forEach((scanItem) => {
         csts.plugins.jsonQuery('hosts[*]', { data: scanItem }).value.forEach((hostItem) => {
           summary.push({
-            type: 'ACAS',
-            host: hostItem.hostname,
-            os: hostItem.os,
-            fileName: csts.plugins.path.basename(scanItem.scanFile),
-            cat1: hostItem.openFindings.cat1,
-            cat2: hostItem.openFindings.cat2,
-            cat3: hostItem.openFindings.cat3,
-            cat4: hostItem.openFindings.cat4,
-            total: hostItem.openFindings.cat1 +
+            Type: 'ACAS',
+            Hosts: typeof hostItem.hostname === 'object' ? hostItem.hostname[0] : hostItem.hostname,
+            'Operating System': hostItem.os,
+            'Scan File Name': csts.plugins.path.basename(scanItem.scanFile),
+            'Cat 1': hostItem.openFindings.cat1,
+            'Cat 2': hostItem.openFindings.cat2,
+            'Cat 3': hostItem.openFindings.cat3,
+            'Cat 4': hostItem.openFindings.cat4,
+            Total: hostItem.openFindings.cat1 +
               hostItem.openFindings.cat2 +
               hostItem.openFindings.cat3 +
               hostItem.openFindings.cat4,
-            score: (10 * hostItem.openFindings.cat1) +
+            Score: (10 * hostItem.openFindings.cat1) +
               (3 * hostItem.openFindings.cat2) +
               hostItem.openFindings.cat3,
-            credentialed: hostItem.credentialed,
+            'Credentialed Scan': hostItem.credentialed,
           });
         });
       });
 
       csts.plugins.jsonQuery('scap[*]', { data: this.scans }).value.forEach((scanItem) => {
         summary.push({
-          type: 'SCAP',
-          host: scanItem.hostname,
-          os: '',
-          fileName: csts.plugins.path.basename(scanItem.scanFile),
-          cat1: scanItem.openFindings.cat1,
-          cat2: scanItem.openFindings.cat2,
-          cat3: scanItem.openFindings.cat3,
-          cat4: 0,
-          total: scanItem.openFindings.cat1 +
+          Type: 'SCAP',
+          Hosts: typeof scanItem.hostname === 'object' ? scanItem.hostname[0] : scanItem.hostname,
+          'Operating System': '',
+          'Scan File Name': csts.plugins.path.basename(scanItem.scanFile),
+          'Cat 1': scanItem.openFindings.cat1,
+          'Cat 2': scanItem.openFindings.cat2,
+          'Cat 3': scanItem.openFindings.cat3,
+          'Cat 4': 0,
+          Total: scanItem.openFindings.cat1 +
           scanItem.openFindings.cat2 +
             scanItem.openFindings.cat3,
-          score: (10 * scanItem.openFindings.cat1) +
+          Score: (10 * scanItem.openFindings.cat1) +
             (3 * scanItem.openFindings.cat2) +
             scanItem.openFindings.cat3,
-          credentialed: scanItem.credentialed,
+          'Credentialed Scan': scanItem.credentialed,
         });
       });
 
       csts.plugins.jsonQuery('ckl[*]', { data: this.scans }).value.forEach((scanItem) => {
         summary.push({
-          type: 'CKL',
-          host: scanItem.hostname[0],
-          os: '',
-          fileName: csts.plugins.path.basename(scanItem.scanFile),
-          cat1: scanItem.openFindings.cat1,
-          cat2: scanItem.openFindings.cat2,
-          cat3: scanItem.openFindings.cat3,
-          cat4: 0,
-          total: scanItem.openFindings.cat1 +
+          Type: 'CKL',
+          Hosts: typeof scanItem.hostname === 'object' ? scanItem.hostname[0] : scanItem.hostname,
+          'Operating System': '',
+          'Scan File Name': csts.plugins.path.basename(scanItem.scanFile),
+          'Cat 1': scanItem.openFindings.cat1,
+          'Cat 2': scanItem.openFindings.cat2,
+          'Cat 3': scanItem.openFindings.cat3,
+          'Cat 4': 0,
+          Total: scanItem.openFindings.cat1 +
           scanItem.openFindings.cat2 +
             scanItem.openFindings.cat3,
-          score: (10 * scanItem.openFindings.cat1) +
+          Score: (10 * scanItem.openFindings.cat1) +
             (3 * scanItem.openFindings.cat2) +
             scanItem.openFindings.cat3,
-          credentialed: scanItem.credentialed,
+          'Credentialed Scan': scanItem.credentialed,
         });
       });
 
@@ -143,46 +143,44 @@ csts.models.Scans = {
       
       csts.plugins.jsonQuery('acas[*]', { data: this.scans }).value.forEach((scanItem) => {
         testPlan.push({
-          title: 'Assured Compliance Assessment Solution (ACAS): Nessus Scanner',
-          version: scanItem.hosts[0].scanEngine,
-          hosts: scanItem.hosts.map(host => host.hostname).sort().join(', '),
-          fileName: csts.plugins.path.basename(scanItem.scanFile),
-          dates: scanItem.hosts[0].scanDate,
+          Title: 'Assured Compliance Assessment Solution (ACAS): Nessus Scanner',
+          Version: scanItem.hosts[0].scanEngine,
+          Hosts: scanItem.hosts.map(host => host.hostname).sort().join(', '),
+          'Scan File Name': csts.plugins.path.basename(scanItem.scanFile),
+          Dates: scanItem.hosts[0].scanDate,
         });
       });
 
       this.scans.scap.map((e) => { return `${e.title} - V${e.version}R${e.release}`; }).sort().filter((value, index, self) => self.indexOf(value) === index).forEach((scapScan) => {
         console.log(scapScan);
-        const results = {
-          hosts: [],
-          dates: [],
-        };
+        const results = {};
 
         const hosts = [];
         const dates = [];
         this.scans.scap.filter((e) => { return scapScan === `${e.title} - V${e.version}R${e.release}`; }).forEach((scapResult) => {
-          results.fileName = '';
-          results.title = `Security Content Automation Protocol (SCAP): ${scapResult.title}`;
-          results.version = `V${scapResult.version}R${scapResult.release}`;
+          results.Title = `Security Content Automation Protocol (SCAP): ${scapResult.title}`;
+          results.Version = `V${scapResult.version}R${scapResult.release}`;
           hosts.push(scapResult.hostname);
-          dates.push(scapResult.scanDate);
+          dates.push(csts.plugins.moment(scapResult.scanDate, 'MM/DD/YYYY HH:mm'));
         });
-        results.hosts = hosts.sort().filter((value, index, self) => self.indexOf(value) === index).join(', ');
 
-        const start = csts.plugins.moment(Date(Math.min.apply(null, dates))).format('MM/DD/YYYY HH:mm');
-        const end = csts.plugins.moment(Date(Math.max.apply(null, dates))).format('MM/DD/YYYY HH:mm');
-        results.dates = `${start} - ${end}`;
+        results.Hosts = hosts.sort().filter((value, index, self) => self.indexOf(value) === index).join(', ');
+        results['Scan File Name'] = '';
 
+        const start = csts.plugins.moment((Math.min.apply(null, dates))).format('MM/DD/YYYY HH:mm');
+        const end = csts.plugins.moment((Math.max.apply(null, dates))).format('MM/DD/YYYY HH:mm');
+        results.Dates = `${start} - ${end}`;
+        
         testPlan.push(results);
       });
 
       this.scans.ckl.sort((a, b) =>  a.title > b.title ? 1 : b.title > a.title ? -1 : 0).forEach((cklScan) => {
         const results = {
-          fileName: cklScan.scanFile,
-          title: cklScan.title,
-          version: `V${cklScan.version}R${cklScan.release}`,
-          hosts: cklScan.hostname[0],
-          dates: cklScan.scanDate,
+          Title: `Security Technical Implementation Guideline (STIG): ${cklScan.title}`,
+          Version: `V${cklScan.version}R${cklScan.release}`,
+          Hosts: cklScan.hostname,
+          'Scan File Name': cklScan.scanFile,
+          Dates: cklScan.scanDate,
         };
         testPlan.push(results);
       });
@@ -200,61 +198,59 @@ csts.models.Scans = {
     getIssues() {
       const results = [];
 
-      const ckls = csts.plugins.jsonQuery('ckl[*].requirements[*status!=Completed].vulnId', {data : csts.models.Scans.scans2poam.scans}).value.sort().filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; });
-      const scaps = csts.plugins.jsonQuery('scap[*].requirements[*status!=Completed].vulnId', {data : csts.models.Scans.scans2poam.scans}).value.sort().filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; });
-      
-      // open on scap, not on ckl
-      // open on scap, not executed on ckl
+      csts.models.Scans.scans2poam.scans.scap.forEach((scap) => {
+        scap.requirements.filter(s => s.status !== 'Completed').forEach((r) => {
 
-      // just scap (this should be impossible if SCAP and STIG is done properly)
-      scaps.filter(e => !ckls.includes(e)).sort()
-        .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; }).forEach((element) => {
-          const scapReq = csts.plugins.jsonQuery(`scap[*].requirements[vulnId=${element}]`, { data: csts.models.Scans.scans2poam.scans }).value;
-
-          results.push({
-            scapStig: csts.models.Scans.scans2poam.scans.scap
-              .filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId).length > 0)
-              .map(h => h.title)
-              .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId).length > 0).map(h => h.title))
-              .sort()
-              .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
-              .join(', '),
-            assets: csts.models.Scans.scans2poam.scans.scap
-              .filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId ).length > 0)
-              .map(h => h.hostname)
-              .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.hostname))
-              .sort()
-              .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
-              .filter((el, i, a) => { if (el.trim() !== '') return 1; return 0; })
-              .join(', '),
-            requirement: scapReq.title,
-            version: csts.models.Scans.scans2poam.scans.scap
-              .filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId).length > 0)
-              .map(h => h.version)
-              .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId).length > 0).map(h => h.version))
-              .sort()
-              .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
-              .join(', '),
-            release: csts.models.Scans.scans2poam.scans.scap
-              .filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId).length > 0)
-              .map(h => h.release)
-              .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId).length > 0).map(h => h.release))
-              .sort()
-              .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
-              .join(', '),
-            grpId: scapReq.grpId,
-            vulnId: scapReq.vulnId,
-            ruleId: scapReq.ruleId,
-            scapStatus: scapReq.status,
-            stigStatus: csts.models.Scans.scans2poam.scans.ckl
-              .filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId).length > 0),
-              
-            finding: scapReq.findingDetails,
-            comments: ''
-
-          });
+          if (csts.models.Scans.scans2poam.scans.ckl.filter(stig => stig.title === scap.title).length > 0) {
+            csts.models.Scans.scans2poam.scans.ckl.filter(stig => stig.title === scap.title).forEach((c) => {
+              if (r.status !== c.requirements.filter(cr => cr.vulnId === r.vulnId ).map(cr => cr.status).join(', ')) {
+                results.push({
+                  Title: scap.title,
+                  Hosts: csts.models.Scans.scans2poam.scans.scap.filter(s => s.title === scap.title && s.requirements.filter(srf => srf.status !== 'Completed').length > 0)
+                    .map(h => h.hostname)
+                    .sort()
+                    .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+                    .join(', '),
+                  Vulnerability: r.title,
+                  Version: scap.version,
+                  Release: scap.release,
+                  grpId: r.grpId,
+                  vulnId: r.vulnId,
+                  ruleId: r.ruleId,
+                  'SCAP Status': r.status,
+                  'CKL Status': c.requirements
+                    .filter(cr => cr.vulnId === r.vulnId)
+                    .map(cr => cr.status).join(', '),
+                  'Finding Details': r.findingDetails,
+                  Comments: c.requirements
+                    .filter(cr => cr.vulnId === r.vulnId)
+                    .map(cr => cr.comments)
+                    .join(', '),
+                });
+              }
+            });
+          } else { 
+            results.push({
+              Title: scap.title,
+              Hosts: csts.models.Scans.scans2poam.scans.scap.filter(s => s.title === scap.title && s.requirements.filter(srf => srf.status !== 'Completed').length > 0)
+                .map(h => h.hostname)
+                .sort()
+                .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+                .join(', '),
+              Vulnerability: r.title,
+              Version: scap.version,
+              Release: scap.release,
+              grpId: r.grpId,
+              vulnId: r.vulnId,
+              ruleId: r.ruleId,
+              'SCAP Status': r.status,
+              'CKL Status': 'Not Executed',
+              'Finding Details': r.findingDetails,
+              Comments: '',
+            });
+          }
         });
-   
+      });
       return results;
     },
 
@@ -271,36 +267,34 @@ csts.models.Scans = {
         const acasPlugin = csts.plugins.jsonQuery(`acas[*].hosts[*].requirements[pluginId = ${element}`, { data: csts.models.Scans.scans2poam.scans }).value;
 
         results.push({
-          nonCompliantSecurityControls: '',
-          affectedCCI: '',
-          sourceOfDiscovery: 'Assured Compliance Assessment Solution (ACAS): Nessus Scanner',
-          vulnerabilityId: `Group ID: ${acasPlugin.grpId}
+          'Non-Compliant Security Controls (16a)': '',
+          'Affected CCI (16a.1)': '',
+          'Source of Discovery(16a.2)': 'Assured Compliance Assessment Solution (ACAS): Nessus Scanner',
+          'Vulnerability ID(16a.3)': `Group ID: ${acasPlugin.grpId}
 Vuln ID: 
 Rule ID: 
 Plugin ID: ${element}`,
-          vulnerabilityDescription: acasPlugin.title,
-          devicesAffected: csts.plugins.jsonQuery("acas[*].hosts[*hostname!='']", { data: csts.models.Scans.scans2poam.scans }).value.filter(
-            host => host.requirements.filter(
-              req => req.pluginId === element,
-            ).length,
-          ).map(h => h.hostname).sort().join(', '),
-          securityObjectives: '',
-          rawTestResult: this.getRiskVal(acasPlugin.severity, 'CAT'),
-          predisposingConditions: '',
-          technicalMitigations: '',
-          severityOrPervasiveness: this.getRiskVal(acasPlugin.severity, 'VL-VH'),
-          relevanceOfThreat: this.getRiskVal(acasPlugin.severity, 'VL-VH'),
-          threatDescription: acasPlugin.description,
-          resources: '',
-          likelihood: this.getRiskVal(acasPlugin.severity, 'VL-VH'),
-          impact: this.getRiskVal(acasPlugin.severity, 'VL-VH'),
-          impactDescription: '',
-          risk: this.getRiskVal(acasPlugin.severity, 'VL-VH'),
-          proposedMitigations: acasPlugin.solution,
-          residualRisk: '',
-          status: 'Ongoing',
-          recommendations: acasPlugin.comments,
-          pluginId: element,
+          'Vulnerability Description (16.b)': acasPlugin.title,
+          'Devices Affected (16b.1)': csts.plugins.jsonQuery("acas[*].hosts[*hostname!='']", { data: csts.models.Scans.scans2poam.scans }).value
+            .filter(host => host.requirements.filter(req => req.pluginId === element).length)
+            .map(h => h.hostname).sort().join(', '),
+          'Security Objectives (C-I-A) (16c)': '',
+          'Raw Test Result (16d)': this.getRiskVal(acasPlugin.severity, 'CAT'),
+          'Predisposing Condition(s) (16d.1)': '',
+          'Technical Mitigation(s)/Remediation(s) (16d.2)': '',
+          'Severity or Pervasiveness (VL-VH) (16d.3)': this.getRiskVal(acasPlugin.severity, 'VL-VH'),
+          'Relevance of Threat (VL-VH) (16e)': this.getRiskVal(acasPlugin.severity, 'VL-VH'),
+          'Threat Description (16e.1)': acasPlugin.description,
+          Resources: '',
+          'Likelihood (Cells 16d.3 & 16e) (VL-VH) (16f)': this.getRiskVal(acasPlugin.severity, 'VL-VH'),
+          'Impact (VL-VH) (16g)': this.getRiskVal(acasPlugin.severity, 'VL-VH'),
+          'Impact Description (16h)': '',
+          'Risk (Cells 16f & 16g) (VL-VH) (16i)': this.getRiskVal(acasPlugin.severity, 'VL-VH'),
+          'Proposed Mitigations (From POA&M) (16j)': acasPlugin.solution,
+          'Residual Risk (After Proposed Mitigations) (16k)': '',
+          Status: 'Ongoing',
+          'Recommendations (16l)': acasPlugin.comments,
+          // pluginId: element,
         });
       });
 
@@ -313,21 +307,21 @@ Plugin ID: ${element}`,
           const cklReq = csts.plugins.jsonQuery(`ckl[*].requirements[vulnId=${element}]`, { data: csts.models.Scans.scans2poam.scans }).value;
 
           results.push({
-            nonCompliantSecurityControls: typeof cklReq.iaControls === 'object' ? cklReq.iaControls.join(', ') : cklReq.iaControls,
-            affectedCCI: cklReq.cci.join(', '),
-            sourceOfDiscovery: `SCAP/STIG: ${csts.models.Scans.scans2poam.scans.scap
+            'Non-Compliant Security Controls (16a)': typeof cklReq.iaControls === 'object' ? cklReq.iaControls.join(', ') : cklReq.iaControls,
+            'Affected CCI (16a.1)': cklReq.cci.join(', '),
+            'Source of Discovery(16a.2)': `SCAP/STIG: ${csts.models.Scans.scans2poam.scans.scap
               .filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
               .map(h => h.title)
               .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.title))
               .sort()
               .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
               .join(', ')}`,
-            vulnerabilityId: `Group ID: ${cklReq.grpId}
+            'Vulnerability ID(16a.3)': `Group ID: ${cklReq.grpId}
   Vuln ID: ${cklReq.vulnId}
   Rule ID: ${cklReq.ruleId}
   Plugin ID: `,
-            vulnerabilityDescription: cklReq.description,
-            devicesAffected: csts.models.Scans.scans2poam.scans.scap
+            'Vulnerability Description (16.b)': cklReq.description,
+            'Devices Affected (16b.1)': csts.models.Scans.scans2poam.scans.scap
               .filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
               .map(h => h.hostname)
               .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.hostname))
@@ -335,23 +329,23 @@ Plugin ID: ${element}`,
               .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
               .filter((el, i, a) => { if (el.trim() !== '') return 1; return 0; })
               .join(', '),
-            securityObjectives: '',
-            rawTestResult: this.getRiskVal(cklReq.severity, 'CAT'), 
-            predisposingConditions: '',
-            technicalMitigations: cklReq.comments,
-            severityOrPervasiveness: this.getRiskVal(cklReq.severity, 'VL-VH'),
-            relevanceOfThreat: this.getRiskVal(cklReq.severity, 'VL-VH'),
-            threatDescription: cklReq.description,
-            resources: cklReq.resources,
-            likelihood: this.getRiskVal(cklReq.severity, 'VL-VH'),
-            impact: this.getRiskVal(cklReq.severity, 'VL-VH'),
-            impactDescription: '',
-            risk: this.getRiskVal(cklReq.severity, 'VL-VH'),
-            proposedMitigations: cklReq.solution,
-            residualRisk: '',
-            status: cklReq.status,
-            recommendations: '',
-            pluginId: '',
+            'Security Objectives (C-I-A) (16c)': '',
+            'Raw Test Result (16d)': this.getRiskVal(cklReq.severity, 'CAT'), 
+            'Predisposing Condition(s) (16d.1)': '',
+            'Technical Mitigation(s)/Remediation(s) (16d.2)': cklReq.comments,
+            'Severity or Pervasiveness (VL-VH) (16d.3)': this.getRiskVal(cklReq.severity, 'VL-VH'),
+            'Relevance of Threat (VL-VH) (16e)': this.getRiskVal(cklReq.severity, 'VL-VH'),
+            'Threat Description (16e.1)': cklReq.description,
+            Resources: cklReq.resources,
+            'Likelihood (Cells 16d.3 & 16e) (VL-VH) (16f)': this.getRiskVal(cklReq.severity, 'VL-VH'),
+            'Impact (VL-VH) (16g)': this.getRiskVal(cklReq.severity, 'VL-VH'),
+            'Impact Description (16h)': '',
+            'Risk (Cells 16f & 16g) (VL-VH) (16i)': this.getRiskVal(cklReq.severity, 'VL-VH'),
+            'Proposed Mitigations (From POA&M) (16j)': cklReq.solution,
+            'Residual Risk (After Proposed Mitigations) (16k)': '',
+            Status: cklReq.status,
+            'Recommendations (16l)': '',
+            // pluginId: '',
           });
         });
 
@@ -361,21 +355,21 @@ Plugin ID: ${element}`,
           const cklReq = csts.plugins.jsonQuery(`ckl[*].requirements[vulnId=${element}]`, { data: csts.models.Scans.scans2poam.scans }).value;
 
           results.push({
-            nonCompliantSecurityControls: typeof cklReq.iaControls === 'object' ? cklReq.iaControls.join(', ') : cklReq.iaControls,
-            affectedCCI: cklReq.cci.join(', '),
-            sourceOfDiscovery: `STIG: ${csts.models.Scans.scans2poam.scans.ckl
+            'Non-Compliant Security Controls (16a)': typeof cklReq.iaControls === 'object' ? cklReq.iaControls.join(', ') : cklReq.iaControls,
+            'Affected CCI (16a.1)': cklReq.cci.join(', '),
+            'Source of Discovery(16a.2)': `STIG: ${csts.models.Scans.scans2poam.scans.ckl
               .filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
               .map(h => h.title)
               .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.title))
               .sort()
               .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
               .join(', ')}`,
-            vulnerabilityId: `Group ID: ${cklReq.grpId}
+            'Vulnerability ID(16a.3)': `Group ID: ${cklReq.grpId}
   Vuln ID: ${cklReq.vulnId}
   Rule ID: ${cklReq.ruleId}
   Plugin ID: `,
-            vulnerabilityDescription: cklReq.description,
-            devicesAffected: csts.models.Scans.scans2poam.scans.scap
+            'Vulnerability Description (16.b)': cklReq.description,
+            'Devices Affected (16b.1)': csts.models.Scans.scans2poam.scans.scap
               .filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
               .map(h => h.hostname)
               .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.hostname))
@@ -383,23 +377,23 @@ Plugin ID: ${element}`,
               .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
               .filter((el, i, a) => { if (el.trim() !== '') return 1; return 0; })
               .join(', '),
-            securityObjectives: '',
-            rawTestResult: this.getRiskVal(cklReq.severity, 'CAT'), 
-            predisposingConditions: '',
-            technicalMitigations: cklReq.comments,
-            severityOrPervasiveness: this.getRiskVal(cklReq.severity, 'VL-VH'),
-            relevanceOfThreat: this.getRiskVal(cklReq.severity, 'VL-VH'),
-            threatDescription: cklReq.description,
-            resources: cklReq.resources,
-            likelihood: this.getRiskVal(cklReq.severity, 'VL-VH'),
-            impact: this.getRiskVal(cklReq.severity, 'VL-VH'),
-            impactDescription: '',
-            risk: this.getRiskVal(cklReq.severity, 'VL-VH'),
-            proposedMitigations: cklReq.solution,
-            residualRisk: '',
-            status: cklReq.status,
-            recommendations: '',
-            pluginId: '',
+            'Security Objectives (C-I-A) (16c)': '',
+            'Raw Test Result (16d)': this.getRiskVal(cklReq.severity, 'CAT'), 
+            'Predisposing Condition(s) (16d.1)': '',
+            'Technical Mitigation(s)/Remediation(s) (16d.2)': cklReq.comments,
+            'Severity or Pervasiveness (VL-VH) (16d.3)': this.getRiskVal(cklReq.severity, 'VL-VH'),
+            'Relevance of Threat (VL-VH) (16e)': this.getRiskVal(cklReq.severity, 'VL-VH'),
+            'Threat Description (16e.1)': cklReq.description,
+            Resources: cklReq.resources,
+            'Likelihood (Cells 16d.3 & 16e) (VL-VH) (16f)': this.getRiskVal(cklReq.severity, 'VL-VH'),
+            'Impact (VL-VH) (16g)': this.getRiskVal(cklReq.severity, 'VL-VH'),
+            'Impact Description (16h)': '',
+            'Risk (Cells 16f & 16g) (VL-VH) (16i)': this.getRiskVal(cklReq.severity, 'VL-VH'),
+            'Proposed Mitigations (From POA&M) (16j)': cklReq.solution,
+            'Residual Risk (After Proposed Mitigations) (16k)': '',
+            Status: cklReq.status,
+            Recommendations: '',
+            // pluginId: '',
           });
         });
 
@@ -409,21 +403,21 @@ Plugin ID: ${element}`,
           const scapReq = csts.plugins.jsonQuery(`scap[*].requirements[vulnId=${element}]`, { data: csts.models.Scans.scans2poam.scans }).value;
 
           results.push({
-            nonCompliantSecurityControls: typeof scapReq.iaControls === 'object' ? scapReq.iaControls.join(', ') : scapReq.iaControls,
-            affectedCCI: scapReq.cci.join(', '),
-            sourceOfDiscovery: `SCAP: ${csts.models.Scans.scans2poam.scans.scap
+            'Non-Compliant Security Controls (16a)': typeof scapReq.iaControls === 'object' ? scapReq.iaControls.join(', ') : scapReq.iaControls,
+            'Affected CCI (16a.1)': scapReq.cci.join(', '),
+            'Source of Discovery(16a.2)': `SCAP: ${csts.models.Scans.scans2poam.scans.scap
               .filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0)
               .map(h => h.title)
               .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.title))
               .sort()
               .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
               .join(', ')}`,
-            vulnerabilityId: `Group ID: ${scapReq.grpId}
+              'Vulnerability ID(16a.3)': `Group ID: ${scapReq.grpId}
   Vuln ID: ${scapReq.vulnId}
   Rule ID: ${scapReq.ruleId}
   Plugin ID: `,
-            vulnerabilityDescription: scapReq.description,
-            devicesAffected: csts.models.Scans.scans2poam.scans.scap
+            'Vulnerability Description (16.b)': scapReq.description,
+            'Devices Affected (16b.1)': csts.models.Scans.scans2poam.scans.scap
               .filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0)
               .map(h => h.hostname)
               .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.hostname))
@@ -431,23 +425,23 @@ Plugin ID: ${element}`,
               .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
               .filter((el, i, a) => { if (el.trim() !== '') return 1; return 0; })
               .join(', '),
-            securityObjectives: '',
-            rawTestResult: this.getRiskVal(scapReq.severity, 'CAT'),
-            predisposingConditions: '',
-            technicalMitigations: scapReq.comments,
-            severityOrPervasiveness: this.getRiskVal(scapReq.severity, 'VL-VH'),
-            relevanceOfThreat: this.getRiskVal(scapReq.severity, 'VL-VH'),
-            threatDescription: scapReq.description,
-            resources: scapReq.resources,
-            likelihood: this.getRiskVal(scapReq.severity, 'VL-VH'),
-            impact: this.getRiskVal(scapReq.severity, 'VL-VH'),
-            impactDescription: '',
-            risk: this.getRiskVal(scapReq.severity, 'VL-VH'),
-            proposedMitigations: scapReq.solution,
-            residualRisk: '',
-            status: scapReq.status,
-            recommendations: '',
-            pluginId: '',
+            'Security Objectives (C-I-A) (16c)': '',
+            'Raw Test Result (16d)': this.getRiskVal(scapReq.severity, 'CAT'),
+            'Predisposing Condition(s) (16d.1)': '',
+            'Technical Mitigation(s)/Remediation(s) (16d.2)': scapReq.comments,
+            'Severity or Pervasiveness (VL-VH) (16d.3)': this.getRiskVal(scapReq.severity, 'VL-VH'),
+            'Relevance of Threat (VL-VH) (16e)': this.getRiskVal(scapReq.severity, 'VL-VH'),
+            'Threat Description (16e.1)': scapReq.description,
+            Resources: scapReq.resources,
+            'Likelihood (Cells 16d.3 & 16e) (VL-VH) (16f)': this.getRiskVal(scapReq.severity, 'VL-VH'),
+            'Impact (VL-VH) (16g)': this.getRiskVal(scapReq.severity, 'VL-VH'),
+            'Impact Description (16h)': '',
+            'Risk (Cells 16f & 16g) (VL-VH) (16i)': this.getRiskVal(scapReq.severity, 'VL-VH'),
+            'Proposed Mitigations (From POA&M) (16j)': scapReq.solution,
+            'Residual Risk (After Proposed Mitigations) (16k)': '',
+            Status: scapReq.status,
+            Recommendations: '',
+            // pluginId: '',
           });
         });
 
@@ -484,13 +478,12 @@ Plugin ID: ${element}`,
     },
 
     getPoam() {
-      const cats = ['CAT I', 'CAT II', 'CAT III', 'CAT IV'];
       const results = [];
       csts.plugins.jsonQuery('acas[*].hosts[*].requirements[*].pluginId', { data: csts.models.Scans.scans2poam.scans }).value.sort().filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; }).forEach((element) => {
         const acasPlugin = csts.plugins.jsonQuery(`acas[*].hosts[*].requirements[pluginId = ${element}`, { data: csts.models.Scans.scans2poam.scans }).value;
 
         results.push({
-          controlVulnerabilityDescription: `Title: ${acasPlugin.title}
+          'Control Vulnerability Description': `Title: ${acasPlugin.title}
 
 Description:
   ${acasPlugin.description}
@@ -500,24 +493,23 @@ Devices Affected:
     "acas[*].hosts[*hostname!='']",
     { data: csts.controllers.Scans.scans2poam.scans },
   ).value.filter(host => host.requirements.filter(req => req.pluginId === element).length).map(h => h.hostname).sort().join(', ')
-}
-`,
-          securityControlNumber: '',
-          officeOrg: '',
-          securityChecks: `Group ID: ${acasPlugin.grpId}
+}`,
+          'Security Control Number (NC/NA controls only)': '',
+          'Office/Org': '',
+          'Security Checks': `Group ID: ${acasPlugin.grpId}
 Vuln ID: 
 Rule ID: 
 Plugin ID: ${element}`,
-          rawSecurityValue: cats[3 - acasPlugin.severity],
-          mitigations: '',
-          severityValue: cats[3 - acasPlugin.severity],
-          resourcesRequired: '',
-          scheduledCompletionDate: '',
-          milestoneWithCompletionDate: '',
-          milestoneChanges: '',
-          sourceIdentifyingControlVulnerabity: 'Assured Compliance Assessment Solution (ACAS) Nessus Scanner',
-          status: 'Ongoing',
-          comments: acasPlugin.comments,
+          'Raw Severity Value': this.getRiskVal(acasPlugin.severity, 'CAT'),
+          Mitigations: '',
+          'Severity Value': this.getRiskVal(acasPlugin.severity, 'CAT'),
+          'Resources Required': '',
+          'Scheduled Completion Date': '',
+          'Milestone with Completion Dates': '',
+          'Milestone Changes': '',
+          'Source Identifying Control Vulnerability': 'Assured Compliance Assessment Solution (ACAS) Nessus Scanner',
+          Status: 'Ongoing',
+          Comments: acasPlugin.comments,
         });
       });
 
@@ -531,7 +523,7 @@ Plugin ID: ${element}`,
           const cklReq = csts.plugins.jsonQuery(`ckl[*].requirements[vulnId=${element}]`, { data: csts.models.Scans.scans2poam.scans }).value;
 
           results.push({
-            controlVulnerabilityDescription: `Title: ${cklReq.title}
+            'Control Vulnerability Description': `Title: ${cklReq.title}
   
  Description:
   ${cklReq.description}
@@ -546,28 +538,28 @@ Devices Affected:
     .filter((el, i, a) => { if (el.trim() !== '') return 1; return 0; })
     .join(', ')
 }`,
-            securityControlNumber: typeof cklReq.iaControls === 'object' ? cklReq.iaControls.join(', ') : cklReq.iaControls,
-            officeOrg: '',
-            securityChecks: `Group ID: ${cklReq.grpId}
+            'Security Control Number (NC/NA controls only)': typeof cklReq.iaControls === 'object' ? cklReq.iaControls.join(', ') : cklReq.iaControls,
+            'Office/Org': '',
+            'Security Checks': `Group ID: ${cklReq.grpId}
 Vuln ID: ${cklReq.vulnId}
 Rule ID: ${cklReq.ruleId}
 Plugin ID:`,
-            rawSecurityValue: this.getRiskVal(cklReq.severity, 'CAT'), 
-            mitigations: '',
-            severityValue: this.getRiskVal(cklReq.severity, 'CAT'), 
-            resourcesRequired: cklReq.resources,
-            scheduledCompletionDate: '',
-            milestoneWithCompletionDate: '',
-            milestoneChanges: '',
-            sourceIdentifyingControlVulnerabity: `SCAP/STIG: ${csts.models.Scans.scans2poam.scans.scap
+            'Raw Severity Value': this.getRiskVal(cklReq.severity, 'CAT'), 
+            Mitigations: '',
+            'Severity Value': this.getRiskVal(cklReq.severity, 'CAT'), 
+            'Resources Required': cklReq.resources,
+            'Scheduled Completion Date': '',
+            'Milestone with Completion Dates': '',
+            'Milestone Changes': '',
+            'Source Identifying Control Vulnerability': `SCAP/STIG: ${csts.models.Scans.scans2poam.scans.scap
               .filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
               .map(h => h.title)
               .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.title))
               .sort()
               .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
               .join(', ')}`,
-            status: 'Ongoing',
-            comments: cklReq.comments,
+            Status: 'Ongoing',
+            Comments: cklReq.comments,
           });
         });
 
@@ -576,7 +568,7 @@ Plugin ID:`,
         .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; }).forEach((element) => {
           const cklReq = csts.plugins.jsonQuery(`ckl[*].requirements[vulnId=${element}]`, { data: csts.models.Scans.scans2poam.scans }).value;
           results.push({
-            controlVulnerabilityDescription: `Title: ${cklReq.title}
+            'Control Vulnerability Description': `Title: ${cklReq.title}
 
 Description:
 ${cklReq.description}
@@ -591,28 +583,28 @@ ${csts.models.Scans.scans2poam.scans.scap
     .filter((el, i, a) => { if (el.trim() !== '') return 1; return 0; })
     .join(', ')
 }`,
-            securityControlNumber: typeof cklReq.iaControls === 'object' ? cklReq.iaControls.join(', ') : cklReq.iaControls,
-            officeOrg: '',
-            securityChecks: `Group ID: ${cklReq.grpId}
+            'Security Control Number (NC/NA controls only)': typeof cklReq.iaControls === 'object' ? cklReq.iaControls.join(', ') : cklReq.iaControls,
+            'Office/Org': '',
+            'Security Checks': `Group ID: ${cklReq.grpId}
 Vuln ID: ${cklReq.vulnId}
 Rule ID: ${cklReq.ruleId}
 Plugin ID:`,
-            rawSecurityValue: this.getRiskVal(cklReq.severity, 'CAT'), 
-            mitigations: '',
-            severityValue: this.getRiskVal(cklReq.severity, 'CAT'), 
-            resourcesRequired: cklReq.resources,
-            scheduledCompletionDate: '',
-            milestoneWithCompletionDate: '',
-            milestoneChanges: '',
-            sourceIdentifyingControlVulnerabity: `STIG: ${csts.models.Scans.scans2poam.scans.scap
+            'Raw Severity Value': this.getRiskVal(cklReq.severity, 'CAT'),
+            Mitigations: '',
+            'Severity Value': this.getRiskVal(cklReq.severity, 'CAT'),
+            'Resources Required': cklReq.resources,
+            'Scheduled Completion Date': '',
+            'Milestone with Completion Dates': '',
+            'Milestone Changes': '',
+            'Source Identifying Control Vulnerability': `STIG: ${csts.models.Scans.scans2poam.scans.scap
               .filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
               .map(h => h.title)
               .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.title))
               .sort()
               .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
               .join(', ')}`,
-            status: 'Ongoing',
-            comments: cklReq.comments,
+            Status: 'Ongoing',
+            Comments: cklReq.comments,
           });
         });
 
@@ -622,7 +614,7 @@ Plugin ID:`,
           const scapReq = csts.plugins.jsonQuery(`scap[*].requirements[vulnId=${element}]`, { data: csts.models.Scans.scans2poam.scans }).value;
 
           results.push({
-            controlVulnerabilityDescription: `Title: ${scapReq.title}
+            'Control Vulnerability Description': `Title: ${scapReq.title}
 
 Description:
 ${scapReq.description}
@@ -637,28 +629,28 @@ ${csts.models.Scans.scans2poam.scans.scap
     .filter((el, i, a) => { if (el.trim() !== '') return 1; return 0; })
     .join(', ')
 }`,
-            securityControlNumber: typeof scapReq.iaControls === 'object' ? scapReq.iaControls.join(', ') : scapReq.iaControls,
-            officeOrg: '',
-            securityChecks: `Group ID: ${scapReq.grpId}
+            'Security Control Number (NC/NA controls only)': typeof scapReq.iaControls === 'object' ? scapReq.iaControls.join(', ') : scapReq.iaControls,
+            'Office/Org': '',
+            'Security Checks': `Group ID: ${scapReq.grpId}
 Vuln ID: ${scapReq.vulnId}
 Rule ID: ${scapReq.ruleId}
 Plugin ID:`,
-            rawSecurityValue: this.getRiskVal(scapReq.severity, 'CAT'), 
-            mitigations: '',
-            severityValue: this.getRiskVal(scapReq.severity, 'CAT'), 
-            resourcesRequired: scapReq.resources,
-            scheduledCompletionDate: '',
-            milestoneWithCompletionDate: '',
-            milestoneChanges: '',
-            sourceIdentifyingControlVulnerabity: `SCAP: ${csts.models.Scans.scans2poam.scans.scap
+            'Raw Severity Value': this.getRiskVal(scapReq.severity, 'CAT'), 
+            Mitigations: '',
+            'Severity Value': this.getRiskVal(scapReq.severity, 'CAT'), 
+            'Resources Required': scapReq.resources,
+            'Scheduled Completion Date': '',
+            'Milestone with Completion Dates': '',
+            'Milestone Changes': '',
+            'Source Identifying Control Vulnerability': `SCAP: ${csts.models.Scans.scans2poam.scans.scap
               .filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0)
               .map(h => h.title)
               .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.title))
               .sort()
               .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
               .join(', ')}`,
-            status: 'Ongoing',
-            comments: scapReq.findingDetails,
+            Status: 'Ongoing',
+            Comments: scapReq.findingDetails,
           });
         });
 
