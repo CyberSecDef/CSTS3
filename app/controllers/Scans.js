@@ -100,36 +100,65 @@ csts.controllers.Scans = ({
       $('#myModalBody').text('Currently Loading the Scanfiles.  Please wait.');
       $('#myModal')
         .one('shown.bs.modal', () => {
-          for (let i = 0; i < files.length; i += 1) {
-            console.log(files[i]);
-            csts.models.Scans.scans2poam.parseFile(files[i]);
+          
+          // $.eachCallback(files,
+          //   function(){
+          //     console.log(this);
+          //     csts.models.Scans.scans2poam.parseFile(this);
+          //   },
+          //   function(loopcount){
+          //     $('#statusbar-text').text(files[loopcount])
+          //   }
+          // );
+
+
+
+
+
+          function * fileGenerator() {
+            for (let i = 0; i < files.length; i += 1) {
+              $('#myModalBody').html(files[i]);
+                yield files[i];
+                $('#myModalBody').html(files[i]);
+                csts.models.Scans.scans2poam.parseFile(files[i]);
+            }
           }
 
+          for(let i of fileGenerator(files)){
+            console.log(i);
+            requestAnimationFrame(function(){ $('#statusbar-text').text(i) } );
+          }
+
+          
           const results = {};
           const cols = {};
 
           results.Summary = csts.models.Scans.scans2poam.getSummary();
-
-
+          cols.Summary = [{ width: 10 }, { width: 20 }, { width: 50 }, { width: 65 }, { width: 10 }, { width: 10 }, { width: 10 }, { width: 10 }, { width: 10 }, { width: 10 }, { width: 15 }];
 
           results.Issues = csts.models.Scans.scans2poam.getIssues();
-          cols.Issues = [
-            { width: 75 },
-            { width: 25 },
-            { width: 50 },
-            { width: 25 },
-            { width: 15 },
-            { width: 15 },
-            { width: 15 },
-            { width: 25 },
-            { width: 25 },
-            { width: 75 },
-            { width: 75 },
-          ];
-          
+          cols.Issues = [{ width: 75 }, { width: 25 }, { width: 50 }, { width: 25 }, { width: 15 }, { width: 15 }, { width: 15 }, { width: 25 }, { width: 25 }, { width: 75 }, { width: 50 }, { width: 50 }];
+
           results['Test Plan'] = csts.models.Scans.scans2poam.getTestPlan();
+          cols['Test Plan'] = [{ width: 65 }, { width: 10 }, { width: 40 }, { width: 40 }, { width: 35 }];
+
           results.RAR = csts.models.Scans.scans2poam.getRar();
+          cols.RAR = [{ width: 15 }, { width: 15 }, { width: 45 }, { width: 30 }, { width: 30 }, { width: 45 }, { width: 35 }, { width: 15 }, { width: 30 }, { width: 30 }, { width: 15 }, { width: 15 }, { width: 30 }, { width: 30 }, { width: 15 }, { width: 15 }, { width: 15 }, { width: 15 }, { width: 30 }, { width: 30 }, { width: 15 }, { width: 30 }, { width: 30 }];
+
           results.POAM = csts.models.Scans.scans2poam.getPoam();
+          cols.POAM = [{ width: 40 }, { width: 15 }, { width: 25 }, { width: 25 }, { width: 15 }, { width: 30 }, { width: 15 }, { width: 30 }, { width: 15 }, { width: 30 }, { width: 30 }, { width: 30 }, { width: 20 }, { width: 40 }];
+
+          // Make sure no cell data is over 32760 characters long
+          Object.keys(results).forEach((item) => {
+            results[item].forEach((entry) => {
+              Object.keys(entry).forEach((field) => {
+                if (entry[field].length > 32760) {
+                  entry[field] = entry[field].substr(0, 32760);
+                }
+              });
+            });
+          });
+
 
           console.log(csts.models.Scans.scans2poam.scans);
           console.log(csts.plugins.jsonQuery('acas[*].hosts[*].requirements[*].pluginId', { data: csts.models.Scans.scans2poam.scans }).value.sort().filter((el, i, a) => { if (i === a.indexOf(el)) { return 1; } return 0; }));
@@ -137,17 +166,16 @@ csts.controllers.Scans = ({
 
           const filename = `./app/storage/results/${this.name}_${csts.plugins.moment().format('YYYYMMDD_HHmmss')}.xlsx`;
           csts.wb = csts.plugins.xlsx.utils.book_new();
-          
+
           Object.keys(results).forEach((k) => {
             const ws = csts.plugins.xlsx.utils.json_to_sheet(results[k]);
             ws['!cols'] = cols[k];
+            ws['!autofilter'] = { ref: `A1:${ String.fromCharCode(64 + cols[k].length) }1`};
             csts.plugins.xlsx.utils.book_append_sheet(csts.wb, ws, k);
           });
-          
+
           csts.plugins.xlsx.writeFile(csts.wb, filename);
-          
           $('#scans2poamResults').html($('<a></a>').attr('href', filename.replace('./app/', './')).attr('target','_blank').text(filename.replace('./app/', '/')));
-          
           $('#select-scan-results-card').click();
           $('#myModal').modal('hide');
         });

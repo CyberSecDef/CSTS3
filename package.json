@@ -44,7 +44,7 @@
     "popper.js": "^1.12.9",
     "setimmediate": "^1.0.5",
     "systeminformation": "^3.33.18",
-    "xlsx": "^0.11.18",
+    "xlsx": "^0.12.4",
     "xml2js": "^0.4.19",
     "zip-local": "^0.3.4"
   },

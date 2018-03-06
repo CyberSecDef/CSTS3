@@ -152,7 +152,6 @@ csts.models.Scans = {
       });
 
       this.scans.scap.map((e) => { return `${e.title} - V${e.version}R${e.release}`; }).sort().filter((value, index, self) => self.indexOf(value) === index).forEach((scapScan) => {
-        console.log(scapScan);
         const results = {};
 
         const hosts = [];
@@ -892,7 +891,7 @@ Plugin ID:`,
         fileName = csts.plugins.path.basename(file);
       }
       csts.plugins.xml2js.parseString(fileData, (err, result) => {
-        nessusData.scanType = 'acas';
+        nessusData.scanType = 'ACAS';
         nessusData.scanFile = fileName;
         nessusData.hosts = [];
         result.NessusClientData_v2.Report[0].ReportHost.forEach((host) => {
@@ -903,7 +902,7 @@ Plugin ID:`,
           }
           hostData.scanDate = csts.plugins.moment(host.HostProperties[0].tag.filter(a => a.$.name === 'HOST_START')[0]._)
             .format('MM/DD/YYYY HH:mm');
-          hostData.credentialed = host.HostProperties[0].tag.filter(a => a.$.name === 'Credentialed_Scan')[0]._;
+          hostData.credentialed = host.HostProperties[0].tag.filter(a => a.$.name === 'Credentialed_Scan')[0]._.toUpperCase();
 
           const os = host.HostProperties[0].tag.filter(a => a.$.name === 'operating-system')[0];
           hostData.os = typeof os !== 'undefined' ? typeof os._ !== 'undefined' ? os._ : os : '';
@@ -960,7 +959,6 @@ Plugin ID:`,
      */
     parseZip(f) {
       const unzippedFs = csts.plugins.zip.sync.unzip(f).memory();
-      console.log(unzippedFs.contents());
       const self = this;
       unzippedFs.contents()
         .forEach((file) => {

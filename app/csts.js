@@ -274,6 +274,37 @@ const csts = {
 
     $(document).ready(() => {
 
+
+      // the callback can be used to update progress bars in a loop
+      $.eachCallback = function(arr, process, callback) {
+        var cnt = 0;
+        function work() {
+          var item = arr[cnt];
+          process.apply(item);
+          callback.apply(item, [cnt]); cnt += 1;
+          if (cnt < arr.length) {
+            setTimeout(work, 100);
+          }
+        }
+        setTimeout(work, 100);
+      };
+      $.fn.eachCallback = function(process, callback) {
+        var cnt = 0;
+        var jq = this;
+        function work() {
+          var item = jq.get(cnt);
+          process.apply(item);
+          callback.apply(item, [cnt]);
+          cnt += 1;
+          if (cnt < jq.length) {
+            setTimeout(work, 100);
+          }
+        }
+        setTimeout(work, 100);
+      };
+
+
+
       csts.plugins.ejs.renderFile('app/resources/views/layouts/default.tpl', {
         username: process.env.USERNAME,
         url: window.location.valueOf().pathname.replace('/app', '').replace('index.html', ''),
@@ -299,7 +330,6 @@ const csts = {
         });
       });
 
-      console.log(csts.routes);
       $.each(csts.routes, (name, val) => {
         let c = '';
         let f = '';
