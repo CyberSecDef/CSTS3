@@ -280,11 +280,10 @@ Plugin ID: ${element}`,
           'Security Objectives (C-I-A) (16c)': '',
           'Raw Test Result (16d)': this.getRiskVal(acasPlugin.severity, 'CAT'),
           'Predisposing Condition(s) (16d.1)': '',
-          'Technical Mitigation(s)/Remediation(s) (16d.2)': '',
+          'Technical Mitigation(s) (16d.2)': '',
           'Severity or Pervasiveness (VL-VH) (16d.3)': this.getRiskVal(acasPlugin.severity, 'VL-VH'),
           'Relevance of Threat (VL-VH) (16e)': this.getRiskVal(acasPlugin.severity, 'VL-VH'),
           'Threat Description (16e.1)': acasPlugin.description,
-          Resources: '',
           'Likelihood (Cells 16d.3 & 16e) (VL-VH) (16f)': this.getRiskVal(acasPlugin.severity, 'VL-VH'),
           'Impact (VL-VH) (16g)': this.getRiskVal(acasPlugin.severity, 'VL-VH'),
           'Impact Description (16h)': '',
@@ -293,6 +292,7 @@ Plugin ID: ${element}`,
           'Residual Risk (After Proposed Mitigations) (16k)': '',
           Status: 'Ongoing',
           'Recommendations (16l)': acasPlugin.comments,
+          Comments: '',
           // pluginId: element,
         });
       });
@@ -331,11 +331,10 @@ Plugin ID: ${element}`,
             'Security Objectives (C-I-A) (16c)': '',
             'Raw Test Result (16d)': this.getRiskVal(cklReq.severity, 'CAT'), 
             'Predisposing Condition(s) (16d.1)': '',
-            'Technical Mitigation(s)/Remediation(s) (16d.2)': cklReq.comments,
+            'Technical Mitigation(s) (16d.2)': cklReq.comments,
             'Severity or Pervasiveness (VL-VH) (16d.3)': this.getRiskVal(cklReq.severity, 'VL-VH'),
             'Relevance of Threat (VL-VH) (16e)': this.getRiskVal(cklReq.severity, 'VL-VH'),
             'Threat Description (16e.1)': cklReq.description,
-            Resources: cklReq.resources,
             'Likelihood (Cells 16d.3 & 16e) (VL-VH) (16f)': this.getRiskVal(cklReq.severity, 'VL-VH'),
             'Impact (VL-VH) (16g)': this.getRiskVal(cklReq.severity, 'VL-VH'),
             'Impact Description (16h)': '',
@@ -344,6 +343,7 @@ Plugin ID: ${element}`,
             'Residual Risk (After Proposed Mitigations) (16k)': '',
             Status: cklReq.status,
             'Recommendations (16l)': '',
+            Comments: '',
             // pluginId: '',
           });
         });
@@ -379,11 +379,10 @@ Plugin ID: ${element}`,
             'Security Objectives (C-I-A) (16c)': '',
             'Raw Test Result (16d)': this.getRiskVal(cklReq.severity, 'CAT'), 
             'Predisposing Condition(s) (16d.1)': '',
-            'Technical Mitigation(s)/Remediation(s) (16d.2)': cklReq.comments,
+            'Technical Mitigation(s) (16d.2)': cklReq.comments,
             'Severity or Pervasiveness (VL-VH) (16d.3)': this.getRiskVal(cklReq.severity, 'VL-VH'),
             'Relevance of Threat (VL-VH) (16e)': this.getRiskVal(cklReq.severity, 'VL-VH'),
             'Threat Description (16e.1)': cklReq.description,
-            Resources: cklReq.resources,
             'Likelihood (Cells 16d.3 & 16e) (VL-VH) (16f)': this.getRiskVal(cklReq.severity, 'VL-VH'),
             'Impact (VL-VH) (16g)': this.getRiskVal(cklReq.severity, 'VL-VH'),
             'Impact Description (16h)': '',
@@ -391,7 +390,8 @@ Plugin ID: ${element}`,
             'Proposed Mitigations (From POA&M) (16j)': cklReq.solution,
             'Residual Risk (After Proposed Mitigations) (16k)': '',
             Status: cklReq.status,
-            Recommendations: '',
+            'Recommendations (16l)': '',
+            Comments: '',
             // pluginId: '',
           });
         });
@@ -427,11 +427,10 @@ Plugin ID: ${element}`,
             'Security Objectives (C-I-A) (16c)': '',
             'Raw Test Result (16d)': this.getRiskVal(scapReq.severity, 'CAT'),
             'Predisposing Condition(s) (16d.1)': '',
-            'Technical Mitigation(s)/Remediation(s) (16d.2)': scapReq.comments,
+            'Technical Mitigation(s) (16d.2)': scapReq.comments,
             'Severity or Pervasiveness (VL-VH) (16d.3)': this.getRiskVal(scapReq.severity, 'VL-VH'),
             'Relevance of Threat (VL-VH) (16e)': this.getRiskVal(scapReq.severity, 'VL-VH'),
             'Threat Description (16e.1)': scapReq.description,
-            Resources: scapReq.resources,
             'Likelihood (Cells 16d.3 & 16e) (VL-VH) (16f)': this.getRiskVal(scapReq.severity, 'VL-VH'),
             'Impact (VL-VH) (16g)': this.getRiskVal(scapReq.severity, 'VL-VH'),
             'Impact Description (16h)': '',
@@ -439,7 +438,8 @@ Plugin ID: ${element}`,
             'Proposed Mitigations (From POA&M) (16j)': scapReq.solution,
             'Residual Risk (After Proposed Mitigations) (16k)': '',
             Status: scapReq.status,
-            Recommendations: '',
+            'Recommendations (16l)': '',
+            Comments: '',
             // pluginId: '',
           });
         });
@@ -482,6 +482,7 @@ Plugin ID: ${element}`,
         const acasPlugin = csts.plugins.jsonQuery(`acas[*].hosts[*].requirements[pluginId = ${element}`, { data: csts.models.Scans.scans2poam.scans }).value;
 
         results.push({
+          A: '',
           'Control Vulnerability Description': `Title: ${acasPlugin.title}
 
 Description:
@@ -490,7 +491,7 @@ Description:
 Devices Affected:
   ${csts.plugins.jsonQuery(
     "acas[*].hosts[*hostname!='']",
-    { data: csts.controllers.Scans.scans2poam.scans },
+    { data: csts.models.Scans.scans2poam.scans },
   ).value.filter(host => host.requirements.filter(req => req.pluginId === element).length).map(h => h.hostname).sort().join(', ')
 }`,
           'Security Control Number (NC/NA controls only)': '',
@@ -522,6 +523,7 @@ Plugin ID: ${element}`,
           const cklReq = csts.plugins.jsonQuery(`ckl[*].requirements[vulnId=${element}]`, { data: csts.models.Scans.scans2poam.scans }).value;
 
           results.push({
+            A: '',
             'Control Vulnerability Description': `Title: ${cklReq.title}
   
  Description:
@@ -567,6 +569,7 @@ Plugin ID:`,
         .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; }).forEach((element) => {
           const cklReq = csts.plugins.jsonQuery(`ckl[*].requirements[vulnId=${element}]`, { data: csts.models.Scans.scans2poam.scans }).value;
           results.push({
+            A: '',
             'Control Vulnerability Description': `Title: ${cklReq.title}
 
 Description:
@@ -613,6 +616,7 @@ Plugin ID:`,
           const scapReq = csts.plugins.jsonQuery(`scap[*].requirements[vulnId=${element}]`, { data: csts.models.Scans.scans2poam.scans }).value;
 
           results.push({
+            A: '',
             'Control Vulnerability Description': `Title: ${scapReq.title}
 
 Description:
@@ -896,8 +900,8 @@ Plugin ID:`,
         nessusData.hosts = [];
         result.NessusClientData_v2.Report[0].ReportHost.forEach((host) => {
           const hostData = {};
-          hostData.hostname = host.HostProperties[0].tag.filter(a => a.$.name === 'host-fqdn')[0]._;
-          if (hostData.hostname.indexOf('.') >= 0) {
+          hostData.hostname = typeof host.HostProperties[0].tag.filter(a => a.$.name === 'host-fqdn')[0] !== 'undefined' ? host.HostProperties[0].tag.filter(a => a.$.name === 'host-fqdn')[0]._ : host.$.name;
+          if (hostData.hostname.indexOf('.') >= 0 && hostData.hostname.match(/[a-zA-Z]*/)[0].trim() !== '') {
             hostData.hostname = hostData.hostname.substr(0, hostData.hostname.indexOf('.'));
           }
           hostData.scanDate = csts.plugins.moment(host.HostProperties[0].tag.filter(a => a.$.name === 'HOST_START')[0]._)
@@ -906,7 +910,7 @@ Plugin ID:`,
 
           const os = host.HostProperties[0].tag.filter(a => a.$.name === 'operating-system')[0];
           hostData.os = typeof os !== 'undefined' ? typeof os._ !== 'undefined' ? os._ : os : '';
-          hostData.scanEngine = host.ReportItem.filter(a => a.$.pluginID === '19506')[0].plugin_output[0].match(new RegExp('Nessus version : ([0-9.]+)'))[1];
+          hostData.scanEngine = typeof host.ReportItem.filter(a => a.$.pluginID === '19506')[0] !== 'undefined' ? host.ReportItem.filter(a => a.$.pluginID === '19506')[0].plugin_output[0].match(new RegExp('Nessus version : ([0-9.]+)'))[1] : 'UNKNOWN';
           hostData.openFindings = {
             cat1: host.ReportItem.filter(a => a.$.severity >= '3')
               .length,
@@ -1027,15 +1031,15 @@ Plugin ID:`,
     fields: ['Mitigation', 'Comment', 'Description', 'Raw Risk', 'Residual Risk', 'Security Control', 'Source', 'Status'],
     rarFields: {
       Mitigation: 'J',
-      Comment: 'N',
-      Description: 'D',
-      'Raw Risk': 'F',
-      'Residual Risk': 'L',
+      Comment: 'V',
+      Description: 'E',
+      'Raw Risk': 'H',
+      'Residual Risk': 'S',
       'Security Control': 'A',
-      Source: 'B',
-      Status: 'M',
-      'Test Id': 'C',
-      Likelihood: 'H',
+      Source: 'C',
+      Status: 'T',
+      'Test Id': 'D',
+      Likelihood: 'N',
     },
     poamFields: {
       Mitigation: 'G',
@@ -1085,6 +1089,12 @@ Plugin ID:`,
       let rarRow = 0;
       let $items = [];
       let resRow = 0;
+
+
+
+      // TODO: Update this to scan for proper column headers.
+      // do the same for POAM
+
 
       rarRow = 8;
       while (rarRow < 3000 && (!csts.models.Scans.workbooks.rar.isBlank(rarTab, [`A${rarRow}`, `B${rarRow}`]))) {

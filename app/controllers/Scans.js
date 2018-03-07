@@ -89,95 +89,139 @@ csts.controllers.Scans = ({
 
       Description:
         executes the scans2poam function
+        This is magic to update the UI while in the processing loop.
+        Verbose comments provided
     */
     execute() {
+      const caller = this;
       const table = $('table#tabScanFiles').DataTable();
       const files = [];
       table.rows().every(rowIdx => files.push($(table.row(rowIdx).node()).attr('file-path')));
 
       $('#myModal').modal();
       $('#myModalLabel').text('Please Wait...');
-      $('#myModalBody').text('Currently Loading the Scanfiles.  Please wait.');
+      $('#myModalBody').html(`Currently Parsing the Scanfiles.  Please wait.
+      <div class="progress" id="modalProgess">
+        <div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+      </div>`);
       $('#myModal')
         .one('shown.bs.modal', () => {
-          
-          // $.eachCallback(files,
-          //   function(){
-          //     console.log(this);
-          //     csts.models.Scans.scans2poam.parseFile(this);
-          //   },
-          //   function(loopcount){
-          //     $('#statusbar-text').text(files[loopcount])
-          //   }
-          // );
+          // this object is at the execute scope to track whether the process has completed
+          // or not.  Used in the generator/iterator next functions
+          let processing = {};
 
+          // this is the generator that updates the ui and yields as needed
+          function* fileGenerator() {
+            const fileLength = files.length;
+            for (let i = 0; i < fileLength; i += 1) {
+              csts.models.Scans.scans2poam.parseFile(files[i]);
 
-
-
-
-          function * fileGenerator() {
-            for (let i = 0; i < files.length; i += 1) {
-              $('#myModalBody').html(files[i]);
-                yield files[i];
-                $('#myModalBody').html(files[i]);
-                csts.models.Scans.scans2poam.parseFile(files[i]);
+              $('div#modalProgess div.progress-bar')
+                .attr('aria-valuenow',Math.round(100 * i / fileLength))
+                .css('width',`${Math.round(100 * i / fileLength)}%`)
+                .text(`${Math.round(100 * i / fileLength)}%`);
+              $('#statusbar-text').html(`${i} / ${fileLength}: ${csts.plugins.path.basename(files[i])}`);
+              yield;
             }
           }
 
-          for(let i of fileGenerator(files)){
-            console.log(i);
-            requestAnimationFrame(function(){ $('#statusbar-text').text(i) } );
+          // create variable link for the generator function
+          const myfuncGen = fileGenerator();
+
+          // this named function handles looping the generator without locking up the browser
+          function myfunction() {
+            processing = myfuncGen.next(); // start it
+
+            // if the iteration/generator is not done (all files are not processed), set a
+            // timeout to call this function again
+            if (processing.done === false) {
+              setTimeout(myfunction, 250);
+            } else {
+              // if processing is done, do the 'rest' of the syncronous stuff.  This is what
+              // gets executed AFTER everything is parsed.  This was originally at the bottom
+              // of the Execute function
+
+              // build the results object
+              const results = {};
+              const cols = {};
+
+              results.Summary = csts.models.Scans.scans2poam.getSummary();
+              cols.Summary = [
+                { width: 10 }, { width: 20 }, { width: 50 }, { width: 65 }, { width: 10 },
+                { width: 10 }, { width: 10 }, { width: 10 }, { width: 10 }, { width: 10 },
+                { width: 15 },
+              ];
+
+              results.Issues = csts.models.Scans.scans2poam.getIssues();
+              cols.Issues = [
+                { width: 75 }, { width: 25 }, { width: 50 }, { width: 25 }, { width: 15 },
+                { width: 15 }, { width: 15 }, { width: 25 }, { width: 25 }, { width: 75 },
+                { width: 50 }, { width: 50 },
+              ];
+
+              results['Test Plan'] = csts.models.Scans.scans2poam.getTestPlan();
+              cols['Test Plan'] = [{ width: 65 }, { width: 10 }, { width: 40 }, { width: 40 }, { width: 35 }];
+
+              results.RAR = csts.models.Scans.scans2poam.getRar();
+              cols.RAR = [
+                { width: 15 }, { width: 15 }, { width: 45 }, { width: 30 }, { width: 30 },
+                { width: 45 }, { width: 35 }, { width: 15 }, { width: 30 }, { width: 30 },
+                { width: 15 }, { width: 15 }, { width: 30 }, { width: 30 }, { width: 15 },
+                { width: 15 }, { width: 15 }, { width: 15 }, { width: 30 }, { width: 30 },
+                { width: 15 }, { width: 30 },
+              ];
+
+              results.POAM = csts.models.Scans.scans2poam.getPoam();
+              cols.POAM = [
+                { width: 1 }, { width: 40 }, { width: 15 }, { width: 25 }, { width: 25 },
+                { width: 15 }, { width: 30 }, { width: 15 }, { width: 30 }, { width: 15 },
+                { width: 30 }, { width: 30 }, { width: 30 }, { width: 20 }, { width: 40 },
+              ];
+
+              // validate data
+              // Make sure no cell data is over 32760 characters long
+              Object.keys(results).forEach((item) => {
+                results[item].forEach((entry) => {
+                  Object.keys(entry).forEach((field) => {
+                    if (entry[field].length > 32760) {
+                      entry[field] = entry[field].substr(0, 32760);
+                    }
+                  });
+                });
+              });
+
+              // build excel file
+              const filename = `./app/storage/results/${caller.name}_${csts.plugins.moment().format('YYYYMMDD_HHmmss')}.xlsx`;
+              csts.wb = csts.plugins.xlsx.utils.book_new();
+
+              // add all the results sheets
+              Object.keys(results).forEach((k) => {
+                const ws = csts.plugins.xlsx.utils.json_to_sheet(results[k]);
+                ws['!cols'] = cols[k];
+                ws['!autofilter'] = { ref: `A1:${String.fromCharCode(64 + cols[k].length)}1` };
+                csts.plugins.xlsx.utils.book_append_sheet(csts.wb, ws, k);
+              });
+
+              // save the file
+              csts.plugins.xlsx.writeFile(csts.wb, filename);
+
+              // update the UI accordingly
+              $('#scans2poamResults').html($('<a></a>').attr('href', filename.replace('./app/', './')).attr('target', '_blank').text(filename.replace('./app/', '/')));
+
+              // show the results link
+              $('#select-scan-results-card').click();
+
+              // hide the modal
+              $('#myModal').modal('hide');
+
+              // log results and scans for debugging purposes
+              console.log(csts.models.Scans.scans2poam.scans);
+              console.log(results);
+            }
           }
 
-          
-          const results = {};
-          const cols = {};
-
-          results.Summary = csts.models.Scans.scans2poam.getSummary();
-          cols.Summary = [{ width: 10 }, { width: 20 }, { width: 50 }, { width: 65 }, { width: 10 }, { width: 10 }, { width: 10 }, { width: 10 }, { width: 10 }, { width: 10 }, { width: 15 }];
-
-          results.Issues = csts.models.Scans.scans2poam.getIssues();
-          cols.Issues = [{ width: 75 }, { width: 25 }, { width: 50 }, { width: 25 }, { width: 15 }, { width: 15 }, { width: 15 }, { width: 25 }, { width: 25 }, { width: 75 }, { width: 50 }, { width: 50 }];
-
-          results['Test Plan'] = csts.models.Scans.scans2poam.getTestPlan();
-          cols['Test Plan'] = [{ width: 65 }, { width: 10 }, { width: 40 }, { width: 40 }, { width: 35 }];
-
-          results.RAR = csts.models.Scans.scans2poam.getRar();
-          cols.RAR = [{ width: 15 }, { width: 15 }, { width: 45 }, { width: 30 }, { width: 30 }, { width: 45 }, { width: 35 }, { width: 15 }, { width: 30 }, { width: 30 }, { width: 15 }, { width: 15 }, { width: 30 }, { width: 30 }, { width: 15 }, { width: 15 }, { width: 15 }, { width: 15 }, { width: 30 }, { width: 30 }, { width: 15 }, { width: 30 }, { width: 30 }];
-
-          results.POAM = csts.models.Scans.scans2poam.getPoam();
-          cols.POAM = [{ width: 40 }, { width: 15 }, { width: 25 }, { width: 25 }, { width: 15 }, { width: 30 }, { width: 15 }, { width: 30 }, { width: 15 }, { width: 30 }, { width: 30 }, { width: 30 }, { width: 20 }, { width: 40 }];
-
-          // Make sure no cell data is over 32760 characters long
-          Object.keys(results).forEach((item) => {
-            results[item].forEach((entry) => {
-              Object.keys(entry).forEach((field) => {
-                if (entry[field].length > 32760) {
-                  entry[field] = entry[field].substr(0, 32760);
-                }
-              });
-            });
-          });
-
-
-          console.log(csts.models.Scans.scans2poam.scans);
-          console.log(csts.plugins.jsonQuery('acas[*].hosts[*].requirements[*].pluginId', { data: csts.models.Scans.scans2poam.scans }).value.sort().filter((el, i, a) => { if (i === a.indexOf(el)) { return 1; } return 0; }));
-          console.log(results);
-
-          const filename = `./app/storage/results/${this.name}_${csts.plugins.moment().format('YYYYMMDD_HHmmss')}.xlsx`;
-          csts.wb = csts.plugins.xlsx.utils.book_new();
-
-          Object.keys(results).forEach((k) => {
-            const ws = csts.plugins.xlsx.utils.json_to_sheet(results[k]);
-            ws['!cols'] = cols[k];
-            ws['!autofilter'] = { ref: `A1:${ String.fromCharCode(64 + cols[k].length) }1`};
-            csts.plugins.xlsx.utils.book_append_sheet(csts.wb, ws, k);
-          });
-
-          csts.plugins.xlsx.writeFile(csts.wb, filename);
-          $('#scans2poamResults').html($('<a></a>').attr('href', filename.replace('./app/', './')).attr('target','_blank').text(filename.replace('./app/', '/')));
-          $('#select-scan-results-card').click();
-          $('#myModal').modal('hide');
+          // start it all off
+          myfunction();
         });
     },
 
@@ -332,10 +376,12 @@ csts.controllers.Scans = ({
           if (fields.mismatch !== 'POAM' && fields.mismatch !== 'RAR') {
             // workbook
             csts.models.Scans.workbooks.rar.val(
-              $('#rarTabSel')
-                .val(), (csts.models.Scans.compareRarPoam.rarFields[fields.type]) + fields.rarRow,
-              csts.models.Scans.workbooks.poam.val($('#poamTabSel')
-                .val(), (csts.models.Scans.compareRarPoam.poamFields[fields.type]) + fields.poamRow),
+              $('#rarTabSel').val(),
+              (csts.models.Scans.compareRarPoam.rarFields[fields.type]) + fields.rarRow,
+              csts.models.Scans.workbooks.poam.val(
+                $('#poamTabSel').val(),
+                (csts.models.Scans.compareRarPoam.poamFields[fields.type]) + fields.poamRow,
+              ),
             );
 
             // excel
