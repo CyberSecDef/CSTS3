@@ -117,9 +117,9 @@ csts.controllers.Scans = ({
               csts.models.Scans.scans2poam.parseFile(files[i]);
 
               $('div#modalProgess div.progress-bar')
-                .attr('aria-valuenow',Math.round(100 * i / fileLength))
-                .css('width',`${Math.round(100 * i / fileLength)}%`)
-                .text(`${Math.round(100 * i / fileLength)}%`);
+                .attr('aria-valuenow', Math.round(100 * (i / fileLength)))
+                .css('width', `${Math.round(100 * (i / fileLength))}%`)
+                .text(`${Math.round(100 * (i / fileLength))}%`);
               $('#statusbar-text').html(`${i} / ${fileLength}: ${csts.plugins.path.basename(files[i])}`);
               yield;
             }
@@ -165,7 +165,7 @@ csts.controllers.Scans = ({
               results.RAR = csts.models.Scans.scans2poam.getRar();
               cols.RAR = [
                 { width: 15 }, { width: 15 }, { width: 45 }, { width: 30 }, { width: 30 },
-                { width: 45 }, { width: 35 }, { width: 15 }, { width: 30 }, { width: 30 },
+                { width: 45 }, { width: 20 }, { width: 15 }, { width: 30 }, { width: 30 },
                 { width: 15 }, { width: 15 }, { width: 30 }, { width: 30 }, { width: 15 },
                 { width: 15 }, { width: 15 }, { width: 15 }, { width: 30 }, { width: 30 },
                 { width: 15 }, { width: 30 },
@@ -176,6 +176,15 @@ csts.controllers.Scans = ({
                 { width: 1 }, { width: 40 }, { width: 15 }, { width: 25 }, { width: 25 },
                 { width: 15 }, { width: 30 }, { width: 15 }, { width: 30 }, { width: 15 },
                 { width: 30 }, { width: 30 }, { width: 30 }, { width: 20 }, { width: 40 },
+              ];
+
+              results['Raw Results'] = csts.models.Scans.scans2poam.getRawData();
+              cols['Raw Results'] = [
+                { width: 15 }, { width: 40 }, { width: 40 }, { width: 15 }, { width: 10 }, // a-e
+                { width: 10 }, { width: 10 }, { width: 15 }, { width: 20 }, { width: 10 }, // f-j
+                { width: 15 }, { width: 15 }, { width: 20 }, { width: 20 }, { width: 40 }, // k-o
+                { width: 10 }, { width: 15 }, { width: 30 }, { width: 30 }, { width: 30 }, // p-t
+                { width: 15 }, { width: 20 }, { width: 20 }, { width: 30 }, // u-x
               ];
 
               // validate data
@@ -339,12 +348,19 @@ csts.controllers.Scans = ({
           <Models.Scans.compareRarPoam.compareWorkbooks>
     */
     executeComparison(fields) {
-      $('#headingFour button').click();
-      csts.models.Scans.compareRarPoam.compareWorkbooks(
-        $('#rarTabSel').val(),
-        $('#poamTabSel').val(),
-        fields,
-      );
+      $('#myModal').modal();
+      $('#myModalLabel').text('Please Wait...');
+      $('#myModalBody').html('Currently Comparing the Workbooks.  Please wait.');
+      $('#myModal')
+        .one('shown.bs.modal', () => {
+          $('#headingFour button').click();
+          csts.models.Scans.compareRarPoam.compareWorkbooks(
+            $('#rarTabSel').val(),
+            $('#poamTabSel').val(),
+            fields,
+          );
+          $('#myModal').modal('hide');
+        });
     },
 
     /*

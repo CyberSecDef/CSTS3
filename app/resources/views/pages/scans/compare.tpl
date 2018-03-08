@@ -3,7 +3,13 @@
 		<main class="col-sm-12 ml-sm-auto col-md-12 pt-3" role="main">
 			<h1>Overview</h1>
 			<div>
-				This is the POAM/RAR Management Tool.	This tool will allow you to execute multiple processes on your Excel based POAM's and RAR's.	Please select the applicable files below.
+					<div class="alert alert-secondary" role="alert">
+						This is the POAM/RAR Management Tool.	This tool will allow you to execute multiple processes on your Excel based POAM's and RAR's.	Please select the applicable files below.
+					</div>
+
+				<div class="alert alert-warning" role="alert">
+					<strong>Note:</strong>  The processed RAR and POAMs must have the column headers on the first row.  The RAR and POAM must also be no more than 5000 rows long.
+				</div>
 			</div>
 			<br />
 			
@@ -223,7 +229,7 @@
 		$results = $('#scans-compare-results').clone();
 		$results.find('th').remove(':nth-child(6)');
 		$results.find('td').remove(':nth-child(6)');
-		csts.libs.export.saveDoc($results.html(), 'compareRarPoam.doc')
+		csts.libs.export.saveDOC($results.html(), 'compareRarPoam.doc')
 	});
 	
 	$('button#exportPDF').on('click',function(){
@@ -248,7 +254,7 @@
 		})
 		console.log(data);
 			
-		csts.libs.export.savePdf(data, 'compareRarPoam.pdf')
+		csts.libs.export.savePDF(data, 'compareRarPoam.pdf')
 	});
 	
 	$('button#exportCSV').on('click',function(){
@@ -266,7 +272,7 @@
 				$(el).find('td:nth-child(8)').text()
 			] )
 		})
-		csts.libs.export.saveCsv(data, 'compareRarPoam.csv')
+		csts.libs.export.saveCSV(data, 'compareRarPoam.csv')
 	});
 	
 	

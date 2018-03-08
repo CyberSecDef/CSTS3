@@ -245,7 +245,7 @@ const csts = {
         }, (err2, res) => {
           csts.db.config.update({
             // eslint-disable-next-line
-            _id: res._id, 
+            _id: res._id,
           }, {
             $set: {
               viewCount: (res.viewCount + 1),
@@ -273,13 +273,11 @@ const csts = {
     csts.router = new csts.plugins.Navigo(window.location.origin, false, '#');
 
     $(document).ready(() => {
-
-
       // the callback can be used to update progress bars in a loop
-      $.eachCallback = function(arr, process, callback) {
-        var cnt = 0;
+      $.eachCallback = function eachCallBack(arr, process, callback) {
+        let cnt = 0;
         function work() {
-          var item = arr[cnt];
+          const item = arr[cnt];
           process.apply(item);
           callback.apply(item, [cnt]); cnt += 1;
           if (cnt < arr.length) {
@@ -288,11 +286,11 @@ const csts = {
         }
         setTimeout(work, 100);
       };
-      $.fn.eachCallback = function(process, callback) {
-        var cnt = 0;
-        var jq = this;
+      $.fn.eachCallback = function fnEachCallBack(process, callback) {
+        let cnt = 0;
+        const jq = this;
         function work() {
-          var item = jq.get(cnt);
+          const item = jq.get(cnt);
           process.apply(item);
           callback.apply(item, [cnt]);
           cnt += 1;
@@ -303,8 +301,6 @@ const csts = {
         setTimeout(work, 100);
       };
 
-
-
       csts.plugins.ejs.renderFile('app/resources/views/layouts/default.tpl', {
         username: process.env.USERNAME,
         url: window.location.valueOf().pathname.replace('/app', '').replace('index.html', ''),
@@ -313,19 +309,22 @@ const csts = {
       });
 
       // load any routes that are specified in the controllers
-      Object.keys(csts.controllers).forEach((c) => {  
+      Object.keys(csts.controllers).forEach((c) => {
         Object.keys(csts.controllers[c]).filter(m => typeof csts.controllers[c][m] === 'object').forEach((m) => {
           if (typeof csts.controllers[c][m].default !== 'undefined') {
-
             // add to route
             const r = {};
             r[`/${c}/${m}`] = `${c}@${m}.${csts.controllers[c][m].default}`;
             $.extend(csts.routes, r);
 
             // add to navbar
-            $("header nav.navbar div ul li").find(`a:contains('${c}')`).parent().find("div.dropdown-menu").append(
-              $('<a></a>').addClass('dropdown-item').attr('href',`/${c}/${m}`).text(csts.controllers[c][m].name)
-            );
+            $('header nav.navbar div ul li').find(`a:contains('${c}')`)
+              .parent()
+              .find('div.dropdown-menu')
+              .append($('<a></a>')
+                .addClass('dropdown-item')
+                .attr('href', `/${c}/${m}`)
+                .text(csts.controllers[c][m].name));
           }
         });
       });
@@ -370,8 +369,6 @@ const csts = {
 
       // this function calls the routing without actually navigating away
       csts.plugins.win.on('navigation', (frame, url, policy) => {
-        
-
         window.onbeforeunload = null;
         policy.ignore();
         const req = url.replace(window.location.origin, '');

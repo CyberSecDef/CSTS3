@@ -140,7 +140,7 @@ csts.models.Scans = {
     */
     getTestPlan() {
       const testPlan = [];
-      
+
       csts.plugins.jsonQuery('acas[*]', { data: this.scans }).value.forEach((scanItem) => {
         testPlan.push({
           Title: 'Assured Compliance Assessment Solution (ACAS): Nessus Scanner',
@@ -151,12 +151,12 @@ csts.models.Scans = {
         });
       });
 
-      this.scans.scap.map((e) => { return `${e.title} - V${e.version}R${e.release}`; }).sort().filter((value, index, self) => self.indexOf(value) === index).forEach((scapScan) => {
+      this.scans.scap.map(e => `${e.title} - V${e.version}R${e.release}`).sort().filter((value, index, self) => self.indexOf(value) === index).forEach((scapScan) => {
         const results = {};
 
         const hosts = [];
         const dates = [];
-        this.scans.scap.filter((e) => { return scapScan === `${e.title} - V${e.version}R${e.release}`; }).forEach((scapResult) => {
+        this.scans.scap.filter(e => scapScan === `${e.title} - V${e.version}R${e.release}`).forEach((scapResult) => {
           results.Title = `Security Content Automation Protocol (SCAP): ${scapResult.title}`;
           results.Version = `V${scapResult.version}R${scapResult.release}`;
           hosts.push(scapResult.hostname);
@@ -169,20 +169,21 @@ csts.models.Scans = {
         const start = csts.plugins.moment((Math.min.apply(null, dates))).format('MM/DD/YYYY HH:mm');
         const end = csts.plugins.moment((Math.max.apply(null, dates))).format('MM/DD/YYYY HH:mm');
         results.Dates = `${start} - ${end}`;
-        
+
         testPlan.push(results);
       });
 
-      this.scans.ckl.sort((a, b) =>  a.title > b.title ? 1 : b.title > a.title ? -1 : 0).forEach((cklScan) => {
-        const results = {
-          Title: `Security Technical Implementation Guideline (STIG): ${cklScan.title}`,
-          Version: `V${cklScan.version}R${cklScan.release}`,
-          Hosts: cklScan.hostname,
-          'Scan File Name': cklScan.scanFile,
-          Dates: cklScan.scanDate,
-        };
-        testPlan.push(results);
-      });
+      this.scans.ckl.sort((a, b) => a.title > b.title ? 1 : b.title > a.title ? -1 : 0)
+        .forEach((cklScan) => {
+          const results = {
+            Title: `Security Technical Implementation Guideline (STIG): ${cklScan.title}`,
+            Version: `V${cklScan.version}R${cklScan.release}`,
+            Hosts: cklScan.hostname,
+            'Scan File Name': cklScan.scanFile,
+            Dates: cklScan.scanDate,
+          };
+          testPlan.push(results);
+        });
 
       return testPlan;
     },
@@ -199,10 +200,9 @@ csts.models.Scans = {
 
       csts.models.Scans.scans2poam.scans.scap.forEach((scap) => {
         scap.requirements.filter(s => s.status !== 'Completed').forEach((r) => {
-
           if (csts.models.Scans.scans2poam.scans.ckl.filter(stig => stig.title === scap.title).length > 0) {
             csts.models.Scans.scans2poam.scans.ckl.filter(stig => stig.title === scap.title).forEach((c) => {
-              if (r.status !== c.requirements.filter(cr => cr.vulnId === r.vulnId ).map(cr => cr.status).join(', ')) {
+              if (r.status !== c.requirements.filter(cr => cr.vulnId === r.vulnId).map(cr => cr.status).join(', ')) {
                 results.push({
                   Title: scap.title,
                   Hosts: csts.models.Scans.scans2poam.scans.scap.filter(s => s.title === scap.title && s.requirements.filter(srf => srf.status !== 'Completed').length > 0)
@@ -228,7 +228,7 @@ csts.models.Scans = {
                 });
               }
             });
-          } else { 
+          } else {
             results.push({
               Title: scap.title,
               Hosts: csts.models.Scans.scans2poam.scans.scap.filter(s => s.title === scap.title && s.requirements.filter(srf => srf.status !== 'Completed').length > 0)
@@ -253,6 +253,123 @@ csts.models.Scans = {
       return results;
     },
 
+    /*
+      Method: getRawData
+
+      Description:
+        Generates the Raw Data tab
+    */
+    getRawData() {
+      const results = [];
+      csts.models.Scans.scans2poam.scans.scap.forEach((scap) => {
+        scap.requirements.forEach((req) => {
+          results.push({
+            'Scan Type': scap.scanType.toUpperCase(),
+            'Scan Title': scap.title,
+            Filename: scap.scanFile,
+            'Scan Date': scap.scanDate,
+            Version: scap.version,
+            Release: scap.release,
+            Credentialed: scap.credentialed,
+            Hostname: scap.hostname,
+
+            grpId: req.grpId,
+            vulnId: req.vulnId,
+            ruleId: req.ruleId,
+            pluginId: req.pluginId,
+
+            'IA Controls': typeof req.iaControls === 'object' ? req.iaControls.join(', ').trim() : req.iaControls,
+            CCI: typeof req.cci === 'object' ? req.cci.join(', ').trim() : req.cci,
+            Title: req.title,
+            Severity: req.severity,
+            Status: req.status,
+            'Finding Details': req.findingDetails,
+
+            Description: req.description,
+            Solution: req.solution,
+            fixId: req.fixId,
+            References: req.references,
+            Resources: req.resources,
+
+            Comments: req.comments,
+          });
+        });
+      });
+
+      csts.models.Scans.scans2poam.scans.ckl.forEach((ckl) => {
+        ckl.requirements.forEach((req) => {
+          results.push({
+            'Scan Type': ckl.scanType.toUpperCase(),
+            'Scan Title': ckl.title,
+            Filename: ckl.scanFile,
+            'Scan Date': ckl.scanDate,
+            Version: ckl.version,
+            Release: ckl.release,
+            Credentialed: ckl.credentialed,
+            Hostname: ckl.hostname,
+
+            grpId: req.grpId,
+            vulnId: req.vulnId,
+            ruleId: req.ruleId,
+            pluginId: req.pluginId,
+
+            'IA Controls': typeof req.iaControls === 'object' ? req.iaControls.join(', ').trim() : req.iaControls,
+            CCI: typeof req.cci === 'object' ? req.cci.join(', ').trim() : req.cci,
+            Title: req.title,
+            Severity: req.severity,
+            Status: req.status,
+            'Finding Details': req.findingDetails,
+
+            Description: req.description,
+            Solution: req.solution,
+            fixId: req.fixId,
+            References: req.references,
+            Resources: req.resources,
+
+            Comments: req.comments,
+          });
+        });
+      });
+
+      csts.models.Scans.scans2poam.scans.acas.forEach((acas) => {
+        acas.hosts.forEach((host) => {
+          host.requirements.forEach((req) => {
+            results.push({
+              'Scan Type': acas.scanType.toUpperCase(),
+              'Scan Title': 'Assured Compliance Assessment Solution',
+              Filename: acas.scanFile,
+
+              Release: '',
+              Credentialed: host.credentialed,
+              Hostname: host.hostname,
+              Version: host.scanEngine,
+              'Scan Date': host.scanDate,
+
+              grpId: req.grpId,
+              vulnId: req.vulnId,
+              ruleId: req.ruleId,
+              pluginId: req.pluginId,
+
+              'IA Controls': typeof req.iaControls === 'object' ? req.iaControls.join(', ').trim() : req.iaControls,
+              CCI: typeof req.cci === 'object' ? req.cci.join(', ').trim() : req.cci,
+              Title: req.title,
+              Severity: req.severity,
+              Status: req.status,
+              'Finding Details': req.findingDetails,
+
+              Description: req.description,
+              Solution: req.solution,
+              fixId: req.fixId,
+              References: req.references,
+              Resources: req.resources,
+              Comments: req.comments,
+            });
+          });
+        });
+      });
+
+      return results;
+    },
 
     /*
       Method: getRar
@@ -270,8 +387,8 @@ csts.models.Scans = {
           'Affected CCI (16a.1)': '',
           'Source of Discovery(16a.2)': 'Assured Compliance Assessment Solution (ACAS): Nessus Scanner',
           'Vulnerability ID(16a.3)': `Group ID: ${acasPlugin.grpId}
-Vuln ID: 
-Rule ID: 
+Vuln ID:
+Rule ID:
 Plugin ID: ${element}`,
           'Vulnerability Description (16.b)': acasPlugin.title,
           'Devices Affected (16b.1)': csts.plugins.jsonQuery("acas[*].hosts[*hostname!='']", { data: csts.models.Scans.scans2poam.scans }).value
@@ -288,21 +405,22 @@ Plugin ID: ${element}`,
           'Impact (VL-VH) (16g)': this.getRiskVal(acasPlugin.severity, 'VL-VH'),
           'Impact Description (16h)': '',
           'Risk (Cells 16f & 16g) (VL-VH) (16i)': this.getRiskVal(acasPlugin.severity, 'VL-VH'),
-          'Proposed Mitigations (From POA&M) (16j)': acasPlugin.solution,
+          'Proposed Mitigations (From POA&M) (16j)': '',
           'Residual Risk (After Proposed Mitigations) (16k)': '',
           Status: 'Ongoing',
-          'Recommendations (16l)': acasPlugin.comments,
-          Comments: '',
+          'Recommendations (16l)': acasPlugin.solution,
+          Comments: acasPlugin.comments,
           // pluginId: element,
         });
       });
 
       // unique list of requirements for scap and ckl
-      const ckls = csts.plugins.jsonQuery('ckl[*].requirements[*status!=Completed].vulnId', {data : csts.models.Scans.scans2poam.scans}).value.sort().filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; });
-      const scaps = csts.plugins.jsonQuery('scap[*].requirements[*status!=Completed].vulnId', {data : csts.models.Scans.scans2poam.scans}).value.sort().filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; });
+      const ckls = csts.plugins.jsonQuery('ckl[*].requirements[*status!=Completed].vulnId', { data: csts.models.Scans.scans2poam.scans }).value.sort().filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; });
+      const scaps = csts.plugins.jsonQuery('scap[*].requirements[*status!=Completed].vulnId', { data: csts.models.Scans.scans2poam.scans }).value.sort().filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; });
       // ckl and scap
       ckls.filter(e => scaps.includes(e)).concat(scaps.filter(e => ckls.includes(e))).sort()
-        .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; }).forEach((element) => {
+        .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+        .forEach((element) => {
           const cklReq = csts.plugins.jsonQuery(`ckl[*].requirements[vulnId=${element}]`, { data: csts.models.Scans.scans2poam.scans }).value;
 
           results.push({
@@ -329,7 +447,7 @@ Plugin ID: ${element}`,
               .filter((el, i, a) => { if (el.trim() !== '') return 1; return 0; })
               .join(', '),
             'Security Objectives (C-I-A) (16c)': '',
-            'Raw Test Result (16d)': this.getRiskVal(cklReq.severity, 'CAT'), 
+            'Raw Test Result (16d)': this.getRiskVal(cklReq.severity, 'CAT'),
             'Predisposing Condition(s) (16d.1)': '',
             'Technical Mitigation(s) (16d.2)': cklReq.comments,
             'Severity or Pervasiveness (VL-VH) (16d.3)': this.getRiskVal(cklReq.severity, 'VL-VH'),
@@ -339,11 +457,11 @@ Plugin ID: ${element}`,
             'Impact (VL-VH) (16g)': this.getRiskVal(cklReq.severity, 'VL-VH'),
             'Impact Description (16h)': '',
             'Risk (Cells 16f & 16g) (VL-VH) (16i)': this.getRiskVal(cklReq.severity, 'VL-VH'),
-            'Proposed Mitigations (From POA&M) (16j)': cklReq.solution,
+            'Proposed Mitigations (From POA&M) (16j)': '',
             'Residual Risk (After Proposed Mitigations) (16k)': '',
             Status: cklReq.status,
-            'Recommendations (16l)': '',
-            Comments: '',
+            'Recommendations (16l)': cklReq.solution,
+            Comments: cklReq.findingDetails,
             // pluginId: '',
           });
         });
@@ -377,7 +495,7 @@ Plugin ID: ${element}`,
               .filter((el, i, a) => { if (el.trim() !== '') return 1; return 0; })
               .join(', '),
             'Security Objectives (C-I-A) (16c)': '',
-            'Raw Test Result (16d)': this.getRiskVal(cklReq.severity, 'CAT'), 
+            'Raw Test Result (16d)': this.getRiskVal(cklReq.severity, 'CAT'),
             'Predisposing Condition(s) (16d.1)': '',
             'Technical Mitigation(s) (16d.2)': cklReq.comments,
             'Severity or Pervasiveness (VL-VH) (16d.3)': this.getRiskVal(cklReq.severity, 'VL-VH'),
@@ -387,11 +505,11 @@ Plugin ID: ${element}`,
             'Impact (VL-VH) (16g)': this.getRiskVal(cklReq.severity, 'VL-VH'),
             'Impact Description (16h)': '',
             'Risk (Cells 16f & 16g) (VL-VH) (16i)': this.getRiskVal(cklReq.severity, 'VL-VH'),
-            'Proposed Mitigations (From POA&M) (16j)': cklReq.solution,
+            'Proposed Mitigations (From POA&M) (16j)': '',
             'Residual Risk (After Proposed Mitigations) (16k)': '',
             Status: cklReq.status,
-            'Recommendations (16l)': '',
-            Comments: '',
+            'Recommendations (16l)': cklReq.solution,
+            Comments: cklReq.findingDetails,
             // pluginId: '',
           });
         });
@@ -411,7 +529,7 @@ Plugin ID: ${element}`,
               .sort()
               .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
               .join(', ')}`,
-              'Vulnerability ID(16a.3)': `Group ID: ${scapReq.grpId}
+            'Vulnerability ID(16a.3)': `Group ID: ${scapReq.grpId}
   Vuln ID: ${scapReq.vulnId}
   Rule ID: ${scapReq.ruleId}
   Plugin ID: `,
@@ -435,11 +553,11 @@ Plugin ID: ${element}`,
             'Impact (VL-VH) (16g)': this.getRiskVal(scapReq.severity, 'VL-VH'),
             'Impact Description (16h)': '',
             'Risk (Cells 16f & 16g) (VL-VH) (16i)': this.getRiskVal(scapReq.severity, 'VL-VH'),
-            'Proposed Mitigations (From POA&M) (16j)': scapReq.solution,
+            'Proposed Mitigations (From POA&M) (16j)': '',
             'Residual Risk (After Proposed Mitigations) (16k)': '',
             Status: scapReq.status,
-            'Recommendations (16l)': '',
-            Comments: '',
+            'Recommendations (16l)': scapReq.solution,
+            Comments: scapReq.findingDetails,
             // pluginId: '',
           });
         });
@@ -459,7 +577,7 @@ Plugin ID: ${element}`,
       */
     getRiskVal(source, format) {
       const crossWalkFrom = {
-        VL: 0, L: 1, M: 2, H: 3, VH: 4, NONE: 0, LOW: 1, MEDIUM: 2, HIGH: 3, CRITICAL: 4, CATIV: 0, CATIII: 1, CATII: 2, CATI: 3, 'CAT IV': 0, 'CAT III': 1, 'CAT II': 2, 'CAT I': 3, MODERATE: 2, 0: 0, 1: 1, 2: 2, 3: 3, 4: 4
+        VL: 0, L: 1, M: 2, H: 3, VH: 4, NONE: 0, LOW: 1, MEDIUM: 2, HIGH: 3, CRITICAL: 4, CATIV: 0, CATIII: 1, CATII: 2, CATI: 3, 'CAT IV': 0, 'CAT III': 1, 'CAT II': 2, 'CAT I': 3, MODERATE: 2, 0: 0, 1: 1, 2: 2, 3: 3, 4: 4,
       };
       const crossWalkTo = {
         'VL-VH': {
@@ -497,8 +615,8 @@ Devices Affected:
           'Security Control Number (NC/NA controls only)': '',
           'Office/Org': '',
           'Security Checks': `Group ID: ${acasPlugin.grpId}
-Vuln ID: 
-Rule ID: 
+Vuln ID:
+Rule ID:
 Plugin ID: ${element}`,
           'Raw Severity Value': this.getRiskVal(acasPlugin.severity, 'CAT'),
           Mitigations: '',
@@ -514,18 +632,19 @@ Plugin ID: ${element}`,
       });
 
       // unique list of requirements for scap and ckl
-      const ckls = csts.plugins.jsonQuery('ckl[*].requirements[*status!=Completed].vulnId', {data : csts.models.Scans.scans2poam.scans }).value.sort().filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; });
-      const scaps = csts.plugins.jsonQuery('scap[*].requirements[*status!=Completed].vulnId', {data : csts.models.Scans.scans2poam.scans }).value.sort().filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; });
+      const ckls = csts.plugins.jsonQuery('ckl[*].requirements[*status!=Completed].vulnId', { data: csts.models.Scans.scans2poam.scans }).value.sort().filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; });
+      const scaps = csts.plugins.jsonQuery('scap[*].requirements[*status!=Completed].vulnId', { data: csts.models.Scans.scans2poam.scans }).value.sort().filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; });
 
       // ckl and scap
       ckls.filter(e => scaps.includes(e)).concat(scaps.filter(e => ckls.includes(e))).sort()
-        .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; }).forEach((element) => {
+        .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+        .forEach((element) => {
           const cklReq = csts.plugins.jsonQuery(`ckl[*].requirements[vulnId=${element}]`, { data: csts.models.Scans.scans2poam.scans }).value;
 
           results.push({
             A: '',
             'Control Vulnerability Description': `Title: ${cklReq.title}
-  
+
  Description:
   ${cklReq.description}
 
@@ -545,9 +664,9 @@ Devices Affected:
 Vuln ID: ${cklReq.vulnId}
 Rule ID: ${cklReq.ruleId}
 Plugin ID:`,
-            'Raw Severity Value': this.getRiskVal(cklReq.severity, 'CAT'), 
+            'Raw Severity Value': this.getRiskVal(cklReq.severity, 'CAT'),
             Mitigations: '',
-            'Severity Value': this.getRiskVal(cklReq.severity, 'CAT'), 
+            'Severity Value': this.getRiskVal(cklReq.severity, 'CAT'),
             'Resources Required': cklReq.resources,
             'Scheduled Completion Date': '',
             'Milestone with Completion Dates': '',
@@ -638,9 +757,9 @@ ${csts.models.Scans.scans2poam.scans.scap
 Vuln ID: ${scapReq.vulnId}
 Rule ID: ${scapReq.ruleId}
 Plugin ID:`,
-            'Raw Severity Value': this.getRiskVal(scapReq.severity, 'CAT'), 
+            'Raw Severity Value': this.getRiskVal(scapReq.severity, 'CAT'),
             Mitigations: '',
-            'Severity Value': this.getRiskVal(scapReq.severity, 'CAT'), 
+            'Severity Value': this.getRiskVal(scapReq.severity, 'CAT'),
             'Resources Required': scapReq.resources,
             'Scheduled Completion Date': '',
             'Milestone with Completion Dates': '',
@@ -711,8 +830,6 @@ Plugin ID:`,
       }
 
       csts.plugins.xml2js.parseString(fileData, (err, result) => {
-        
-
         xccdfData.credentialed = true;
         xccdfData.scanFile = fileName;
         xccdfData.hostname = csts.plugins.jsonPath.value(result, "$['cdf:Benchmark']['cdf:TestResult'][0]['cdf:target'][0]");
@@ -737,11 +854,9 @@ Plugin ID:`,
         xccdfData.requirements = [];
         csts.plugins.jsonPath.value(result, "$..['cdf:rule-result']")
           .forEach((element) => {
-
             const ruleData = csts.plugins.jsonPath.query(result, `$..['cdf:Rule'][?(@.$.id=='${element.$.idref}')]`);
-
             const vulnerability = {};
-            vulnerability.vulnId = result['cdf:Benchmark']['cdf:Group'].filter( e => e['cdf:Rule'][0]['$'].id ===  element.$.idref )[0]['$'].id;
+            vulnerability.vulnId = result['cdf:Benchmark']['cdf:Group'].filter(e => e['cdf:Rule'][0].$.id === element.$.idref)[0].$.id;
             vulnerability.comments = '';
             vulnerability.findingDetails = JSON.stringify(element);
 
@@ -752,7 +867,7 @@ Plugin ID:`,
               });
             }
             vulnerability.iaControls = '';
-            csts.plugins.xml2js.parseString(`<root>${ruleData[0]['cdf:description'].reduce(a => a).replace('&gt;', '>').replace('&lt;', '<')}</root>`,  (e, r) => { if(typeof r !== 'undefined' && typeof r.root !== 'undefined') vulnerability.iaControls = r.root.IAControls; });
+            csts.plugins.xml2js.parseString(`<root>${ruleData[0]['cdf:description'].reduce(a => a).replace('&gt;', '>').replace('&lt;', '<')}</root>`, (e, r) => { if (typeof r !== 'undefined' && typeof r.root !== 'undefined') vulnerability.iaControls = r.root.IAControls; });
 
             vulnerability.description = ruleData[0]['cdf:description'].reduce(a => a);
             vulnerability.fixId = ruleData[0]['cdf:fix'][0].$.id;
@@ -810,7 +925,7 @@ Plugin ID:`,
         cklData.scanType = 'ckl';
         cklData.credentialed = true;
         cklData.scanFile = fileName;
-        cklData.hostname = [csts.plugins.jsonPath.value(result, '$..HOST_NAME')][0].reduce( a => a );
+        cklData.hostname = [csts.plugins.jsonPath.value(result, '$..HOST_NAME')][0].reduce(a => a);
         cklData.title = csts.plugins.jsonPath.flatValue(result, "$..STIG_INFO[0].SI_DATA[?(@.SID_NAME=='title')].SID_DATA");
 
         const vrMatch = csts.plugins.path.basename(file)
@@ -1031,15 +1146,14 @@ Plugin ID:`,
     fields: ['Mitigation', 'Comment', 'Description', 'Raw Risk', 'Residual Risk', 'Security Control', 'Source', 'Status'],
     rarFields: {
       Mitigation: 'J',
-      Comment: 'V',
+      Comment: '',
       Description: 'E',
       'Raw Risk': 'H',
       'Residual Risk': 'S',
       'Security Control': 'A',
       Source: 'C',
-      Status: 'T',
+      Status: '',
       'Test Id': 'D',
-      Likelihood: 'N',
     },
     poamFields: {
       Mitigation: 'G',
@@ -1050,6 +1164,7 @@ Plugin ID:`,
       'Security Control': 'C',
       Source: 'M',
       Status: 'N',
+      'Test Id': 'J',
     },
 
     /*
@@ -1067,8 +1182,8 @@ Plugin ID:`,
     compareVals(workbook, sheet, address, val) {
       if (!csts.models.Scans.workbooks[workbook].isBlank(sheet, address)) {
         return (
-          csts.models.Scans.workbooks[workbook].Sheets[sheet][address].v.replace(/\s/g, '').toUpperCase()
-            .indexOf(val.replace(/\s/g, '').toUpperCase()) >= 0
+          String(csts.models.Scans.workbooks[workbook].Sheets[sheet][address].v).replace(/\s/g, '').toUpperCase()
+            .indexOf(String(val).replace(/\s/g, '').toUpperCase()) >= 0
         );
       }
       return false;
@@ -1091,48 +1206,85 @@ Plugin ID:`,
       let resRow = 0;
 
 
+      // since there is no consistency, try to map which fields are in which columns for the RAR and POAM
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach((i) => {
+        if (csts.models.Scans.workbooks.rar.val(rarTab, `${i}1`).toLowerCase().indexOf('raw') >= 0) { this.rarFields['Raw Risk'] = i; }
+        if (csts.models.Scans.workbooks.rar.val(rarTab, `${i}1`).toLowerCase().indexOf('residual') >= 0) { this.rarFields['Residual Risk'] = i; }
+        if (csts.models.Scans.workbooks.rar.val(rarTab, `${i}1`).toLowerCase().indexOf('control') >= 0) { this.rarFields['Security Control'] = i; }
+        if (csts.models.Scans.workbooks.rar.val(rarTab, `${i}1`).toLowerCase().indexOf('source') >= 0) { this.rarFields.Source = i; }
+        if (csts.models.Scans.workbooks.rar.val(rarTab, `${i}1`).toLowerCase().indexOf('status') >= 0) { this.rarFields.Status = i; }
 
-      // TODO: Update this to scan for proper column headers.
-      // do the same for POAM
+        if (
+          csts.models.Scans.workbooks.rar.val(rarTab, `${i}1`).toLowerCase().indexOf('technical mitigation') >= 0 ||
+          (csts.models.Scans.workbooks.rar.val(rarTab, `${i}1`).toLowerCase().indexOf('mitigation') >= 0 && csts.models.Scans.workbooks.rar.val(rarTab, `${i}1`).toLowerCase().indexOf('proposed')) === -1
+        ) {
+          this.rarFields.Mitigation = i;
+        }
 
+        if (
+          csts.models.Scans.workbooks.rar.val(rarTab, `${i}1`).toLowerCase().indexOf('vulnerability description') >= 0 ||
+          (
+            (csts.models.Scans.workbooks.rar.val(rarTab, `${i}1`).toLowerCase().indexOf('description') >= 0 && csts.models.Scans.workbooks.rar.val(rarTab, `${i}1`).toLowerCase().indexOf('threat') === -1) &&
+            (csts.models.Scans.workbooks.rar.val(rarTab, `${i}1`).toLowerCase().indexOf('description') >= 0 && csts.models.Scans.workbooks.rar.val(rarTab, `${i}1`).toLowerCase().indexOf('mitigation') === -1) &&
+            (csts.models.Scans.workbooks.rar.val(rarTab, `${i}1`).toLowerCase().indexOf('description') >= 0 && csts.models.Scans.workbooks.rar.val(rarTab, `${i}1`).toLowerCase().indexOf('remediation') === -1) &&
+            (csts.models.Scans.workbooks.rar.val(rarTab, `${i}1`).toLowerCase().indexOf('description') >= 0 && csts.models.Scans.workbooks.rar.val(rarTab, `${i}1`).toLowerCase().indexOf('impact') === -1)
+          )
+        ) {
+          this.rarFields.Description = i;
+        }
 
-      rarRow = 8;
-      while (rarRow < 3000 && (!csts.models.Scans.workbooks.rar.isBlank(rarTab, [`A${rarRow}`, `B${rarRow}`]))) {
-        if (!csts.models.Scans.workbooks.rar.isBlank(rarTab, [`F${rarRow}`, `B${rarRow}`]) && csts.models.Scans.workbooks.rar.Sheets[rarTab][`F${rarRow}`].v !== 'IV') {
-          const vulnId = csts.models.Scans.compareRarPoam.getVulnId('rar', rarTab, `C${rarRow}`);
+        if (csts.models.Scans.workbooks.rar.val(rarTab, `${i}1`).toLowerCase().indexOf('vulnerability id') >= 0 || csts.models.Scans.workbooks.rar.val(rarTab, `${i}1`).toLowerCase().indexOf('test id') >= 0) {
+          this.rarFields['Test Id'] = i;
+        }
+
+        if (csts.models.Scans.workbooks.poam.val(poamTab, `${i}1`).toLowerCase().indexOf('raw') >= 0) { this.poamFields['Raw Risk'] = i; }
+        if (csts.models.Scans.workbooks.poam.val(poamTab, `${i}1`).toLowerCase().indexOf('residual') >= 0) { this.poamFields['Residual Risk'] = i; }
+        if (csts.models.Scans.workbooks.poam.val(poamTab, `${i}1`).toLowerCase().indexOf('severity value') >= 0) { this.poamFields['Residual Risk'] = i; }
+        if (csts.models.Scans.workbooks.poam.val(poamTab, `${i}1`).toLowerCase().indexOf('control') >= 0) { this.poamFields['Security Control'] = i; }
+        if (csts.models.Scans.workbooks.poam.val(poamTab, `${i}1`).toLowerCase().indexOf('source') >= 0) { this.poamFields.Source = i; }
+        if (csts.models.Scans.workbooks.poam.val(poamTab, `${i}1`).toLowerCase().indexOf('status') >= 0) { this.poamFields.Status = i; }
+        if (csts.models.Scans.workbooks.poam.val(poamTab, `${i}1`).toLowerCase().indexOf('mitigations') >= 0) { this.poamFields.Mitigation = i; }
+        if (csts.models.Scans.workbooks.poam.val(poamTab, `${i}1`).toLowerCase().indexOf('description') >= 0) { this.poamFields.Description = i; }
+        if (csts.models.Scans.workbooks.poam.val(poamTab, `${i}1`).toLowerCase().indexOf('checks') >= 0) { this.poamFields['Test Id'] = i; }
+      });
+      rarRow = 2;
+      while (rarRow < 5000 && (!csts.models.Scans.workbooks.rar.isBlank(rarTab, [`${this.rarFields['Security Control']}${rarRow}`, `${this.rarFields.CCI}${rarRow}`, `${this.rarFields.Source}${rarRow}`]))) {
+        if (String(csts.models.Scans.workbooks.rar.Sheets[rarTab][`${this.rarFields['Raw Risk']}${rarRow}`]).v !== 'IV') {
+          const vulnId = csts.models.Scans.compareRarPoam.getVulnId('rar', rarTab, `${this.rarFields['Test Id']}${rarRow}`);
           $items.push({
             row: rarRow,
             vulnId,
-            control: csts.models.Scans.workbooks.rar.val(rarTab, `A${rarRow}`),
-            source: csts.models.Scans.workbooks.rar.val(rarTab, `B${rarRow}`),
-            testId: csts.models.Scans.workbooks.rar.val(rarTab, `C${rarRow}`),
-            description: csts.models.Scans.workbooks.rar.val(rarTab, `D${rarRow}`),
-            riskStatement: csts.models.Scans.workbooks.rar.val(rarTab, `E${rarRow}`),
-            rawRisk: csts.models.Scans.workbooks.rar.val(rarTab, `F${rarRow}`),
-            impact: csts.models.Scans.workbooks.rar.val(rarTab, `G${rarRow}`),
-            likelihood: csts.models.Scans.workbooks.rar.val(rarTab, `H${rarRow}`),
-            correctiveAction: csts.models.Scans.workbooks.rar.val(rarTab, `I${rarRow}`),
-            mitigation: csts.models.Scans.workbooks.rar.val(rarTab, `J${rarRow}`),
-            remediation: csts.models.Scans.workbooks.rar.val(rarTab, `K${rarRow}`),
-            residualRisk: csts.models.Scans.workbooks.rar.val(rarTab, `L${rarRow}`),
-            status: csts.models.Scans.workbooks.rar.val(rarTab, `M${rarRow}`),
-            comment: csts.models.Scans.workbooks.rar.val(rarTab, `N${rarRow}`),
-            devices: csts.models.Scans.workbooks.rar.val(rarTab, `O${rarRow}`),
+            control: this.rarFields['Security Control'] !== '' ? csts.models.Scans.workbooks.rar.val(rarTab, `${this.rarFields['Security Control']}${rarRow}`) : '',
+            source: this.rarFields.Source !== '' ? csts.models.Scans.workbooks.rar.val(rarTab, `${this.rarFields.Source}${rarRow}`) : '',
+            testId: this.rarFields['Test Id'] !== '' ? csts.models.Scans.workbooks.rar.val(rarTab, `${this.rarFields['Test Id']}${rarRow}`) : '',
+            description: this.rarFields.Description !== '' ? csts.models.Scans.workbooks.rar.val(rarTab, `${this.rarFields.Description}${rarRow}`) : '',
+            rawRisk: this.rarFields['Raw Risk'] !== '' ? csts.models.Scans.workbooks.rar.val(rarTab, `${this.rarFields['Raw Risk']}${rarRow}`) : '',
+            impact: this.rarFields.Impact !== '' ? csts.models.Scans.workbooks.rar.val(rarTab, `${this.rarFields.Impact}${rarRow}`) : '',
+            likelihood: this.rarFields.Likelihood !== '' ? csts.models.Scans.workbooks.rar.val(rarTab, `${this.rarFields.Likelihood}${rarRow}`) : '',
+            mitigation: this.rarFields.Mitigation !== '' ? csts.models.Scans.workbooks.rar.val(rarTab, `${this.rarFields.Mitigation}${rarRow}`) : '',
+            residualRisk: this.rarFields['Residual Risk'] !== '' ? csts.models.Scans.workbooks.rar.val(rarTab, `${this.rarFields['Residual Risk']}${rarRow}`) : '',
+            status: this.rarFields.Status !== '' ? csts.models.Scans.workbooks.rar.val(rarTab, `${this.rarFields.Status}${rarRow}`) : '',
+            comment: this.rarFields.Comment !== '' ? csts.models.Scans.workbooks.rar.val(rarTab, `${this.rarFields.Comment}${rarRow}`) : '',
           });
         }
         rarRow += 1;
       }
 
+      console.log(this.rarFields);
+      console.log(this.poamFields);
+      console.log($items);
+
       // all rar foundings are found, time to search the poam
       $.each($items, (index, element) => {
-        let poamRow = 8;
+        let poamRow = 2;
         let found = false;
 
         // loop through all the poam until blanks are recieved
-        while (poamRow < 3000 && (!csts.models.Scans.workbooks.poam.isBlank(poamTab, [`B${poamRow}`, `L${poamRow}`, `N${poamRow}`, `O${poamRow}`]))) {
-          if (this.compareVals('poam', poamTab, `B${poamRow}`, element.vulnId) || this.compareVals('poam', poamTab, `M${poamRow}`, element.vulnId)) {
+        while (poamRow < 5000) {
+          // see if the vuln id from the rar is found anywhere in the poam
+          if (this.compareVals('poam', poamTab, `${this.poamFields.Source}${poamRow}`, element.vulnId) || this.compareVals('poam', poamTab, `${this.poamFields['Test Id']}${poamRow}`, element.vulnId)) {
             found = true;
-            if (!this.compareVals('poam', poamTab, `N${poamRow}`, element.status) && $.grep(fields, n => n.value === 'Status').length > 0) {
+            if (!this.compareVals('poam', poamTab, `${this.poamFields.Status}${poamRow}`, element.status) && $.grep(fields, n => n.value === 'Status').length > 0) {
               resRow += 1;
               csts.controllers.Scans.viewModels.compareRarPoam.push({
                 rowId: resRow,
@@ -1143,11 +1295,11 @@ Plugin ID:`,
                 rarRow: element.row,
                 rarVal: element.status,
                 poamRow,
-                poamVal: csts.models.Scans.workbooks.poam.val(poamTab, `N${poamRow}`),
+                poamVal: csts.models.Scans.workbooks.poam.val(poamTab, `${this.poamFields.Status}${poamRow}`),
               });
             }
 
-            if (!this.compareVals('poam', poamTab, `C${poamRow}`, element.control) && $.grep(fields, n => n.value === 'Security Controls').length > 0) {
+            if (!this.compareVals('poam', poamTab, `${this.poamFields['Security Control']}${poamRow}`, element.control) && $.grep(fields, n => n.value === 'Security Controls').length > 0) {
               resRow += 1;
               csts.controllers.Scans.viewModels.compareRarPoam.push({
                 rowId: resRow,
@@ -1158,11 +1310,11 @@ Plugin ID:`,
                 rarRow: element.row,
                 rarVal: element.control,
                 poamRow,
-                poamVal: csts.models.Scans.workbooks.poam.val(poamTab, `C${poamRow}`),
+                poamVal: csts.models.Scans.workbooks.poam.val(poamTab, `${this.poamFields['Security Control']}${poamRow}`),
               });
             }
 
-            if (!this.compareVals('poam', poamTab, `M${poamRow}`, element.source) && $.grep(fields, n => n.value === 'Source').length > 0) {
+            if (!this.compareVals('poam', poamTab, `${this.poamFields.Source}${poamRow}`, element.source) && $.grep(fields, n => n.value === 'Source').length > 0) {
               resRow += 1;
               csts.controllers.Scans.viewModels.compareRarPoam.push({
                 rowId: resRow,
@@ -1173,12 +1325,12 @@ Plugin ID:`,
                 rarRow: element.row,
                 rarVal: element.source,
                 poamRow,
-                poamVal: csts.models.Scans.workbooks.poam.val(poamTab, `M${poamRow}`),
+                poamVal: csts.models.Scans.workbooks.poam.val(poamTab, `${this.poamFields.Source}${poamRow}`),
               });
             }
 
-            if (!this.compareVals('poam', poamTab, `F${poamRow}`, element.rawRisk) &&
-            element.rawRisk.toUpperCase().replace('CAT', '') !== csts.models.Scans.workbooks.poam.val(poamTab, `F${poamRow}`) &&
+            if (!this.compareVals('poam', poamTab, `${this.poamFields['Raw Risk']}${poamRow}`, element.rawRisk) &&
+            element.rawRisk.toUpperCase().replace('CAT', '') !== csts.models.Scans.workbooks.poam.val(poamTab, `${this.poamFields['Raw Risk']}${poamRow}`) &&
               $.grep(fields, n => n.value === 'Raw Risk').length > 0
             ) {
               resRow += 1;
@@ -1191,12 +1343,12 @@ Plugin ID:`,
                 rarRow: element.row,
                 rarVal: element.rawRisk,
                 poamRow,
-                poamVal: csts.models.Scans.workbooks.poam.val(poamTab, `F${poamRow}`),
+                poamVal: csts.models.Scans.workbooks.poam.val(poamTab, `${this.poamFields['Raw Risk']}${poamRow}`),
               });
             }
 
-            if (!this.compareVals('poam', poamTab, `H${poamRow}`, element.residualRisk) &&
-            element.residualRisk.toUpperCase().replace('CAT', '') !== csts.models.Scans.workbooks.poam.val(poamTab, `H${poamRow}`) &&
+            if (!this.compareVals('poam', poamTab, `${this.poamFields['Residual Risk']}${poamRow}`, element.residualRisk) &&
+            element.residualRisk.toUpperCase().replace('CAT', '') !== csts.models.Scans.workbooks.poam.val(poamTab, `${this.poamFields['Residual Risk']}${poamRow}`) &&
               $.grep(fields, n => n.value === 'Residual Risk').length > 0
             ) {
               resRow += 1;
@@ -1209,15 +1361,16 @@ Plugin ID:`,
                 rarRow: element.row,
                 rarVal: element.residualRisk,
                 poamRow,
-                poamVal: csts.models.Scans.workbooks.poam.val(poamTab, `H${poamRow}`),
+                poamVal: csts.models.Scans.workbooks.poam.val(poamTab, `${this.poamFields['Residual Risk']}${poamRow}`),
               });
             }
 
             if (
-              (!this.compareVals('poam', poamTab, `B${poamRow}`, element.description) &&
-                ([$.trim(element.vulnId), ' - ', $.trim(element.description)].join()).toUpperCase() !== $.trim(csts.models.Scans.workbooks.poam.val(poamTab, `B${poamRow}`)).toUpperCase() &&
-                (['(', $.trim(element.vulnId), ')', ' - ', $.trim(element.description)].join()).toUpperCase() !== $.trim(csts.models.Scans.workbooks.poam.val(poamTab, `B${poamRow}`)).toUpperCase() &&
-                $.trim(csts.models.Scans.workbooks.poam.val(poamTab, `B${poamRow}`).toUpperCase()).replace(/\W/g, '').indexOf(element.description.toUpperCase().replace(/\W/g, '')) === -1
+              (!this.compareVals('poam', poamTab, `${this.poamFields.Description}${poamRow}`, element.description) &&
+                ([$.trim(element.vulnId), ' - ', $.trim(element.description)].join()).toUpperCase() !== $.trim(csts.models.Scans.workbooks.poam.val(poamTab, `${this.poamFields.Description}${poamRow}`)).toUpperCase() &&
+                (['(', $.trim(element.vulnId), ')', ' - ', $.trim(element.description)].join()).toUpperCase() !== $.trim(csts.models.Scans.workbooks.poam.val(poamTab, `${this.poamFields.Description}${poamRow}`)).toUpperCase() &&
+                $.trim(csts.models.Scans.workbooks.poam.val(poamTab, `${this.poamFields.Description}${poamRow}`).toUpperCase())
+                  .replace(/\W/g, '').indexOf(element.description.toUpperCase().replace(/\W/g, '')) === -1
               ) &&
               $.grep(fields, n => n.value === 'Residual Risk').length > 0
             ) {
@@ -1231,13 +1384,13 @@ Plugin ID:`,
                 rarRow: element.row,
                 rarVal: element.description,
                 poamRow,
-                poamVal: csts.models.Scans.workbooks.poam.val(poamTab, `B${poamRow}`),
+                poamVal: csts.models.Scans.workbooks.poam.val(poamTab, `${this.poamFields.Description}${poamRow}`),
               });
             }
 
             if (
-              (!this.compareVals('poam', poamTab, `G${poamRow}`, element.mitigation) &&
-                (csts.models.Scans.workbooks.poam.val(poamTab, `G${poamRow}`).toUpperCase()).replace(/\W/g, '').indexOf(element.mitigation.toUpperCase().replace(/\W/g, '')) === -1
+              (!this.compareVals('poam', poamTab, `${this.poamFields.Mitigation}${poamRow}`, element.mitigation) &&
+                (csts.models.Scans.workbooks.poam.val(poamTab, `${this.poamFields.Mitigation}${poamRow}`).toUpperCase()).replace(/\W/g, '').indexOf(element.mitigation.toUpperCase().replace(/\W/g, '')) === -1
               ) &&
               $.grep(fields, n => n.value === 'Mitigations').length > 0
             ) {
@@ -1251,13 +1404,13 @@ Plugin ID:`,
                 rarRow: element.row,
                 rarVal: element.mitigation,
                 poamRow,
-                poamVal: csts.models.Scans.workbooks.poam.val(poamTab, `G${poamRow}`),
+                poamVal: csts.models.Scans.workbooks.poam.val(poamTab, `${this.poamFields.Mitigation}${poamRow}`),
               });
             }
 
             if (
-              (!this.compareVals('poam', poamTab, `O${poamRow}`, element.comment) &&
-                (csts.models.Scans.workbooks.poam.val(poamTab, `O${poamRow}`).toUpperCase()).replace(/\W/g, '').indexOf(element.comment.toUpperCase().replace(/\W/g, '')) === -1
+              (!this.compareVals('poam', poamTab, `${this.poamFields.Comment}${poamRow}`, element.comment) &&
+                (csts.models.Scans.workbooks.poam.val(poamTab, `${this.poamFields.Comment}${poamRow}`).toUpperCase()).replace(/\W/g, '').indexOf(element.comment.toUpperCase().replace(/\W/g, '')) === -1
               ) &&
               $.grep(fields, n => n.value === 'Comments').length > 0
             ) {
@@ -1271,7 +1424,7 @@ Plugin ID:`,
                 rarRow: element.row,
                 rarVal: element.comment,
                 poamRow,
-                poamVal: csts.models.Scans.workbooks.poam.val(poamTab, `O${poamRow}`),
+                poamVal: csts.models.Scans.workbooks.poam.val(poamTab, `${this.poamFields.Comment}${poamRow}`),
               });
             }
           }
@@ -1298,21 +1451,21 @@ Plugin ID:`,
       // see if anything is in the POAM, but not in the rar
       $items = [];
       let poamRow = 8;
-      while (poamRow < 3000 && !csts.models.Scans.workbooks.poam.isBlank(poamTab, [`B${poamRow}`, `N${poamRow}`])) {
-        if (csts.models.Scans.workbooks.poam.val(poamTab, `F${poamRow}`) !== 'IV') {
-          const vulnId = csts.models.Scans.compareRarPoam.getVulnId('poam', poamTab, `M${poamRow}`);
+      while (poamRow < 5000) {
+        if (csts.models.Scans.workbooks.poam.val(poamTab, `${this.poamFields['Raw Risk']}${poamRow}`) !== 'IV') {
+          const vulnId = csts.models.Scans.compareRarPoam.getVulnId('poam', poamTab, `${this.poamFields['Test Id']}${poamRow}`);
 
           $items.push({
             row: poamRow,
             vulnId,
-            description: csts.models.Scans.workbooks.poam.val(poamTab, `B${poamRow}`),
-            control: csts.models.Scans.workbooks.poam.val(poamTab, `C${poamRow}`),
-            source: csts.models.Scans.workbooks.poam.val(poamTab, `M${poamRow}`),
-            testId: csts.models.Scans.workbooks.poam.val(poamTab, `M${poamRow}`),
-            rawRisk: csts.models.Scans.workbooks.poam.val(poamTab, `F${poamRow}`),
-            mitigation: csts.models.Scans.workbooks.poam.val(poamTab, `H${poamRow}`),
-            status: csts.models.Scans.workbooks.poam.val(poamTab, `N${poamRow}`),
-            comment: csts.models.Scans.workbooks.poam.val(poamTab, `O${poamRow}`),
+            description: csts.models.Scans.workbooks.poam.val(poamTab, `${this.poamFields.Description}${poamRow}`),
+            control: csts.models.Scans.workbooks.poam.val(poamTab, `${this.poamFields['Security Control']}${poamRow}`),
+            source: csts.models.Scans.workbooks.poam.val(poamTab, `${this.poamFields.Source}${poamRow}`),
+            testId: csts.models.Scans.workbooks.poam.val(poamTab, `${this.poamFields['Test Id']}${poamRow}`),
+            rawRisk: csts.models.Scans.workbooks.poam.val(poamTab, `${this.poamFields['Raw Risk']}${poamRow}`),
+            mitigation: csts.models.Scans.workbooks.poam.val(poamTab, `${this.poamFields.Mitigation}${poamRow}`),
+            status: csts.models.Scans.workbooks.poam.val(poamTab, `${this.poamFields.Status}${poamRow}`),
+            comment: csts.models.Scans.workbooks.poam.val(poamTab, `${this.poamFields.Comment}${poamRow}`),
           });
         }
         poamRow += 1;
@@ -1322,8 +1475,8 @@ Plugin ID:`,
         rarRow = 8;
         let found = false;
 
-        while (rarRow < 3000 && !csts.models.Scans.workbooks.poam.isBlank(poamTab, [`B${rarRow}`, `C${rarRow}`, `F${rarRow}`, `M${rarRow}`, `N${rarRow}`])) {
-          if (!this.compareVals('rar', rarTab, `C${rarRow}`, element.vulnId)) {
+        while (rarRow < 5000) {
+          if (!this.compareVals('rar', rarTab, `${this.rarFields['Test Id']}${rarRow}`, element.vulnId)) {
             found = true;
           }
           rarRow += 1;
@@ -1363,7 +1516,7 @@ Plugin ID:`,
       let vulnId = '';
       if (!csts.models.Scans.workbooks[workbook].isBlank(sheet, address)) {
         vulnId = csts.models.Scans.workbooks[workbook].Sheets[sheet][address].v;
-        if (vulnId.indexOf('Vuln ID:') >= 0) {
+        if (String(vulnId).indexOf('Vuln ID:') >= 0) {
           const temp = vulnId.split('\n');
           $.each(temp, (index, item) => {
             const i = item.split(':');

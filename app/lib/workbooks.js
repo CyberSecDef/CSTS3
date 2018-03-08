@@ -87,7 +87,7 @@ csts.libs.Workbooks = {
       this.Sheets[sheet][address].v = val;
     }
 
-    return (!this.isBlank(sheet, address) ? this.Sheets[sheet][address].v : '');
+    return String(!this.isBlank(sheet, address) ? this.Sheets[sheet][address].v : '');
   },
 };
 
