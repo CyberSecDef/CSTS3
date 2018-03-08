@@ -3,3 +3,5 @@ app/database
 csts.code-workspace
 package-lock.json
 app/database/config.db
+/.eslintrc.json
+/csts.code-workspace
