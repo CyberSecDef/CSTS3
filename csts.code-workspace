@@ -6,6 +6,7 @@
 	],
 	"settings": {
 		"sonarlint.ls.javaHome": "C:/Program Files/Java/jdk-9.0.4",
+		
 		"files.eol" : "\n",
 			"files.associations" :{
 				"*.tpl" : "html"

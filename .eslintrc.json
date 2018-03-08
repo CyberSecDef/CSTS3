@@ -4,7 +4,9 @@
         "global-require" : "off",
         "prefer-destructuring" : "off",
         "no-console" : "off",
-        "no-underscore-dangle" : "off"
+        "no-underscore-dangle" : "off",
+        "max-len" : "off",
+        "no-unused-vars" : "off"
     },
     "globals" : {
         "ko" : true,
