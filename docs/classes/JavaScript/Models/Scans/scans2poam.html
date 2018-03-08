@@ -8,9 +8,94 @@
 
 <body onload="NDLoader.OnLoad('Content');" class="NDPage NDContentPage">
 
-<a name="Topic73"></a><div class="CTopic TClass LJavaScript first">
+<a name="Topic60"></a><div class="CTopic TClass LJavaScript first">
  <div class="CTitle"><span class="Qualifier">Models.&#8203;Scans.</span>&#8203;scans2poam</div>
  <div class="CBody"><p>This is the container for the functions that deal with the scans2poam module</p><div class="CHeading">See Also</div><p><a href="../../../../index.html#JavaScriptClass:Controllers.Scans.scans2poam" target="_top" onmouseover="NDContentPage.OnLinkMouseOver(event,11);" onmouseout="NDContentPage.OnLinkMouseOut(event);" >Controllers.Scans.scans2poam</a></p></div>
+</div>
+
+<a name="Variables"></a><a name="Topic61"></a><div class="CTopic TGroup LJavaScript">
+ <div class="CTitle">Variables</div>
+</div>
+
+<a name="Applet_Variables"></a><a name="Topic62"></a><div class="CTopic TVariable LJavaScript">
+ <div class="CTitle">Applet Variables</div>
+ <div class="CBody"><table class="CDefinitionList"><tr><td class="CDLEntry"><a name="scans"></a><a name="Topic63"></a>scans</td><td class="CDLDefinition"><p>the findings from the various SCAP, ACAS and CKL scans</p></td></tr></table></div>
+</div>
+
+<a name="Functions"></a><a name="Topic64"></a><div class="CTopic TGroup LJavaScript">
+ <div class="CTitle">Functions</div>
+</div>
+
+<a name="getSummary"></a><a name="Topic65"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">getSummary</div>
+ <div id="NDPrototype65" class="NDPrototype NoParameterForm">getSummary()</div>
+ <div class="CBody"><div class="CHeading">Description</div><p>This method builds the 'summary' export data</p></div>
+</div>
+
+<a name="getTestPlan"></a><a name="Topic66"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">getTestPlan</div>
+ <div id="NDPrototype66" class="NDPrototype NoParameterForm">getTestPlan()</div>
+ <div class="CBody"><div class="CHeading">Description</div><p>returns the testplan data for the export report</p></div>
+</div>
+
+<a name="getIssues"></a><a name="Topic67"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">getIssues</div>
+ <div id="NDPrototype67" class="NDPrototype NoParameterForm">getIssues()</div>
+ <div class="CBody"><div class="CHeading">Description</div><p>returns the Issues tab for the export report</p></div>
+</div>
+
+<a name="getRawData"></a><a name="Topic68"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">getRawData</div>
+ <div id="NDPrototype68" class="NDPrototype NoParameterForm">getRawData()</div>
+ <div class="CBody"><div class="CHeading">Description</div><p>Generates the Raw Data tab</p></div>
+</div>
+
+<a name="getRar"></a><a name="Topic69"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">getRar</div>
+ <div id="NDPrototype69" class="NDPrototype NoParameterForm">getRar()</div>
+ <div class="CBody"><div class="CHeading">Description</div><p>Generates the RAR tab</p></div>
+</div>
+
+<a name="getRiskVal"></a><a name="Topic70"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">getRiskVal</div>
+ <div id="NDPrototype70" class="NDPrototype WideForm CStyle"><table><tr><td class="PBeforeParameters">getRiskVal(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">source,</td></tr><tr><td class="PName first last">format</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div>
+ <div class="CBody"><div class="CHeading">Description</div><p>formats the submitted 'risk' into the desired format</p><div class="CHeading">Paramters</div><table class="CDefinitionList"><tr><td class="CDLEntry">source</td><td class="CDLDefinition"><p>the Risk being formatted</p></td></tr><tr><td class="CDLEntry">format</td><td class="CDLDefinition"><p>the desired format (VL-VH, N-C, CAT)</p></td></tr></table></div>
+</div>
+
+<a name="getScanFiles"></a><a name="Topic71"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">getScanFiles</div>
+ <div id="NDPrototype71" class="NDPrototype WideForm CStyle"><table><tr><td class="PBeforeParameters">getScanFiles(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">path</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div>
+ <div class="CBody"><div class="CHeading">Description</div><p>This method will get file information for submitted files</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">{string} path</td><td class="CDLDefinition"><p>the path for the file being analyzed</p></td></tr></table></div>
+</div>
+
+<a name="parseXccdf"></a><a name="Topic72"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">parseXccdf</div>
+ <div id="NDPrototype72" class="NDPrototype WideForm CStyle"><table><tr><td class="PBeforeParameters">parseXccdf(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">file</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div>
+ <div class="CBody"><div class="CHeading">Description</div><p>This method will parse a SCAP XCCDF File</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">{string} file</td><td class="CDLDefinition"><p>string to the file being parsed</p></td></tr></table></div>
+</div>
+
+<a name="parseCkl"></a><a name="Topic73"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">parseCkl</div>
+ <div id="NDPrototype73" class="NDPrototype WideForm CStyle"><table><tr><td class="PBeforeParameters">parseCkl(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">file</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div>
+ <div class="CBody"><div class="CHeading">Description</div><p>This method will parse a checklist file</p><div class="CHeading">Paramters</div><table class="CDefinitionList"><tr><td class="CDLEntry">{string} file</td><td class="CDLDefinition"><p>string to the file being parsed</p></td></tr></table></div>
+</div>
+
+<a name="parseNessus"></a><a name="Topic74"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">parseNessus</div>
+ <div id="NDPrototype74" class="NDPrototype WideForm CStyle"><table><tr><td class="PBeforeParameters">parseNessus(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">file,</td></tr><tr><td class="PName first last">filename</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div>
+ <div class="CBody"><div class="CHeading">Description</div><p>This method will parse a Nessus scan result</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">{string} file</td><td class="CDLDefinition"><p>path to the scan file to be parse</p></td></tr></table></div>
+</div>
+
+<a name="parseZip"></a><a name="Topic75"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">parseZip</div>
+ <div id="NDPrototype75" class="NDPrototype WideForm CStyle"><table><tr><td class="PBeforeParameters">parseZip(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">f</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div>
+ <div class="CBody"><div class="CHeading">Description</div><p>This method will parse the files in a ZIP</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">{string} f</td><td class="CDLDefinition"><p>path to the scan file to be parse</p></td></tr></table></div>
+</div>
+
+<a name="parseFile"></a><a name="Topic76"></a><div class="CTopic TFunction LJavaScript last">
+ <div class="CTitle">parseFile</div>
+ <div id="NDPrototype76" class="NDPrototype WideForm CStyle"><table><tr><td class="PBeforeParameters">parseFile(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">currentFile</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div>
+ <div class="CBody"><div class="CHeading">Description</div><p>This method will call the applicable parse method for a file</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">{string} currentFile</td><td class="CDLDefinition"><p>path to the scan file to be parse</p></td></tr></table></div>
 </div>
 
 </body></html>

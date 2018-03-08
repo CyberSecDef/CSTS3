@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("def",["Variable"],[["default",,[["Controllers.Scans.scans2poam",,,,0,"File:controllers/Scans.js:Controllers.Scans.scans2poam.default","JavaScriptClass:Controllers.Scans.scans2poam:default"]]]]);
