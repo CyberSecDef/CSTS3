@@ -5,3 +5,4 @@ package-lock.json
 app/database/config.db
 /.eslintrc.json
 /csts.code-workspace
+.vscode/settings.json
