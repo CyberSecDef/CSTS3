@@ -56,7 +56,7 @@ const csts = {
   router: {},
   routes: {},
   shells: {},
-
+  theme: 'Default',
   /*
     Objects: Plugins
 
@@ -147,27 +147,19 @@ const csts = {
    * {void}
    */
   initializeCsts() {
-    this.jobs.push(new this.plugins.Cron({
-      cronTime: '1-60/6 * * * * *',
-      onTick() {
-        csts.plugins.si.mem((data) => {
-          const p = parseFloat(data.used / data.total);
-          $('#memChart').css('background', (`#${Math.ceil((0xFF * p)).toString(16)}${Math.ceil(0xFF - (0xFF * p)).toString(16)}00`));
-        });
-      },
-      start: true,
-    }));
 
-    this.jobs.push(new csts.plugins.Cron({
-      cronTime: '1-60/6 * * * * *',
-      onTick() {
-        csts.plugins.cpu.usagePercent((err, p) => {
-          $('#cpuChart').css('background', (`#${Math.ceil((0xFF * (p / 99))).toString(16)}${Math.ceil(0xFF - (0xFF * (p / 99))).toString(16)}00`));
-        });
-      },
-      start: true,
-    }));
-
+    // leaving this to show how jobs can be created
+    //
+    // this.jobs.push(new this.plugins.Cron({
+    //   cronTime: '1-60/6 * * * * *',
+    //   onTick() {
+    //     csts.plugins.si.mem((data) => {
+    //       const p = parseFloat(data.used / data.total);
+    //       $('#memChart').css('background', (`#${Math.ceil((0xFF * p)).toString(16)}${Math.ceil(0xFF - (0xFF * p)).toString(16)}00`));
+    //     });
+    //   },
+    //   start: true,
+    // }));
 
     if (nw.App.manifest.environment === 'developmental') {
       nw.Window.get().showDevTools();
@@ -187,9 +179,11 @@ const csts = {
       './public/js/jquery.tree.js',
       './public/js/jquery.dataTables.js',
       './public/js/dataTables.bootstrap4.min.js',
+      './public/js/hilitor.js',
     ], (index, item) => {
       this.requireFile(item);
     });
+
 
     // include routes
     $.each(
@@ -236,6 +230,7 @@ const csts = {
       if (count === 0) {
         csts.db.config.insert({
           viewCount: 1,
+          theme: 'Default',
         });
       } else {
         csts.db.config.findOne({
@@ -243,6 +238,15 @@ const csts = {
             $gt: 0,
           },
         }, (err2, res) => {
+          csts.theme = res.theme;
+
+          $('head').append(
+            $('<link rel="stylesheet" type="text/css" />')
+              .attr('href', `./public/themes/${csts.theme}/bootstrap.min.css`)
+          );
+
+          $(`#selTheme option:contains("${csts.theme}")`).prop('selected', true)
+
           csts.db.config.update({
             // eslint-disable-next-line
             _id: res._id,
@@ -256,6 +260,8 @@ const csts = {
       }
     });
 
+    
+    
     csts.plugins.tray.tooltip = 'Cyber Security Tool Suite v3.0.0';
     csts.plugins.win.width = (csts.plugins.win.width < 1280 ? 1280 : csts.plugins.win.width);
     csts.plugins.win.height = (csts.plugins.win.height < 800 ? 800 : csts.plugins.win.height);
@@ -273,33 +279,9 @@ const csts = {
     csts.router = new csts.plugins.Navigo(window.location.origin, false, '#');
 
     $(document).ready(() => {
-      // the callback can be used to update progress bars in a loop
-      $.eachCallback = function eachCallBack(arr, process, callback) {
-        let cnt = 0;
-        function work() {
-          const item = arr[cnt];
-          process.apply(item);
-          callback.apply(item, [cnt]); cnt += 1;
-          if (cnt < arr.length) {
-            setTimeout(work, 100);
-          }
-        }
-        setTimeout(work, 100);
-      };
-      $.fn.eachCallback = function fnEachCallBack(process, callback) {
-        let cnt = 0;
-        const jq = this;
-        function work() {
-          const item = jq.get(cnt);
-          process.apply(item);
-          callback.apply(item, [cnt]);
-          cnt += 1;
-          if (cnt < jq.length) {
-            setTimeout(work, 100);
-          }
-        }
-        setTimeout(work, 100);
-      };
+
+      // load search box library
+      csts.plugins.hilitor = new Hilitor('#main-center-col');
 
       csts.plugins.ejs.renderFile('app/resources/views/layouts/default.tpl', {
         username: process.env.USERNAME,
@@ -386,7 +368,7 @@ const csts = {
       csts.controllers.Home.main.showHome();
 
       csts.plugins.isElevated().then((elevated) => {
-        $('footer.footer div div.status-bar-r').html(elevated ? '<i class="fas fa-chess-king"></i>' : '<i class="fas fa-user"></i>');
+        $('div.footer div.systray').append(elevated ? '<i class="fas fa-chess-king"></i>' : '<i class="fas fa-user" onclick="alert(1);"></i>');
       });
     });
 

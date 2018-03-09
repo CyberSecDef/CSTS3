@@ -1,9 +1,8 @@
-<div class="mt-3">
-	<h1>Cyber Security Tool Suite - Version 3</h1>
-</div>
-<p class="lead">
-The Cyber Security Tool Suite is a suite of JavaScripts that will help automate and validate various Cyber Security processes. 
-This version is aiming to be cross-platform from the beginning, thanks to the NWJS framework built on top of the Node.JS suite and the Chromium runtime.
+<h1 class="display-4">Cyber Security Tool Suite - Version 3</h1>
+
+<p>
+	The Cyber Security Tool Suite is a suite of JavaScripts that will help automate and validate various Cyber Security processes. 
+	This version is aiming to be cross-platform from the beginning, thanks to the NWJS framework built on top of the Node.JS suite and the Chromium runtime.
 </p>
 
 <p>

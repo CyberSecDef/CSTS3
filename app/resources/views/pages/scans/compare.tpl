@@ -3,15 +3,14 @@
 		<main class="col-sm-12 ml-sm-auto col-md-12 pt-3" role="main">
 			<h1>Overview</h1>
 			<div>
-					<div class="alert alert-secondary" role="alert">
+					<div class="alert alert-secondary border-secondary" role="alert">
 						This is the POAM/RAR Management Tool.	This tool will allow you to execute multiple processes on your Excel based POAM's and RAR's.	Please select the applicable files below.
 					</div>
 
-				<div class="alert alert-warning" role="alert">
+				<div class="alert alert-warning border-warning" role="alert">
 					<strong>Note:</strong>  The processed RAR and POAMs must have the column headers on the first row.  The RAR and POAM must also be no more than 5000 rows long.
 				</div>
 			</div>
-			<br />
 			
 			<div id="accordion">
 			

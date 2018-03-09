@@ -3,7 +3,9 @@
 		<main class="col-sm-12 ml-sm-auto col-md-12 pt-3" role="main">
 			<h1>Overview</h1>
 			<div>
-				This is the scans2poam Tool.  This will generate an merged POAM/RAR based off submitted scan results.
+					<div class="alert alert-secondary border-secondary" role="alert">
+						This is the scans2poam Tool.  This will generate an merged POAM/RAR based off submitted scan results.
+					</div>
 			</div>
 			<br />
 			<div id="accordion">
