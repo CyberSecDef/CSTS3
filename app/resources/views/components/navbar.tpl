@@ -87,17 +87,16 @@
 					</div>
 				</li>
 				
-				<li class="nav-item dropdown <$= (url == '/STIGs' ? 'active' : '') $> ">
-					<a class="nav-link dropdown-toggle" href="/STIGs" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-						STIGs
+				<li class="nav-item dropdown <$= (url == '/STIG' ? 'active' : '') $> ">
+					<a class="nav-link dropdown-toggle" href="/STIG" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						STIG
 					</a>
 					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
-						<a class="dropdown-item" href="/Stig/updateStig">Update Stig</a>
-						<div class="dropdown-divider"></div>
 						<a class="dropdown-item" href="/Stig/diacap">Diacap Controls</a>
 						<a class="dropdown-item" href="/Stig/rmf">Rmf Controls</a>
 						<a class="dropdown-item" href="/Stig/stig">Stig Requirements</a>
 						<a class="dropdown-item" href="/Stig/scap">Scap Requirements</a>
+						<div class="dropdown-divider"></div>
 					</div>
 				</li>
 				
