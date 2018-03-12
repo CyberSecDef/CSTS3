@@ -73,6 +73,27 @@ csts.libs.utils = {
   },
 
   /*
+    Method: parseXmlSync
+
+    Description:
+      Asynchronously parses an XML string and returns JSON
+  */
+  parseXmlSync(xml) {
+    let error = null;
+    let json = null;
+    csts.plugins.xml2js.parseString(xml, (innerError, innerJson) => {
+      error = innerError;
+      json = innerJson;
+    });
+    if (error) {
+      throw error;
+    }
+    if (!error && !json) {
+      throw new Error('The callback failed.');
+    }
+    return json;
+  },
+  /*
     Method: getGuid
 
     Description:

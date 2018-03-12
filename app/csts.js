@@ -79,7 +79,6 @@ const csts = {
     Shell - allows nwjs to interface with powershell
     si - system information module
     xlsx - reads and writes various spreadsheet files
-    Datastore - database module
   */
   plugins: {
     crypto: require('crypto'),
@@ -110,7 +109,6 @@ const csts = {
     xlsx: require('xlsx'),
     xml2js: require('xml2js'),
     zip: require('zip-local'),
-    Datastore: require('nedb'),
   },
 
   /*
@@ -217,64 +215,41 @@ const csts = {
       },
     );
 
-    csts.db.config = new csts.plugins.Datastore({
-      filename: 'app/database/config.db',
-      autoload: true,
-    });
+    if (csts.plugins.fs.existsSync('app/database/config.db')) {
+      csts.db.config = JSON.parse(csts.plugins.fs.readFileSync('app/database/config.db'));
+    } else {
+      csts.db.config = {
+        _id: csts.libs.utils.getGuid(),
+        viewCount: 1,
+        theme: 'Default',
+      };
+    }
 
-    csts.db.config.count({
-      viewCount: {
-        $gt: 0,
-      },
-    }, (err, count) => {
-      if (count === 0) {
-        csts.db.config.insert({
-          viewCount: 1,
-          theme: 'Default',
-        });
-      } else {
-        csts.db.config.findOne({
-          viewCount: {
-            $gt: 0,
-          },
-        }, (err2, res) => {
-          csts.theme = res.theme;
+    if (typeof csts.db.config.theme === 'undefined') {
+      csts.db.config.theme = 'Default';
+    }
 
-          $('head').append(
-            $('<link rel="stylesheet" type="text/css" />')
-              .attr('href', `./public/themes/${csts.theme}/bootstrap.min.css`)
-          );
+    $('head').append(
+      $('<link rel="stylesheet" type="text/css" />')
+        .attr('href', `./public/themes/${csts.db.config.theme}/bootstrap.min.css`)
+    );
 
-          $(`#selTheme option:contains("${csts.theme}")`).prop('selected', true)
+    csts.db.config.viewCount += 1;
+    csts.plugins.fs.writeFileSync('app/database/config.db', JSON.stringify(csts.db.config));
 
-          csts.db.config.update({
-            // eslint-disable-next-line
-            _id: res._id,
-          }, {
-            $set: {
-              viewCount: (res.viewCount + 1),
-            },
-          });
-          csts.db.config.persistence.compactDatafile();
-        });
-      }
-    });
-
-    
-    
     csts.plugins.tray.tooltip = 'Cyber Security Tool Suite v3.0.0';
     csts.plugins.win.width = (csts.plugins.win.width < 1280 ? 1280 : csts.plugins.win.width);
     csts.plugins.win.height = (csts.plugins.win.height < 800 ? 800 : csts.plugins.win.height);
     csts.plugins.ejs.delimeter = '$';
 
-    csts.plugins.reload = csts.plugins.fs.watch('./app', {
-      recursive: true,
-    }, (eventType, filename) => {
-      if (filename.substring(0, 8) !== 'database' && filename.substring(0, 4) !== 'docs' && filename.indexOf('storage') < 0) {
-        window.location.href = '/app/index.html';
-        reloadWatcher.close();
-      }
-    });
+    // csts.plugins.reload = csts.plugins.fs.watch('./app', {
+    //   recursive: true,
+    // }, (eventType, filename) => {
+    //   if (filename.substring(0, 8) !== 'database' && filename.substring(0, 4) !== 'docs' && filename.indexOf('storage') < 0) {
+    //     window.location.href = '/app/index.html';
+    //     reloadWatcher.close();
+    //   }
+    // });
 
     csts.router = new csts.plugins.Navigo(window.location.origin, false, '#');
 
@@ -336,19 +311,10 @@ const csts = {
         }
       });
 
-      if (typeof csts.db.config !== 'undefined') {
-        csts.db.config.findOne({
-          viewCount: {
-            $gt: 0,
-          },
-        }, (err, res) => {
-          if (typeof res !== 'undefined' && res !== null) {
-            $('#viewCount').text(res.viewCount);
-            csts.plugins.ejs.cache.set('viewCount', res.viewCount);
-          }
-        });
-      }
-
+      
+      $('#viewCount').text(csts.db.config.viewCount);
+      csts.plugins.ejs.cache.set('viewCount', csts.db.config.viewCount);
+      
       // this function calls the routing without actually navigating away
       csts.plugins.win.on('navigation', (frame, url, policy) => {
         window.onbeforeunload = null;
