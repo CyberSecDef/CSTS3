@@ -143,7 +143,6 @@
 					</a>
 					<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
 						
-						<a class="dropdown-item" href="javascript:csts.libs.utils.toggleHosts();"><i class="fas fa-eye"></i>&nbsp;Toggle Host Column</a>
 						<div class="dropdown-divider"></div>
 						<a href="#" class="dropdown-item" id="exit">Exit</a>
 					</div>

@@ -16,7 +16,8 @@
 			<select id="selTheme">
 			</select>
     </div>
-    <div class="col-1 systray" style="text-align:right; padding-right:15px;">
+    <div class="col-1 systray" style="text-align:right; padding-right:15px; padding-left:0px;">
+      <i class="fas fa-eye" onclick="javascript:csts.libs.utils.toggleHosts();"></i>
       <i class="fas fa-tachometer-alt"></i>
       <i class="fas fa-bell"></i>
     </div>
