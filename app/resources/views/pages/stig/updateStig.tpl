@@ -92,7 +92,9 @@
             </div>
 
             <div id="stig-update-results" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
-              
+              <br />
+              <div class="alert alert-info col-10" style="margin-left:auto; margin-right:auto;" id="stig-updates-results-file"></div>
+
               <table class="table table-striped table-sm table-small-text"  id="stigUpdatesResultsTable">
                 <thead>
                   <tr>
@@ -102,7 +104,6 @@
                     <th>Title</th>
                     <th>Status</th>
                     <th>Comments</th>
-                    <th>Result</th>
                   </tr>
                 </thead>
                 <tbody>

@@ -168,6 +168,7 @@ const csts = {
     this.requireFile('../node_modules/chart.js/dist/Chart.bundle.min.js');
     this.requireFile('../node_modules/jspdf/dist/jspdf.min.js');
     this.requireFile('../node_modules/jspdf-autotable/dist/jspdf.plugin.autotable.min.js');
+    
 
     // include library files.  These are individually listed for ordering purposes
     $.each([

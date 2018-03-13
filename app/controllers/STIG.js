@@ -79,18 +79,22 @@ csts.controllers.STIG = ({
       $('#myModal')
         .one('shown.bs.modal', () => {
           const results = csts.models.STIG.updateStig.execute($('#fileSource').val().trim(), $('#fileDestination').val().trim());
-
           const filename = `./app/storage/results/${caller.name}_${csts.plugins.moment().format('YYYYMMDD_HHmmss')}.ckl`;
           const builder = new csts.plugins.xml2js.Builder();
           const xml = builder.buildObject(results);
           csts.plugins.fs.writeFileSync(filename, xml);
-          // console.log(xml);
+
+          $('div#stig-updates-results-file').html(
+            $('<a></a>').attr('href', filename.replace('/app', '')).attr('download', csts.plugins.path.basename(filename) ).text('Click here to save CKL'),
+          );
+
+          $('div#headingTwo button').click();
 
           table.rows()
             .invalidate()
             .draw();
 
-          // hide the modal
+
           $('#myModal').modal('hide');
         });
     },
