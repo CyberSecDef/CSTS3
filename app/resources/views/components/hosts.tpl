@@ -1,10 +1,10 @@
 <div class="hostManual resizable"><textarea placeholder="Manual Host Entry (comma separated)" style="min-width:100%; width:100%;height:100%;resize: none;"></textarea></div>
-<div id="tree" class="hostTree resizeable"></div>
+<div id="adOUTree" class="hostTree resizeable"></div>
 <script>
 	$(document).ready(function() {
-		$('#tree').css('height', (window.innerHeight - 80 - $('div.hostManual').css('height').replace('px','')) + 'px'  );
+		$('#adOUTree').css('height', (window.innerHeight - 80 - $('div.hostManual').css('height').replace('px','')) + 'px'  );
 
-        var hostTree = $('#tree').tree({
+        var hostTree = $('#adOUTree').tree({
 			checkbox:true, 
 			selectable:true,
 			collapseEffect: null,
@@ -51,7 +51,7 @@
 		} 
 
 
-		addNode( "", "div#tree > ul > li"); 
+		addNode( "", "div#adOUTree > ul > li"); 
 
 		
 		
@@ -61,12 +61,12 @@
 			minHeight:150,
 			maxHeight:300,
 			stop : function( event, ui){
-				$('#tree').css('height', window.innerHeight - 80 - ui.size.height);
+				$('#adOUTree').css('height', window.innerHeight - 80 - ui.size.height);
 			}
 		});
 
 		$(window).on('resize',function(){
-			$('#tree').css('height', (window.innerHeight - 80 - $('div.hostManual').css('height').replace('px','')) + 'px'  );
+			$('#adOUTree').css('height', (window.innerHeight - 80 - $('div.hostManual').css('height').replace('px','')) + 'px'  );
 		});
 
 		var i = 0;

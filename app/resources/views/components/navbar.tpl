@@ -28,7 +28,6 @@
 						<a class="dropdown-item" href="/Accounts/AdAttributes">AD Attribute Editor</a>
 						<a class="dropdown-item" href="/Accounts/DormantAccounts">Dormant Accounts</a>
 						<a class="dropdown-item" href="/Accounts/ManageAdmins">Administrators</a>
-						<a class="dropdown-item" href="/Accounts/userAccounts">User Counts</a>
 					</div>
 				</li>
 				

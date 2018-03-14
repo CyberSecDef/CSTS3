@@ -92,5 +92,33 @@ csts.libs.ad = {
     csts.shells.ou.addCommand('$ps_js.Serialize($results) ');
     return csts.shells.ou;
   },
+  /*
+    Method: getUsers
+
+    Description:
+      Returns the users contained within the specified OU
+
+    Paramters:
+      ou - string of path to OU
+      filter - ldap filter for returned users
+
+    Returns:
+      string - JSON object of users
+    */
+  getUsers(ous, filter = '') {
+    if (csts.libs.utils.isBlank(csts.shells.ad)) {
+      csts.shells.ad = (new csts.plugins.Shell({ executionPolicy: 'Bypass', noProfile: true }));
+    }
+    csts.shells.ad.addCommand(`$domainUsers = @();`);
+    ous.forEach((ou)=>{
+      csts.shells.ad.addCommand(`$objstalesearcher = New-Object System.DirectoryServices.DirectorySearcher( ( [adsi]"${ou}" ) );`);
+      csts.shells.ad.addCommand(`$objstalesearcher.filter = "(&(objectCategory=person)(objectClass=user))";`);
+      csts.shells.ad.addCommand(`$domainusers += $objstalesearcher.findall() | select *, @{e={[string]$adspath=$_.properties.adspath;$account=[ADSI]$adspath;$account.psbase.invokeget('AccountDisabled')};n='Disabled'};`);
+    });
+    
+    csts.shells.ad.addCommand('$domainusers | convertTo-json;');
+
+    return csts.shells.ad;
+  }
 };
 
