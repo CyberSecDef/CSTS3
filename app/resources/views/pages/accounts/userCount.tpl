@@ -14,7 +14,9 @@
               The script can check to see if the accounts are disabled, locked, expired, CAC Enforced,
               etc.  This information can be disseminated as needed to management personel. 
             </p>
+
           </div>
+          <p class="alert alert-warning">Click on the Account Type in the summary results to see a detailed user list</p>
       </div>
       
       <div id="accordion">
