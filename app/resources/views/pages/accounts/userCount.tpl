@@ -157,7 +157,7 @@
     };
     data.columns = $("th",$("table#" + $(this).data('table') + " thead")).map(function() {  return (this.innerText || this.textContent) }).get();
     for(let i = 0; i < data.columns.length; i = i +=1){
-      data.styles.columnStyles[i] = {columnWidth: (720/cols)}
+      data.styles.columnStyles[i] = {columnWidth: (720/data.columns.length)}
     }
 
     data.rows = [];
