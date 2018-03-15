@@ -140,3 +140,8 @@ h3 a{
 	color:#ccc !important;
 	background:#666 !important;
 }
+
+.center-this{
+	margin-left: auto;
+	margin-right: auto;
+}

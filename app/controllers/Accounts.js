@@ -40,6 +40,7 @@ csts.controllers.Accounts = ({
   controllerName: 'Accounts',
 
   userCount: {
+    users: [],
     name: 'User Counts',
     default: 'showIndex',
     showIndex() {
@@ -57,29 +58,90 @@ csts.controllers.Accounts = ({
     },
     execute() {
       const caller = this;
+      const table = $('table#tabScanFiles').DataTable();
       const ous = [];
-      const users = [];
-      $('#adOUTree input:checkbox:checked').each((i, c)=>{ous.push($(c).data('path'))});
-      ous.sort();
-      const ps = csts.libs.ad.getUsers(ous);
-      ps.invoke().then((output) => {
-        console.log(output);
-        $.each(JSON.parse(output), (index, item) => {
-          if (users.filter(a => a.Name === item.Properties.samaccountname).length === 0) {
-            users.push({
-              Path: item.Path,
-              Disabled: item.Disabled,
-              Name: item.Properties.samaccountname,
-            });
-          }
+
+      $('#myModal').modal();
+      $('#myModalLabel').text('Please Wait...');
+      $('#myModalBody').html('Currently Parsing the OUs.  Please wait.');
+      $('#myModal')
+        .one('shown.bs.modal', () => {
+          $('#adOUTree input:checkbox:checked').each((i, c)=>{ous.push($(c).data('path'))});
+          csts.models.Accounts.userCount.execute(ous);
         });
-
-      }).catch((err) => {
-        console.log(err);
-      });
-      console.log(users);
     },
-
+    showSummary() {
+      $('#accounts-userCount-results-tbl tbody tr').remove();
+      $('#accounts-userCount-results-tbl tbody')
+        .append($('<tr></tr>')
+          .append($('<th></th>').text('Enabled').on('click', csts.models.Accounts.userCount.users.filter(a => a.Disabled === false), this.showUsers ))
+          .append($('<td></td>').text(csts.models.Accounts.userCount.users.filter(a => a.Disabled === false).length))
+        )
+        .append($('<tr></tr>')
+          .append($('<th></th>').text('Disabled').on('click', csts.models.Accounts.userCount.users.filter(a => a.Disabled === true), this.showUsers ))
+          .append($('<td></td>').text(csts.models.Accounts.userCount.users.filter(a => a.Disabled === true).length))
+        )
+        .append($('<tr></tr>')
+          .append($('<th></th>').text('Smartcard Required').on('click', csts.models.Accounts.userCount.users.filter(a => a.Smartcard === true), this.showUsers ))
+          .append($('<td></td>').text(csts.models.Accounts.userCount.users.filter(a => a.Smartcard === true).length))
+        )
+        .append($('<tr></tr>')
+          .append($('<th></th>').text('Smartcard Not Required').on('click', csts.models.Accounts.userCount.users.filter(a => a.Smartcard === false), this.showUsers ))
+          .append($('<td></td>').text(csts.models.Accounts.userCount.users.filter(a => a.Smartcard === false).length))
+        )
+        .append($('<tr></tr>')
+          .append($('<th></th>').text('Enabled Users, Smartcard Not Required').on('click', csts.models.Accounts.userCount.users.filter(a => a.Smartcard === false && a.Disabled === false), this.showUsers ))
+          .append($('<td></td>').text(csts.models.Accounts.userCount.users.filter(a => a.Smartcard === false && a.Disabled === false).length))
+        )
+        .append($('<tr></tr>')
+          .append($('<th></th>').text('Enabled Users, Smartcard Required').on('click', csts.models.Accounts.userCount.users.filter(a => a.Smartcard === true && a.Disabled === false), this.showUsers ))
+          .append($('<td></td>').text(csts.models.Accounts.userCount.users.filter(a => a.Smartcard === true && a.Disabled === false).length))
+        )
+        .append($('<tr></tr>')
+          .append($('<th></th>').text('Disabled Users, Smartcard Not Required').on('click', csts.models.Accounts.userCount.users.filter(a => a.Smartcard === false && a.Disabled === true), this.showUsers ))
+          .append($('<td></td>').text(csts.models.Accounts.userCount.users.filter(a => a.Smartcard === false && a.Disabled === true).length))
+        )
+        .append($('<tr></tr>')
+          .append($('<th></th>').text('Disabled Users, Smartcard Required').on('click', csts.models.Accounts.userCount.users.filter(a => a.Smartcard === true && a.Disabled === true), this.showUsers ))
+          .append($('<td></td>').text(csts.models.Accounts.userCount.users.filter(a => a.Smartcard === true && a.Disabled === true).length))
+        )
+        .append($('<tr></tr>')
+          .append($('<th></th>').text('Privileged').on('click', csts.models.Accounts.userCount.users.filter(a => a.Name.match( /(adm|dba|priv|psa|sadm|wadm)/ )), this.showUsers ))
+          .append($('<td></td>').text(csts.models.Accounts.userCount.users.filter(a => a.Name.match( /(adm|dba|priv|psa|sadm|wadm)/ ) ).length))
+        )
+        .append($('<tr></tr>')
+          .append($('<th></th>').text('Privileged, Smartcard Required').on('click', csts.models.Accounts.userCount.users.filter(a => a.Smartcard === true && a.Name.match( /(adm|dba|priv|psa|sadm|wadm)/ )), this.showUsers ))
+          .append($('<td></td>').text(csts.models.Accounts.userCount.users.filter(a => a.Smartcard === true && a.Name.match( /(adm|dba|priv|psa|sadm|wadm)/ ) ).length))
+        )
+        .append($('<tr></tr>')
+          .append($('<th></th>').text('Privileged, Smartcard Not Required').on('click', csts.models.Accounts.userCount.users.filter(a => a.Smartcard === false && a.Name.match( /(adm|dba|priv|psa|sadm|wadm)/ )), this.showUsers ))
+          .append($('<td></td>').text(csts.models.Accounts.userCount.users.filter(a => a.Smartcard === false && a.Name.match( /(adm|dba|priv|psa|sadm|wadm)/ ) ).length))
+        )
+        .append($('<tr></tr>')
+          .append($('<th></th>').text('Privileged, Disabled').on('click', csts.models.Accounts.userCount.users.filter(a => a.Disabled === true && a.Name.match( /(adm|dba|priv|psa|sadm|wadm)/ )), this.showUsers ))
+          .append($('<td></td>').text(csts.models.Accounts.userCount.users.filter(a => a.Disabled === true && a.Name.match( /(adm|dba|priv|psa|sadm|wadm)/ ) ).length))
+        )
+        .append($('<tr></tr>')
+          .append($('<th></th>').text('Privileged, Disabled, Smartcard Required').on('click', csts.models.Accounts.userCount.users.filter(a => a.Disabled === true && a.Smartcard === true && a.Name.match( /(adm|dba|priv|psa|sadm|wadm)/ )), this.showUsers ))
+          .append($('<td></td>').text(csts.models.Accounts.userCount.users.filter(a => a.Disabled === true && a.Smartcard === true && a.Name.match( /(adm|dba|priv|psa|sadm|wadm)/ ) ).length))
+        )
+        .append($('<tr></tr>')
+          .append($('<th></th>').text('Privileged, Disabled, Smartcard Not Required').on('click', csts.models.Accounts.userCount.users.filter(a => a.Disabled === true && a.Smartcard === false && a.Name.match( /(adm|dba|priv|psa|sadm|wadm)/ )), this.showUsers ))
+          .append($('<td></td>').text(csts.models.Accounts.userCount.users.filter(a => a.Disabled === true && a.Smartcard === false && a.Name.match( /(adm|dba|priv|psa|sadm|wadm)/ ) ).length))
+        )
+        .append($('<tr></tr>')
+          .append($('<th></th>').text('Total').on('click', csts.models.Accounts.userCount.users.filter(a => a), this.showUsers ) )
+          .append($('<td></td>').text(csts.models.Accounts.userCount.users.filter(a => a).length))
+        );
+    },
+    showUsers(u) {
+      $('#accounts-usercount-detailed-results-table tbody tr').remove();
+      u.data.forEach((i) => {
+        $('#accounts-usercount-detailed-results-table tbody').append( $(`<tr><td>${i.Path}</td><td><u>${i.Name}</u></td><td>${i.Disabled}</td><td>${i.Smartcard}</td></tr>`) );
+        $('#accounts-usercount-detailed-results-table tbody td:contains("true")').css('font-weight', 'bold').css('color', 'darkgreen').css('background-color', '#f9fff9').css('text-align','center');
+        $('#accounts-usercount-detailed-results-table tbody td:contains("false")').css('font-weight', 'bold').css('color', 'darkred').css('background-color', '#fff9f9').css('text-align','center');
+      });
+    }
 
   },
 

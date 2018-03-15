@@ -34,7 +34,7 @@
                 <div class="container">
                   <div class="row">
                     <div class="col-10">
-                        Please select the applicable OU's from the list on the right hand side of the application.
+                        Please select the applicable OU's from the list on the right hand side of the application, then click on the 'Execute' button.
                     </div>
                     <div class="col-2">
                         <button type="button" class="btn btn-primary float-right" id="accounts-userCount-execute-btn">Execute</button>	  
@@ -55,24 +55,64 @@
             </h5>
           </div>
 
-          <div id="accounts-userCount-results" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+          <div id="accounts-userCount-results" class="collapse " aria-labelledby="headingTwo" data-parent="#accordion">
             <br />
             
-            <table class="table table-striped table-sm table-small-text"  id="accounts-userCount-results-tbl">
+            <form class="form-inline float-right">
+              <div class="form-group mb-2">
+                <div class="btn-group" role="group">
+                  <button class="btn btn-outline-primary exportDOC" type="button" data-table="accounts-userCount-results-tbl" data-name="userCountSummary.doc">
+                    <i class="fas fa-file-word"></i>
+                  </button>
+                  <button class="btn btn-outline-danger exportPDF" type="button" data-table="accounts-userCount-results-tbl"  data-name="userCountSummary.pdf">
+                    <i class="fas fa-file-pdf"></i>
+                  </button>
+                  <button class="btn btn-outline-success exportCSV" type="button" data-table="accounts-userCount-results-tbl"  data-name="userCountSummary.csv">
+                    <i class="fas fa-file-excel"></i>
+                  </button>
+                </div>
+              </div>
+            </form>
+
+            <table class="center-this table table-striped table-sm table-small-text table-bordered"  id="accounts-userCount-results-tbl">
               <thead>
                 <tr>
-                  <th>Group</th>
-                  <th>Vulnerability</th>
-                  <th>Rule</th>
-                  <th>Title</th>
-                  <th>Status</th>
-                  <th>Comments</th>
+                  <th>Account Types</th>
+                  <th>Count</th>
                 </tr>
               </thead>
               <tbody>
               </tbody>
             </table>
 
+            <form class="form-inline float-right">
+              <div class="form-group mb-2">
+                <div class="btn-group" role="group">
+                  <button class="btn btn-outline-primary exportDOC" type="button" data-table="accounts-usercount-detailed-results-table"  data-name="userCountDetails.doc">
+                    <i class="fas fa-file-word"></i>
+                  </button>
+                  <button class="btn btn-outline-danger exportPDF" type="button" data-table="accounts-usercount-detailed-results-table" data-name="userCountDetails.pdf">
+                    <i class="fas fa-file-pdf"></i>
+                  </button>
+                  <button class="btn btn-outline-success exportCSV" type="button" data-table="accounts-usercount-detailed-results-table" data-name="userCountDetails.csv">
+                    <i class="fas fa-file-excel"></i>
+                  </button>
+                </div>
+              </div>
+            </form>
+            <table class="table table-striped table-sm table-small-text"  id="accounts-usercount-detailed-results-table">
+              <thead>
+                <tr>
+                  <th class="w-50">Path</th>
+                  <th>Username</th>
+                  <th>Disabled</th>
+                  <th>Smartcard</th>
+                  
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -85,4 +125,44 @@
   $('button#accounts-userCount-execute-btn').on('click',function(){
     csts.controllers.Accounts.userCount.execute();
   });
+
+  $('div#accounts-userCount-results form button.exportDOC').on('click',function(){
+    table = $(this).data('table');
+    $results = $('<table></table>').append( $( `#${table}` ).clone() );
+    $results.css('width', '100%');
+    $results.find('*').removeClass();
+    $results.find('*').css('background-color', '#fff').css('color', '#000').css('font-size', '12pt');
+    $results.find('td, th').css('text-align', 'left').css('border-collapse', 'collapse').css('border', '1px solid #000')
+		csts.libs.export.saveDOC($results.html(), $(this).data('name'))
+  });
+  
+  $('div#accounts-userCount-results form button.exportCSV').on('click',function(){
+    data = {};
+		data.columns = $("th",$("table#" + $(this).data('table') + " thead")).map(function() {  return (this.innerText || this.textContent) }).get();
+    data.rows = [];
+		$.each( $("table#" + $(this).data('table') + " tbody tr"), function(d,el){
+			data.rows.push( $(el).find('td, th').map(function() {  return (this.innerText || this.textContent) }).get() )
+		})
+		csts.libs.export.saveCSV(data, $(this).data('name'))
+  });
+
+
+  $('div#accounts-userCount-results form button.exportPDF').on('click',function(){
+    data = {};
+    data.styles = {
+			columnStyles : { },
+			styles : { overflow: 'linebreak', fontSize: 8, lineWidth: 1},
+    };
+    data.columns = $("th",$("table#" + $(this).data('table') + " thead")).map(function() {  return (this.innerText || this.textContent) }).get();
+    for(let i = 0; i < data.columns.length; i = i +=1){
+      data.styles.columnStyles[i] = {columnWidth: (720/cols)}
+    }
+
+    data.rows = [];
+    $.each( $("table#" + $(this).data('table') + " tbody tr"), function(d,el){
+			data.rows.push( $(el).find('td, th').map(function() {  return (this.innerText || this.textContent) }).get() )
+    })
+		csts.libs.export.savePDF(data, $(this).data('name'))
+  });
+	
 </script>
