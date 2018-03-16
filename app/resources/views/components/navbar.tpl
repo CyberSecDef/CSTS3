@@ -27,7 +27,6 @@
 					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
 						<a class="dropdown-item" href="/Accounts/AdAttributes">AD Attribute Editor</a>
 						<a class="dropdown-item" href="/Accounts/DormantAccounts">Dormant Accounts</a>
-						<a class="dropdown-item" href="/Accounts/ManageAdmins">Administrators</a>
 					</div>
 				</li>
 				

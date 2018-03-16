@@ -78,6 +78,7 @@ const csts = {
     reload - watches for changes in the file system and reloads the application
     Shell - allows nwjs to interface with powershell
     si - system information module
+    wmi - wmi wrapper
     xlsx - reads and writes various spreadsheet files
   */
   plugins: {
@@ -106,6 +107,7 @@ const csts = {
     reload: {},
     Shell: require('node-powershell'),
     si: require('systeminformation'),
+    wmi: require('node-wmi'),
     xlsx: require('xlsx'),
     xml2js: require('xml2js'),
     zip: require('zip-local'),

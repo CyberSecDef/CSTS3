@@ -38,7 +38,32 @@ csts.controllers.Accounts = ({
   controllerName - the name of the controller
 */
   controllerName: 'Accounts',
-
+  manageLocalAdmins: {
+    name: 'Manage Local Administrators',
+    default: 'showIndex',
+    showIndex() {
+      csts.plugins.ejs.renderFile(
+        'app/resources/views/pages/accounts/manageLocalAdmins.tpl',
+        {},
+        { rmWhitespace: true },
+        (err, str) => {
+          if (err) { $('#errors').html(err); }
+          $('#main-center-col').html(str);
+        },
+      );
+    },
+    execute() {
+      const caller = this;
+      const ous = [];
+      let hosts = $('div.hostManual textarea').val();
+      $('#adOUTree input:checkbox:checked').each((i, c) => { ous.push($(c).data('path')); });
+      csts.models.Accounts.manageLocalAdmins.execute(hosts, ous);
+    },
+    addRow(row) {
+      const table = $('table#accounts-manageLocalAdmins-results-tbl').DataTable();
+      table.row.add(row).invalidate().draw();
+    }
+  },
   userCount: {
     users: [],
     name: 'User Counts',

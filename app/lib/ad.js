@@ -106,15 +106,26 @@ csts.libs.ad = {
       string - JSON object of users
     */
   getUsers(ous, filter = '') {
-    
     const ad = (new csts.plugins.Shell({ executionPolicy: 'Bypass', noProfile: true }));
     ad.addCommand(`$domainUsers = @();`);
-    ous.forEach((ou)=>{
+    ous.forEach((ou) => {
       ad.addCommand(`$objstalesearcher = New-Object System.DirectoryServices.DirectorySearcher( ( [adsi]"${ou}" ) );`);
       ad.addCommand(`$objstalesearcher.filter = "(&(objectCategory=person)(objectClass=user)${filter})";`);
       ad.addCommand("$domainusers += $objstalesearcher.findall() | select *, @{e={[string]$adspath=$_.properties.adspath;$account=[ADSI]$adspath;$account.psbase.invokeget('userAccountControl')};n='UAC'}");
     });
     ad.addCommand('@( "[]", $($domainusers | ConvertTo-Json -compress))[ [int]($domainusers.length -gt 0)];');
+    return ad;
+  },
+
+  getComputers(ous) {
+    const ad = (new csts.plugins.Shell({ executionPolicy: 'Bypass', noProfile: true }));
+    ad.addCommand('$domainComputers = @();');
+    ous.forEach((ou) => {
+      ad.addCommand(`$objstalesearcher = New-Object System.DirectoryServices.DirectorySearcher( ( [adsi]"${ou}" ) );`);
+      ad.addCommand('$objstalesearcher.filter = "(&(objectCategory=computer))";');
+      ad.addCommand('$domainComputers += $objstalesearcher.findall() | select *');
+    });
+    ad.addCommand('@( "[]", $($domainComputers | ConvertTo-Json -compress))[ [int]($domainComputers.length -gt 0)];');
     return ad;
   },
 };

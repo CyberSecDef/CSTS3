@@ -37,6 +37,7 @@
     "moment": "^2.20.1",
     "navigo": "^7.0.0",
     "node-powershell": "^3.3.1",
+    "node-wmi": "0.0.5",
     "numeral": "^2.0.6",
     "nw-dev": "^3.0.1",
     "polyfill": "^0.1.0",
