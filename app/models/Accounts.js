@@ -1,6 +1,6 @@
 csts.models.Accounts = {
   name: 'Accounts',
-  manageLocalAdmins: {
+  manageLocalUsers: {
     computers: [],
     async execute(hosts, ous) {
       this.computers = hosts.replace(' ', ',')
@@ -30,13 +30,17 @@ csts.models.Accounts = {
               if (typeof res[0].StatusCode !== 'undefined' && res[0].StatusCode === 0) {
                 csts.plugins.wmi.Query({
                   class: 'Win32_UserAccount',
-                  host:h,
-                  where:'LocalAccount = True'
+                  host: h,
+                  where: 'LocalAccount = True',
                 }, (uErr, users) => {
                   console.log(users);
                   users.forEach((user) => {
-                    csts.controllers.Accounts.manageLocalAdmins.addRow(
-                      [h, user.Name, user.Description, user.Status, user.Lockout.toString().toUpperCase(), user.Disabled.toString().toUpperCase(), user.PasswordChangeable.toString().toUpperCase(), user.PasswordRequired.toString().toUpperCase(), user.PasswordExpires.toString().toUpperCase()],
+                    csts.controllers.Accounts.manageLocalUsers.addRow(
+                      [
+                        $('<input></input>').attr('type', 'checkbox').prop('checked', 'false').val(btoa(`${user.Name}@${h}`)).prop('outerHTML'),
+                        h, user.Name, user.Description, user.Status, user.Lockout.toString().toUpperCase(), user.Disabled.toString().toUpperCase(),
+                        user.PasswordChangeable.toString().toUpperCase(), user.PasswordRequired.toString().toUpperCase(), user.PasswordExpires.toString().toUpperCase(),
+                      ],
                     );
                   });
                 });

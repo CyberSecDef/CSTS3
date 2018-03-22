@@ -38,12 +38,12 @@ csts.controllers.Accounts = ({
   controllerName - the name of the controller
 */
   controllerName: 'Accounts',
-  manageLocalAdmins: {
-    name: 'Manage Local Administrators',
+  manageLocalUsers: {
+    name: 'Manage Local Accounts',
     default: 'showIndex',
     showIndex() {
       csts.plugins.ejs.renderFile(
-        'app/resources/views/pages/accounts/manageLocalAdmins.tpl',
+        'app/resources/views/pages/accounts/manageLocalUsers.tpl',
         {},
         { rmWhitespace: true },
         (err, str) => {
@@ -57,11 +57,13 @@ csts.controllers.Accounts = ({
       const ous = [];
       let hosts = $('div.hostManual textarea').val();
       $('#adOUTree input:checkbox:checked').each((i, c) => { ous.push($(c).data('path')); });
-      csts.models.Accounts.manageLocalAdmins.execute(hosts, ous);
+      $('table#accounts-manageLocalUsers-results-tbl tbody').empty();
+      csts.models.Accounts.manageLocalUsers.execute(hosts, ous);
     },
     addRow(row) {
-      const table = $('table#accounts-manageLocalAdmins-results-tbl').DataTable();
-      table.row.add(row).invalidate().draw();
+      const tr = $('<tr></tr>');
+      $.each(row, (r, e) =>{ tr.append( $('<td></td>').html( e ) ) });
+      $('table#accounts-manageLocalUsers-results-tbl tbody').append(tr);
     }
   },
   userCount: {
