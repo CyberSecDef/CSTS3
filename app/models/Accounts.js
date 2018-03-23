@@ -2,6 +2,20 @@ csts.models.Accounts = {
   name: 'Accounts',
   manageLocalUsers: {
     computers: [],
+    updateAccount(host, user, payload) {
+      console.log('Models -> updateAccount');
+      csts.models.Accounts.ps1 = csts.libs.ad.adsiUpdateAccount(host, user, payload);
+      csts.models.Accounts.ps1.invoke()
+        .then((output) => {
+          csts.models.Accounts.ps1.dispose();
+          console.log('adsi output');
+        }).catch((err) => {
+          $('#errors').html(err);
+          $('#errors').show();
+          $('#main-center-col').animate({ scrollTop: ($('#errors').offset().top) }, 1000);
+          csts.models.Accounts.ps1.dispose();
+        });
+    },
     async execute(hosts, ous) {
       this.computers = hosts.replace(' ', ',')
         .replace(/(?:\r\n|\r|\n)/g, ',')
@@ -38,8 +52,10 @@ csts.models.Accounts = {
                     csts.controllers.Accounts.manageLocalUsers.addRow(
                       [
                         $('<input></input>').attr('type', 'checkbox').prop('checked', 'false').val(btoa(`${user.Name}@${h}`)).prop('outerHTML'),
-                        h, user.Name, user.Description, user.Status, user.Lockout.toString().toUpperCase(), user.Disabled.toString().toUpperCase(),
-                        user.PasswordChangeable.toString().toUpperCase(), user.PasswordRequired.toString().toUpperCase(), user.PasswordExpires.toString().toUpperCase(),
+                        h, user.Name, user.Description, user.Status,
+                        user.Lockout.toString().toUpperCase(),
+                        user.Disabled.toString().toUpperCase(),
+                        user.PasswordRequired.toString().toUpperCase(),
                       ],
                     );
                   });
@@ -53,10 +69,6 @@ csts.models.Accounts = {
           //$('#myModal').modal('hide');
         })
         .catch((err) => { console.log(err); });
-
-      // this.hosts.forEach((h) => {
-      //   console.log(h);
-      // });
     },
   },
   userCount: {

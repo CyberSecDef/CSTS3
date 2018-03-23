@@ -48,8 +48,9 @@ csts.controllers.STIG = ({
           rmWhitespace: true,
         },
         (err, str) => {
-          if (err) {
-            $('#errors').html(err);
+          if (err) { 
+            $('#errors').html(err).show();
+            $('#main-center-col').animate({ scrollTop: ($('#errors').offset().top) }, 1000);
           }
           $('#main-center-col').html(str);
         },

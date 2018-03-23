@@ -128,5 +128,41 @@ csts.libs.ad = {
     ad.addCommand('@( "[]", $($domainComputers | ConvertTo-Json -compress))[ [int]($domainComputers.length -gt 0)];');
     return ad;
   },
+
+  adsiUpdateAccount(host, user, payload) {
+    console.log(payload);
+    const ps2 = (new csts.plugins.Shell({ executionPolicy: 'Bypass', noProfile: true }));
+    ps2.addCommand(`$u = [ADSI]"WinNT://${host}/${user},user"`);
+
+    if (typeof payload.newPassword !== 'undefined' && payload.newPassword.trim() !== '') {
+      console.log('Password:', payload.newPassword);
+      ps2.addCommand(`$u.SetPassword('${payload.newPassword}')`);
+      ps2.addCommand('$u.setinfo()');
+    }
+
+    if (typeof payload.acctLocked !== 'undefined' && payload.acctLocked === 1) {
+      console.log('locked:', payload.acctLocked);
+      ps2.addCommand("if ($u.userflags.value -band '0x0010'){$u.userflags.value = $u.userflags.value -bxor '0x0010';}");
+      ps2.addCommand('$u.SetInfo();');
+    }
+
+    if (typeof payload.passRequired !== 'undefined' && payload.passRequired > 0) {
+      console.log('Password Req:', payload.passRequired);
+      if (payload.passRequired === 1) {
+        ps2.addCommand("if (($u.userflags.value -band '0x0020') -ne 0){ $u.userflags.value = $u.userflags.value -bxor '0x0020';}");
+      } else {
+        ps2.addCommand("if (($u.userflags.value -band '0x0020') -eq 0){$u.userflags.value = $u.userflags.value -bxor '0x0020';}");
+      }
+      ps2.addCommand('$u.SetInfo();');
+    }
+
+    if (typeof payload.acctDisabled !== 'undefined' && payload.acctDisabled > 0) {
+      console.log('Disabled:', payload.acctDisabled, payload.acctDisabled == 2);
+      ps2.addCommand(`$u.AccountDisabled = $${payload.acctDisabled == 2}`);
+      ps2.addCommand('$u.setinfo()');
+    }
+
+    return ps2;
+  },
 };
 

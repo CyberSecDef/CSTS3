@@ -180,6 +180,7 @@ const csts = {
       './public/js/jquery.tree.js',
       './public/js/jquery.dataTables.js',
       './public/js/dataTables.bootstrap4.min.js',
+      './public/js/jquery.tablesorter.min.js',
       './public/js/hilitor.js',
     ], (index, item) => {
       this.requireFile(item);

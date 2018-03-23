@@ -41,13 +41,21 @@ csts.controllers.Accounts = ({
   manageLocalUsers: {
     name: 'Manage Local Accounts',
     default: 'showIndex',
+    ActionEnum: Object.freeze({
+      ENABLE: 0,
+      DISABLE: 1,
+      DELETE: 2,
+    }),
     showIndex() {
       csts.plugins.ejs.renderFile(
         'app/resources/views/pages/accounts/manageLocalUsers.tpl',
         {},
         { rmWhitespace: true },
         (err, str) => {
-          if (err) { $('#errors').html(err); }
+          if (err) { 
+            $('#errors').html(err).show();
+            $('#main-center-col').animate({ scrollTop: ($('#errors').offset().top) }, 1000);
+          }
           $('#main-center-col').html(str);
         },
       );
@@ -58,13 +66,23 @@ csts.controllers.Accounts = ({
       let hosts = $('div.hostManual textarea').val();
       $('#adOUTree input:checkbox:checked').each((i, c) => { ous.push($(c).data('path')); });
       $('table#accounts-manageLocalUsers-results-tbl tbody').empty();
+      $('#errors').html('');
+      $('#errors').hide();
       csts.models.Accounts.manageLocalUsers.execute(hosts, ous);
     },
     addRow(row) {
       const tr = $('<tr></tr>');
       $.each(row, (r, e) =>{ tr.append( $('<td></td>').html( e ) ) });
       $('table#accounts-manageLocalUsers-results-tbl tbody').append(tr);
-    }
+    },
+    manageAccount(account, payload) {
+      console.log('Controller -> manageAccount');
+      $('#errors').html('');
+      $('#errors').hide();
+      const user = account.split('@')[0];
+      const host = account.split('@')[1];
+      csts.models.Accounts.manageLocalUsers.updateAccount(host, user, payload);
+    },
   },
   userCount: {
     users: [],
@@ -76,8 +94,9 @@ csts.controllers.Accounts = ({
           rmWhitespace: true,
         },
         (err, str) => {
-          if (err) {
-            $('#errors').html(err);
+          if (err) { 
+            $('#errors').html(err).show();
+            $('#main-center-col').animate({ scrollTop: ($('#errors').offset().top) }, 1000);
           }
           $('#main-center-col').html(str);
         },

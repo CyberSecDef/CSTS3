@@ -1,3 +1,4 @@
+<div class="errors alert alert-danger collapse" id="errors"></div>
 <div class="container-fluid" data-name="Compare">
     <div class="row">
       <main class="col-sm-12 ml-sm-auto col-md-12 pt-3" role="main">

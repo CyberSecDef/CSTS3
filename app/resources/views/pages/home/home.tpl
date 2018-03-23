@@ -1,3 +1,4 @@
+<div class="errors alert alert-danger collapse" id="errors"></div>
 <h1 class="display-4">Cyber Security Tool Suite - Version 3</h1>
 
 <p>
