@@ -67,7 +67,7 @@
                   <form class="" style="margin-left:20px;" name="acctUpdateForm">
                     <div class="input-group mb-3" role="group">
                       <label class="input-group-text input-group-prepend" >Password:</label>
-                      <input type="text" class="form-control input-group-prepend" style="border-bottom:2px solid #c33;border-top:2px solid #c33;" placeholder="New Password" name="newPassword">
+                      <input type="text" class="form-control input-group-prepend" style="border-bottom:2px solid #c33;border-top:2px solid #c33;" placeholder="New Password" name="newPassword" />
                       
 
                       <select class="custom-select input-group-prepend" name="passRequired">
@@ -146,33 +146,23 @@
 </div>
 
 <script>
-  $(document)
-    .ready(function () {
-      $('table#accounts-manageLocalUsers-results-tbl tbody tr')
-        .on('click', () => {
-          $(this)
-            .toggleClass('active');
-          $(this)
-            .toggleClass('table-info');
-        });
-    });
+  $(document).ready(() => {
+    const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
 
-  $('button#accounts-manageLocalUsers-execute-btn')
-    .on('click', function () {
-      csts.controllers.Accounts.manageLocalUsers.execute();
+    const comparer = (idx, asc) => (a, b) => ((v1, v2) => 
+        v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
+        )(getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
 
-      setTimeout(() => {
-        $('#accounts-manageLocalUsers-results-tbl')
-          .tablesorter();
-        $("table#accounts-manageLocalUsers-results-tbl")
-          .trigger("update");
-        var sorting = [
-          [1, 0]
-        ];
-        $("table#accounts-manageLocalUsers-results-tbl")
-          .trigger("sorton", [sorting]);
-      }, 10000);
+    $('table#accounts-manageLocalUsers-results-tbl thead th').on('click', (e) => {
+        Array.from($('table#accounts-manageLocalUsers-results-tbl tbody').find('tr:nth-child(n+1)'))
+            .sort(comparer(Array.from(e.target.parentNode.children).indexOf(e.target), this.asc = !this.asc))
+            .forEach(tr => $('table#accounts-manageLocalUsers-results-tbl tbody').append(tr) );
     });
+  });
+
+  $('button#accounts-manageLocalUsers-execute-btn').on('click', function () {
+    csts.controllers.Accounts.manageLocalUsers.execute();
+  });
 
   $("button[name='acctUpdate']").on('click', () => {
     const payload = {
@@ -182,19 +172,17 @@
       acctLocked: $("select[name='acctLocked']").val(),
     }
     $.each(
-      $('table#accounts-manageLocalUsers-results-tbl').find('input:checked'), (i, c) => {
+      $('table#accounts-manageLocalUsers-results-tbl').find('input:checked'),
+      (i, c) => {
         csts.controllers.Accounts.manageLocalUsers.manageAccount(
           atob($(c).val()),
           payload,
         );
-      });
-    setTimeout(() => {$('button#accounts-manageLocalUsers-execute-btn').click();}, 10000)
+      }
+    );
+    $('button#accounts-manageLocalUsers-execute-btn').click();
 
   });
-
-
-
-
 
   $('div#accounts-manageLocalUsers-results form button.enableAccount')
     .on('click', function () {

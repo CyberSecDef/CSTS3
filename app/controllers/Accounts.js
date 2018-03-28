@@ -68,12 +68,34 @@ csts.controllers.Accounts = ({
       $('table#accounts-manageLocalUsers-results-tbl tbody').empty();
       $('#errors').html('');
       $('#errors').hide();
-      csts.models.Accounts.manageLocalUsers.execute(hosts, ous);
+
+      $('#myModal').modal();
+      $('#myModalLabel').text('Please Wait...');
+      $('#myModalBody').html('Currently Scanning systems.  Please wait.');
+      $('#myModal')
+        .one('shown.bs.modal', () => {
+          csts.models.Accounts.manageLocalUsers.execute(hosts, ous);
+          setTimeout(() => {
+            $('#headingTwo h5 button').click();
+            $('#myModal').modal('hide');
+          }, 5000);
+        });
     },
     addRow(row) {
-      const tr = $('<tr></tr>');
-      $.each(row, (r, e) =>{ tr.append( $('<td></td>').html( e ) ) });
-      $('table#accounts-manageLocalUsers-results-tbl tbody').append(tr);
+      const rh = $('<tr></tr>');
+      $.each(row, (r, e) =>{ rh.append( $('<td></td>').html( e ) ) });
+      $('table#accounts-manageLocalUsers-results-tbl tbody').append(rh);
+
+      const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
+
+      const comparer = (idx, asc) => (a, b) => ((v1, v2) => 
+          v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
+          )(getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
+
+        Array.from($('table#accounts-manageLocalUsers-results-tbl tbody').find('tr:nth-child(n+1)'))
+            .sort(comparer(1, true))
+            .forEach(tr => $('table#accounts-manageLocalUsers-results-tbl tbody').append(tr) );
+      
     },
     manageAccount(account, payload) {
       console.log('Controller -> manageAccount');
@@ -112,8 +134,12 @@ csts.controllers.Accounts = ({
       $('#myModalBody').html('Currently Parsing the OUs.  Please wait.');
       $('#myModal')
         .one('shown.bs.modal', () => {
-          $('#adOUTree input:checkbox:checked').each((i, c)=>{ous.push($(c).data('path'))});
+          $('#adOUTree input:checkbox:checked').each((i, c) => { ous.push($(c).data('path')); });
           csts.models.Accounts.userCount.execute(ous);
+          setTimeout(() => {
+            $('#headingTwo h5 button').click();
+            $('#myModal').modal('hide');
+          }, 5000);
         });
     },
     showSummary() {

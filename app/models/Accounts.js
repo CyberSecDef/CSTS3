@@ -3,18 +3,7 @@ csts.models.Accounts = {
   manageLocalUsers: {
     computers: [],
     updateAccount(host, user, payload) {
-      console.log('Models -> updateAccount');
       csts.models.Accounts.ps1 = csts.libs.ad.adsiUpdateAccount(host, user, payload);
-      csts.models.Accounts.ps1.invoke()
-        .then((output) => {
-          csts.models.Accounts.ps1.dispose();
-          console.log('adsi output');
-        }).catch((err) => {
-          $('#errors').html(err);
-          $('#errors').show();
-          $('#main-center-col').animate({ scrollTop: ($('#errors').offset().top) }, 1000);
-          csts.models.Accounts.ps1.dispose();
-        });
     },
     async execute(hosts, ous) {
       this.computers = hosts.replace(' ', ',')
@@ -38,8 +27,8 @@ csts.models.Accounts = {
 
           this.computers.forEach((h) => {
             csts.plugins.wmi.Query({
-              class: 'Win32_PingStatus', 
-              where:`Address="${h}"`
+              class: 'Win32_PingStatus',
+              where: `Address="${h}"`,
             }, (err, res) => {
               if (typeof res[0].StatusCode !== 'undefined' && res[0].StatusCode === 0) {
                 csts.plugins.wmi.Query({
@@ -63,12 +52,10 @@ csts.models.Accounts = {
               }
             });
           });
-
-          //csts.controllers.Accounts.manageLocalAdmins.showSummary();
-          //$('#headingTwo h5 button').click();
-          //$('#myModal').modal('hide');
         })
         .catch((err) => { console.log(err); });
+
+        
     },
   },
   userCount: {
@@ -91,8 +78,6 @@ csts.models.Accounts = {
           });
           this.users.sort((a, b) => a.Name < b.Name ? -1 : a.Name > b.Name ? 1 : 0 );
           csts.controllers.Accounts.userCount.showSummary();
-          $('#headingTwo h5 button').click();
-          $('#myModal').modal('hide');
         })
         .catch((err) => { console.log(err); });
     },
