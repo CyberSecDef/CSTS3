@@ -42,6 +42,7 @@
     "nw-dev": "^3.0.1",
     "polyfill": "^0.1.0",
     "popper.js": "^1.12.9",
+    "sec_scan": "^1.0.5",
     "setimmediate": "^1.0.5",
     "systeminformation": "^3.33.18",
     "xlsx": "^0.12.4",

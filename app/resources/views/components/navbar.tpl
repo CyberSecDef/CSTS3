@@ -42,6 +42,7 @@
 						<a class="dropdown-item" href="/Configs/preventSleep">Prevent Sleep</a>
 						<a class="dropdown-item" href="/Configs/sslCertificates">SSL Certificates</a>
 						<a class="dropdown-item" href="/Configs/serviceQuotes">Service Quotes</a>
+						<a class="dropdown-item" href="/Configs/updateHost">Update Host</a>
 						
 					</div>
 				</li>
@@ -51,8 +52,7 @@
 						Policies  
 					</a>
 					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
-						<a class="dropdown-item" href="/Packages/PolicyManager">Policy Manager</a>
-						<a class="dropdown-item" href="/Packages/scap2Gpo">Scap To Gpo</a>
+						<a class="dropdown-item" href="/Packages/PolicyManager">Policy Converter</a>
 						<a class="dropdown-item" href="/Packages/Vram2Acas">Vram to Acas</a>
 					</div>
 				</li>
@@ -62,9 +62,6 @@
 						Resources
 					</a>
 					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
-						<a class="dropdown-item" href="/Resources/systemManager">System Manager</a>
-						<a class="dropdown-item" href="/Resources/fileManager">File Manager</a>
-						<a class="dropdown-item" href="/Resources/regEdit">Registry Editor</a>
 						<a class="dropdown-item" href="/Resources/processes">Processes</a>
 						<a class="dropdown-item" href="/Resources/systemInfo">System Info</a>
 					</div>
@@ -108,8 +105,6 @@
 						<a class="dropdown-item" href="/Systems/scan4Wireless">Scan for Wireless</a>
 						<a class="dropdown-item" href="/Systems/portScan">Port Scan</a>
 						<a class="dropdown-item" href="/Systems/restart">Restart</a>
-						<a class="dropdown-item" href="/Systems/secureWipe">Secure Wipe</a>
-						<a class="dropdown-item" href="/Systems/updateHost">Update Host</a>
 						<a class="dropdown-item" href="/Systems/windowsUpdates">Windows Updates</a>
 						<div class="dropdown-divider"></div>
 						<a class="dropdown-item" href="/Systems/parseEventLogs">Parse Event Logs</a>
