@@ -38,7 +38,52 @@ csts.controllers.STIG = ({
   controllerName - the name of the controller
 */
   controllerName: 'STIG',
+  stigXxls: {
+    name: 'STIG/SCAP/CKL <-> XLS',
+    default: 'showIndex',
+    execute() {
+      csts.models.STIG.stigXxls.execute($('#fileSource').val().trim());
+    },
+    showIndex() {
+      csts.plugins.ejs.renderFile(
+        'app/resources/views/pages/stig/stigXxls.tpl', {}, {
+          rmWhitespace: true,
+        },
+        (err, str) => {
+          if (err) { 
+            $('#errors').html(err).show();
+            $('#main-center-col').animate({ scrollTop: ($('#errors').offset().top) }, 1000);
+          }
+          $('#main-center-col').html(str);
+        },
+      );
+    },
+    parseFiles() {
+      $('#myModal').modal();
+      $('#myModalLabel').text('Please Wait...');
+      $('#myModalBody').text('Currently Parsing the Selected Files.  Please wait.');
+      $('#myModal')
+        .one('shown.bs.modal', () => {
+          $('#tabSelFileInfo tbody')
+            .empty();
+          const table = $('table#tabSelFileInfo').DataTable({ destroy: true, searching: false, paging: false });
+          table.clear();
+          const stats = csts.models.STIG.stigXxls.parseFile($('#fileSource').val().trim());
 
+          table.row.add([
+            csts.plugins.path.basename($('#fileSource').val().trim()),
+            csts.plugins.moment(stats.ctimeMs).format('MM/DD/YYYY HH:mm'),
+            csts.plugins.moment(stats.atimeMs).format('MM/DD/YYYY HH:mm'),
+            csts.plugins.moment(stats.mtimeMs).format('MM/DD/YYYY HH:mm'),
+            stats.size,
+            csts.plugins.path.extname($('#fileSource').val().trim()),
+          ]);
+
+          table.rows().invalidate().draw();
+          $('#myModal').modal('hide');
+        });
+    },
+  },
   updateStig: {
     name: 'Update STIG',
     default: 'showIndex',

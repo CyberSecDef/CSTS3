@@ -15,8 +15,8 @@
 					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
 						<a class="dropdown-item" href="/Home">Home</a>
 						<div class="dropdown-divider"></div>
-						<a class="dropdown-item" href="#">Reports</a>
-						<a class="dropdown-item" href="#">Dashboard</a>
+						<a class="dropdown-item text-inactive" href="#">Reports</a>
+						<a class="dropdown-item text-inactive" href="#">Dashboard</a>
 					</div>
 				</li>
 				
@@ -25,8 +25,9 @@
 						Accounts
 					</a>
 					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
-						<a class="dropdown-item" href="/Accounts/AdAttributes">AD Attribute Editor</a>
-						<a class="dropdown-item" href="/Accounts/DormantAccounts">Dormant Accounts</a>
+						<a class="dropdown-item text-inactive" href="/Accounts/AdAttributes">AD Attribute Editor</a>
+						<a class="dropdown-item text-inactive" href="/Accounts/DormantAccounts">Dormant Accounts</a>
+						<div class="dropdown-divider"></div>
 					</div>
 				</li>
 				
@@ -36,13 +37,14 @@
 					</a>
 					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
 					
-						<a class="dropdown-item" href="/Configs/wakeOnLan">Wake On Lan</a>
-						<a class="dropdown-item" href="/Configs/applyPolicies">Apply Policies</a>
-						<a class="dropdown-item" href="/Configs/fixDotNet">Fix Dot Net</a>
-						<a class="dropdown-item" href="/Configs/preventSleep">Prevent Sleep</a>
-						<a class="dropdown-item" href="/Configs/sslCertificates">SSL Certificates</a>
-						<a class="dropdown-item" href="/Configs/serviceQuotes">Service Quotes</a>
-						<a class="dropdown-item" href="/Configs/updateHost">Update Host</a>
+						<a class="dropdown-item text-inactive" href="/Configs/wakeOnLan">Wake On Lan</a>
+						<a class="dropdown-item text-inactive" href="/Configs/applyPolicies">Apply Policies</a>
+						<a class="dropdown-item text-inactive" href="/Configs/fixDotNet">Fix Dot Net</a>
+						<a class="dropdown-item text-inactive" href="/Configs/preventSleep">Prevent Sleep</a>
+						<a class="dropdown-item text-inactive" href="/Configs/sslCertificates">SSL Certificates</a>
+						<a class="dropdown-item text-inactive" href="/Configs/serviceQuotes">Service Quotes</a>
+						<a class="dropdown-item text-inactive" href="/Configs/updateHost">Update Host</a>
+						<div class="dropdown-divider"></div>
 						
 					</div>
 				</li>
@@ -52,8 +54,9 @@
 						Policies  
 					</a>
 					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
-						<a class="dropdown-item" href="/Packages/PolicyManager">Policy Converter</a>
-						<a class="dropdown-item" href="/Packages/Vram2Acas">Vram to Acas</a>
+						<a class="dropdown-item text-inactive" href="/Packages/PolicyManager">Policy Converter</a>
+						<a class="dropdown-item text-inactive" href="/Packages/Vram2Acas">Vram to Acas</a>
+						<div class="dropdown-divider"></div>
 					</div>
 				</li>
 				
@@ -62,8 +65,9 @@
 						Resources
 					</a>
 					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
-						<a class="dropdown-item" href="/Resources/processes">Processes</a>
-						<a class="dropdown-item" href="/Resources/systemInfo">System Info</a>
+						<a class="dropdown-item text-inactive" href="/Resources/processes">Processes</a>
+						<a class="dropdown-item text-inactive" href="/Resources/systemInfo">System Info</a>
+						<div class="dropdown-divider"></div>
 					</div>
 				</li>
 				
@@ -72,12 +76,11 @@
 						Scans
 					</a>
 					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
-						<a class="dropdown-item" href="/Scans/CleanScap">Clean Scap Folder</a>
-						<a class="dropdown-item" href="/Scans/HwSwList">Hardware/Software List</a>
-						<a class="dropdown-item" href="/Scans/software2Stig">Software To Stig</a>
-						<a class="dropdown-item" href="/Scans/vramOpenFindings">Vram Open Findings</a>
-						<a class="dropdown-item" href="/Scans/resourceComparison">Report Source Comparison</a>
-						
+						<a class="dropdown-item text-inactive" href="/Scans/CleanScap">Clean Scap Folder</a>
+						<a class="dropdown-item text-inactive" href="/Scans/HwSwList">Hardware/Software List</a>
+						<a class="dropdown-item text-inactive" href="/Scans/software2Stig">Software To Stig</a>
+						<a class="dropdown-item text-inactive" href="/Scans/vramOpenFindings">Vram Open Findings</a>
+						<a class="dropdown-item text-inactive" href="/Scans/resourceComparison">Report Source Comparison</a>
 						<div class="dropdown-divider"></div>
 					</div>
 				</li>
@@ -87,10 +90,10 @@
 						STIG
 					</a>
 					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
-						<a class="dropdown-item" href="/Stig/diacap">Diacap Controls</a>
-						<a class="dropdown-item" href="/Stig/rmf">Rmf Controls</a>
-						<a class="dropdown-item" href="/Stig/stig">Stig Requirements</a>
-						<a class="dropdown-item" href="/Stig/scap">Scap Requirements</a>
+						<a class="dropdown-item text-inactive" href="/Stig/diacap">Diacap Controls</a>
+						<a class="dropdown-item text-inactive" href="/Stig/rmf">Rmf Controls</a>
+						<a class="dropdown-item text-inactive" href="/Stig/stig">Stig Requirements</a>
+						<a class="dropdown-item text-inactive" href="/Stig/scap">Scap Requirements</a>
 						<div class="dropdown-divider"></div>
 					</div>
 				</li>
@@ -100,15 +103,16 @@
 						Systems
 					</a>
 					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
-						<a class="dropdown-item" href="/Systems/CleanUSB">Clean USB History</a>
-						<a class="dropdown-item" href="/Systems/fileVerifications">File Verifications</a>
-						<a class="dropdown-item" href="/Systems/scan4Wireless">Scan for Wireless</a>
-						<a class="dropdown-item" href="/Systems/portScan">Port Scan</a>
-						<a class="dropdown-item" href="/Systems/restart">Restart</a>
-						<a class="dropdown-item" href="/Systems/windowsUpdates">Windows Updates</a>
+						<a class="dropdown-item text-inactive" href="/Systems/CleanUSB">Clean USB History</a>
+						<a class="dropdown-item text-inactive" href="/Systems/fileVerifications">File Verifications</a>
+						<a class="dropdown-item text-inactive" href="/Systems/scan4Wireless">Scan for Wireless</a>
+						<a class="dropdown-item text-inactive" href="/Systems/portScan">Port Scan</a>
+						<a class="dropdown-item text-inactive" href="/Systems/restart">Restart</a>
+						<a class="dropdown-item text-inactive" href="/Systems/windowsUpdates">Windows Updates</a>
 						<div class="dropdown-divider"></div>
-						<a class="dropdown-item" href="/Systems/parseEventLogs">Parse Event Logs</a>
-						<a class="dropdown-item" href="/Systems/archiveEventLogs">Archive Event Logs</a>
+						<a class="dropdown-item text-inactive" href="/Systems/parseEventLogs">Parse Event Logs</a>
+						<a class="dropdown-item text-inactive" href="/Systems/archiveEventLogs">Archive Event Logs</a>
+						<div class="dropdown-divider"></div>
 						
 					</div>
 				</li>

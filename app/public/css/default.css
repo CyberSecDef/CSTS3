@@ -149,3 +149,7 @@ h3 a{
 .errors{
 	margin-top:10px;
 }
+
+.text-inactive{
+	text-decoration: line-through;
+}

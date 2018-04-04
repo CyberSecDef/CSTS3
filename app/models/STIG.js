@@ -1,5 +1,27 @@
 csts.models.STIG = {
   name: 'STIG',
+  stigXxls: {
+    execute(source) {
+      // determine the type of file submitted
+      const content = csts.plugins.fs.readFileSync(source, 'utf8');
+      if (csts.libs.utils.isXML(content)) {
+        alert('xml');
+      } else {
+        alert('not xml');
+
+        csts.models.STIG.stigXxls.x = csts.plugins.xlsx.read(content, { type: 'string' });
+
+        
+        alert(content);
+
+      }
+
+      
+    },
+    parseFile(file) {
+      return csts.plugins.fs.statSync(file);
+    },
+  },
   updateStig: {
     parseFile(file) {
       return csts.plugins.fs.statSync(file);
