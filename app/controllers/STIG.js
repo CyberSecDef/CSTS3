@@ -39,10 +39,17 @@ csts.controllers.STIG = ({
 */
   controllerName: 'STIG',
   stigXxls: {
-    name: 'STIG/SCAP/CKL <-> XLS',
+    name: 'CKL <-> XLS',
     default: 'showIndex',
     execute() {
-      csts.models.STIG.stigXxls.execute($('#fileSource').val().trim());
+      $('#myModal').modal();
+      $('#myModalLabel').text('Please Wait...');
+      $('#myModalBody').text('Currently Parsing the Selected Files.  Please wait.');
+      $('#myModal')
+        .one('shown.bs.modal', () => {
+          csts.models.STIG.stigXxls.execute($('#fileSource').val().trim());
+          $('#myModal').modal('hide');
+        });
     },
     showIndex() {
       csts.plugins.ejs.renderFile(

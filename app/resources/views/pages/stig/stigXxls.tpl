@@ -6,7 +6,7 @@
         <div>
             <div class="alert alert-secondary border-secondary" role="alert">
               <p>
-                This script will convert a STIG, SCAP or CKL to and from an Excel file, which makes it much easier to update on the mass scale.
+                This script will convert a CKL to and from an Excel file, which makes it much easier to update on the mass scale.
               </p>
             
               <p>
@@ -14,7 +14,8 @@
                 faster and easier.  It will move the asset data and all comments,
                 finding details, status, severity override and justifications back and forth between the
                 source file and a CSV file.  The Script assumes that the vulnerability ids
-                are consistent from file to file.  
+                are consistent from file to file.  As in, if a CKL is converted to a CSV and rows are removed, 
+                when it is converted back to a CKL the missing items will NOT be re-added.
               </p>
             </div>
         </div>

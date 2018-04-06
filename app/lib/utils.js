@@ -106,12 +106,13 @@ csts.libs.utils = {
   },
 
   isXML(xml) {
-    try {
-      const xmlDoc = $.parseXML(xml);
-      return true;
-    } catch (err) {
+    xml = xml.replace(/<\?xml.*\?>/,'');
+    const oParser = new DOMParser();
+    const oDOM = oParser.parseFromString(xml, 'text/xml');
+    if (oDOM.getElementsByTagName('parsererror').length > 0) {
       return false;
     }
+    return true;
   },
 
   /*
