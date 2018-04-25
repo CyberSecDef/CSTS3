@@ -81,6 +81,9 @@
 						<a class="dropdown-item text-inactive" href="/Scans/software2Stig">Software To Stig</a>
 						<a class="dropdown-item text-inactive" href="/Scans/vramOpenFindings">Vram Open Findings</a>
 						<a class="dropdown-item text-inactive" href="/Scans/resourceComparison">Report Source Comparison</a>
+						
+						<a class="dropdown-item text-inactive" href="/Scans/scan2Report">SCAP/CKL/ACAS Summary Report XSL Transform</a>
+						<a class="dropdown-item text-inactive" href="/Scans/scan2Report">ACAS CSV -> .nessus</a>
 						<div class="dropdown-divider"></div>
 					</div>
 				</li>
@@ -109,11 +112,8 @@
 						<a class="dropdown-item text-inactive" href="/Systems/portScan">Port Scan</a>
 						<a class="dropdown-item text-inactive" href="/Systems/restart">Restart</a>
 						<a class="dropdown-item text-inactive" href="/Systems/windowsUpdates">Windows Updates</a>
+						<a class="dropdown-item text-inactive" href="/Systems/winDirStat">WinDirStat</a>
 						<div class="dropdown-divider"></div>
-						<a class="dropdown-item text-inactive" href="/Systems/parseEventLogs">Parse Event Logs</a>
-						<a class="dropdown-item text-inactive" href="/Systems/archiveEventLogs">Archive Event Logs</a>
-						<div class="dropdown-divider"></div>
-						
 					</div>
 				</li>
 				
