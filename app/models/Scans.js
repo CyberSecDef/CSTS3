@@ -57,7 +57,7 @@ csts.models.Scans = {
       acas: [],
       ckl: [],
     },
-
+    mitigations: JSON.parse(csts.plugins.fs.readFileSync('app/database/mitigations.db')),
     /*
       Method: getSummary
 
@@ -128,8 +128,8 @@ csts.models.Scans = {
           'Credentialed Scan': scanItem.credentialed,
         });
       });
-
-      return summary;
+      
+      return summary.sort((a, b) => { return (a.Type.toLowerCase() > b.Type.toLowerCase() ? 1 : b.Type.toLowerCase() > a.Type.toLowerCase() ? -1 : ( a.Hosts.toLowerCase() > b.Hosts.toLowerCase() ? 1 : -1 )  )});
     },
 
     /*
@@ -378,9 +378,13 @@ csts.models.Scans = {
         Generates the RAR tab
     */
     getRar() {
+      
       const results = [];
       csts.plugins.jsonQuery('acas[*].hosts[*].requirements[*].pluginId', { data: csts.models.Scans.scans2poam.scans }).value.sort().filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; }).forEach((element) => {
         const acasPlugin = csts.plugins.jsonQuery(`acas[*].hosts[*].requirements[pluginId = ${element}`, { data: csts.models.Scans.scans2poam.scans }).value;
+
+        const m = csts.models.Scans.scans2poam.mitigations.find(i => i.plugin === element);
+        const mitigation = typeof m !== 'undefined' ? m.mitigation : '';
 
         results.push({
           'Non-Compliant Security Controls (16a)': '',
@@ -397,7 +401,7 @@ Plugin ID: ${element}`,
           'Security Objectives (C-I-A) (16c)': '',
           'Raw Test Result (16d)': this.getRiskVal(acasPlugin.severity, 'CAT'),
           'Predisposing Condition(s) (16d.1)': '',
-          'Technical Mitigation(s) (16d.2)': '',
+          'Technical Mitigation(s) (16d.2)': mitigation,
           'Severity or Pervasiveness (VL-VH) (16d.3)': this.getRiskVal(acasPlugin.severity, 'VL-VH'),
           'Relevance of Threat (VL-VH) (16e)': this.getRiskVal(acasPlugin.severity, 'VL-VH'),
           'Threat Description (16e.1)': acasPlugin.description,
@@ -422,6 +426,9 @@ Plugin ID: ${element}`,
         .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
         .forEach((element) => {
           const cklReq = csts.plugins.jsonQuery(`ckl[*].requirements[vulnId=${element}]`, { data: csts.models.Scans.scans2poam.scans }).value;
+
+          const m = csts.models.Scans.scans2poam.mitigations.find(i => i.vuln === cklReq.vulnId);
+          const mitigation = typeof m !== 'undefined' ? m.mitigation : '';
 
           results.push({
             'Non-Compliant Security Controls (16a)': typeof cklReq.iaControls === 'object' ? cklReq.iaControls.join(', ') : cklReq.iaControls,
@@ -449,7 +456,7 @@ Plugin ID: ${element}`,
             'Security Objectives (C-I-A) (16c)': '',
             'Raw Test Result (16d)': this.getRiskVal(cklReq.severity, 'CAT'),
             'Predisposing Condition(s) (16d.1)': '',
-            'Technical Mitigation(s) (16d.2)': cklReq.comments,
+            'Technical Mitigation(s) (16d.2)': mitigation,
             'Severity or Pervasiveness (VL-VH) (16d.3)': this.getRiskVal(cklReq.severity, 'VL-VH'),
             'Relevance of Threat (VL-VH) (16e)': this.getRiskVal(cklReq.severity, 'VL-VH'),
             'Threat Description (16e.1)': cklReq.description,
@@ -461,7 +468,7 @@ Plugin ID: ${element}`,
             'Residual Risk (After Proposed Mitigations) (16k)': '',
             Status: cklReq.status,
             'Recommendations (16l)': cklReq.solution,
-            Comments: cklReq.findingDetails,
+            Comments: `${cklReq.comments} ${cklReq.findingDetails}`,
             // pluginId: '',
           });
         });
@@ -470,6 +477,9 @@ Plugin ID: ${element}`,
       ckls.filter(e => !scaps.includes(e)).sort()
         .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; }).forEach((element) => {
           const cklReq = csts.plugins.jsonQuery(`ckl[*].requirements[vulnId=${element}]`, { data: csts.models.Scans.scans2poam.scans }).value;
+
+          const m = csts.models.Scans.scans2poam.mitigations.find(i => i.vuln === cklReq.vulnId);
+          const mitigation = typeof m !== 'undefined' ? m.mitigation : '';
 
           results.push({
             'Non-Compliant Security Controls (16a)': typeof cklReq.iaControls === 'object' ? cklReq.iaControls.join(', ') : cklReq.iaControls,
@@ -497,7 +507,7 @@ Plugin ID: ${element}`,
             'Security Objectives (C-I-A) (16c)': '',
             'Raw Test Result (16d)': this.getRiskVal(cklReq.severity, 'CAT'),
             'Predisposing Condition(s) (16d.1)': '',
-            'Technical Mitigation(s) (16d.2)': cklReq.comments,
+            'Technical Mitigation(s) (16d.2)': mitigation,
             'Severity or Pervasiveness (VL-VH) (16d.3)': this.getRiskVal(cklReq.severity, 'VL-VH'),
             'Relevance of Threat (VL-VH) (16e)': this.getRiskVal(cklReq.severity, 'VL-VH'),
             'Threat Description (16e.1)': cklReq.description,
@@ -509,7 +519,7 @@ Plugin ID: ${element}`,
             'Residual Risk (After Proposed Mitigations) (16k)': '',
             Status: cklReq.status,
             'Recommendations (16l)': cklReq.solution,
-            Comments: cklReq.findingDetails,
+            Comments: `${cklReq.comments} ${cklReq.findingDetails}`,
             // pluginId: '',
           });
         });
@@ -518,6 +528,9 @@ Plugin ID: ${element}`,
       scaps.filter(e => !ckls.includes(e)).sort()
         .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; }).forEach((element) => {
           const scapReq = csts.plugins.jsonQuery(`scap[*].requirements[vulnId=${element}]`, { data: csts.models.Scans.scans2poam.scans }).value;
+
+          const m = csts.models.Scans.scans2poam.mitigations.find(i => i.vuln === scapReq.vulnId);
+          const mitigation = typeof m !== 'undefined' ? m.mitigation : '';
 
           results.push({
             'Non-Compliant Security Controls (16a)': typeof scapReq.iaControls === 'object' ? scapReq.iaControls.join(', ') : scapReq.iaControls,
@@ -545,7 +558,7 @@ Plugin ID: ${element}`,
             'Security Objectives (C-I-A) (16c)': '',
             'Raw Test Result (16d)': this.getRiskVal(scapReq.severity, 'CAT'),
             'Predisposing Condition(s) (16d.1)': '',
-            'Technical Mitigation(s) (16d.2)': scapReq.comments,
+            'Technical Mitigation(s) (16d.2)': mitigation,
             'Severity or Pervasiveness (VL-VH) (16d.3)': this.getRiskVal(scapReq.severity, 'VL-VH'),
             'Relevance of Threat (VL-VH) (16e)': this.getRiskVal(scapReq.severity, 'VL-VH'),
             'Threat Description (16e.1)': scapReq.description,
@@ -557,7 +570,7 @@ Plugin ID: ${element}`,
             'Residual Risk (After Proposed Mitigations) (16k)': '',
             Status: scapReq.status,
             'Recommendations (16l)': scapReq.solution,
-            Comments: scapReq.findingDetails,
+            Comments: `${scapReq.comments} ${scapReq.findingDetails}`,
             // pluginId: '',
           });
         });
@@ -599,6 +612,9 @@ Plugin ID: ${element}`,
       csts.plugins.jsonQuery('acas[*].hosts[*].requirements[*].pluginId', { data: csts.models.Scans.scans2poam.scans }).value.sort().filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; }).forEach((element) => {
         const acasPlugin = csts.plugins.jsonQuery(`acas[*].hosts[*].requirements[pluginId = ${element}`, { data: csts.models.Scans.scans2poam.scans }).value;
 
+        const m = csts.models.Scans.scans2poam.mitigations.find(i => i.plugin === element);
+        const mitigation = typeof m !== 'undefined' ? m.mitigation : '';
+
         results.push({
           A: '',
           'Control Vulnerability Description': `Title: ${acasPlugin.title}
@@ -619,7 +635,7 @@ Vuln ID:
 Rule ID:
 Plugin ID: ${element}`,
           'Raw Severity Value': this.getRiskVal(acasPlugin.severity, 'CAT'),
-          Mitigations: '',
+          Mitigations: mitigation,
           'Severity Value': this.getRiskVal(acasPlugin.severity, 'CAT'),
           'Resources Required': '',
           'Scheduled Completion Date': '',
@@ -640,6 +656,9 @@ Plugin ID: ${element}`,
         .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
         .forEach((element) => {
           const cklReq = csts.plugins.jsonQuery(`ckl[*].requirements[vulnId=${element}]`, { data: csts.models.Scans.scans2poam.scans }).value;
+          
+          const m = csts.models.Scans.scans2poam.mitigations.find(i => i.plugin === cklReq.vulnId);
+          const mitigation = typeof m !== 'undefined' ? m.mitigation : '';
 
           results.push({
             A: '',
@@ -665,7 +684,7 @@ Vuln ID: ${cklReq.vulnId}
 Rule ID: ${cklReq.ruleId}
 Plugin ID:`,
             'Raw Severity Value': this.getRiskVal(cklReq.severity, 'CAT'),
-            Mitigations: '',
+            Mitigations: mitigation,
             'Severity Value': this.getRiskVal(cklReq.severity, 'CAT'),
             'Resources Required': cklReq.resources,
             'Scheduled Completion Date': '',
@@ -687,6 +706,10 @@ Plugin ID:`,
       ckls.filter(e => !scaps.includes(e)).sort()
         .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; }).forEach((element) => {
           const cklReq = csts.plugins.jsonQuery(`ckl[*].requirements[vulnId=${element}]`, { data: csts.models.Scans.scans2poam.scans }).value;
+
+          const m = csts.models.Scans.scans2poam.mitigations.find(i => i.plugin === cklReq.vulnId);
+          const mitigation = typeof m !== 'undefined' ? m.mitigation : '';
+
           results.push({
             A: '',
             'Control Vulnerability Description': `Title: ${cklReq.title}
@@ -711,7 +734,7 @@ Vuln ID: ${cklReq.vulnId}
 Rule ID: ${cklReq.ruleId}
 Plugin ID:`,
             'Raw Severity Value': this.getRiskVal(cklReq.severity, 'CAT'),
-            Mitigations: '',
+            Mitigations: mitigation,
             'Severity Value': this.getRiskVal(cklReq.severity, 'CAT'),
             'Resources Required': cklReq.resources,
             'Scheduled Completion Date': '',
@@ -733,6 +756,10 @@ Plugin ID:`,
       scaps.filter(e => !ckls.includes(e)).sort()
         .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; }).forEach((element) => {
           const scapReq = csts.plugins.jsonQuery(`scap[*].requirements[vulnId=${element}]`, { data: csts.models.Scans.scans2poam.scans }).value;
+
+          const m = csts.models.Scans.scans2poam.mitigations.find(i => i.plugin === scapReq.vulnId);
+          const mitigation = typeof m !== 'undefined' ? m.mitigation : '';
+
 
           results.push({
             A: '',
@@ -758,7 +785,7 @@ Vuln ID: ${scapReq.vulnId}
 Rule ID: ${scapReq.ruleId}
 Plugin ID:`,
             'Raw Severity Value': this.getRiskVal(scapReq.severity, 'CAT'),
-            Mitigations: '',
+            Mitigations: mitigation,
             'Severity Value': this.getRiskVal(scapReq.severity, 'CAT'),
             'Resources Required': scapReq.resources,
             'Scheduled Completion Date': '',
@@ -830,74 +857,76 @@ Plugin ID:`,
       }
 
       csts.plugins.xml2js.parseString(fileData, (err, result) => {
-        xccdfData.credentialed = true;
-        xccdfData.scanFile = fileName;
-        xccdfData.hostname = csts.plugins.jsonPath.value(result, "$['cdf:Benchmark']['cdf:TestResult'][0]['cdf:target'][0]");
-        xccdfData.title = csts.plugins.jsonPath.flatValue(result, "$['cdf:Benchmark']['cdf:title']");
-        xccdfData.version = csts.plugins.jsonPath.flatValue(result, "$['cdf:Benchmark']['cdf:version']");
-        xccdfData.release = csts.plugins.jsonPath.flatValue(result, "$['cdf:Benchmark']['cdf:plain-text']")
-          ._.match(new RegExp('Release: ([0-9]+)'))[1];
-        xccdfData.scanDate = csts.plugins.moment(csts.plugins.jsonPath.value(result, "$['cdf:Benchmark']['cdf:TestResult'][*]['$']['start-time']"))
-          .format('MM/DD/YYYY HH:mm');
-        xccdfData.scanType = 'scap';
-        xccdfData.openFindings = {
-          cat1: result['cdf:Benchmark']['cdf:TestResult'][0]['cdf:rule-result'].filter(element => element['cdf:result'].reduce(a => a) !== 'pass')
-            .filter(element => element.$.severity === 'high')
-            .length,
-          cat2: result['cdf:Benchmark']['cdf:TestResult'][0]['cdf:rule-result'].filter(element => element['cdf:result'].reduce(a => a) !== 'pass')
-            .filter(element => element.$.severity === 'medium')
-            .length,
-          cat3: result['cdf:Benchmark']['cdf:TestResult'][0]['cdf:rule-result'].filter(element => element['cdf:result'].reduce(a => a) !== 'pass')
-            .filter(element => element.$.severity === 'low')
-            .length,
-        };
-        xccdfData.requirements = [];
-        csts.plugins.jsonPath.value(result, "$..['cdf:rule-result']")
-          .forEach((element) => {
-            const ruleData = csts.plugins.jsonPath.query(result, `$..['cdf:Rule'][?(@.$.id=='${element.$.idref}')]`);
-            const vulnerability = {};
-            vulnerability.vulnId = result['cdf:Benchmark']['cdf:Group'].filter(e => e['cdf:Rule'][0].$.id === element.$.idref)[0].$.id;
-            vulnerability.comments = '';
-            vulnerability.findingDetails = JSON.stringify(element);
+        if (typeof csts.plugins.jsonPath.value(result, "$['cdf:Benchmark']['cdf:TestResult']") !== 'undefined') {
+          xccdfData.credentialed = true;
+          xccdfData.scanFile = fileName;
+          xccdfData.hostname = csts.plugins.jsonPath.value(result, "$['cdf:Benchmark']['cdf:TestResult'][0]['cdf:target'][0]");
+          xccdfData.title = csts.plugins.jsonPath.flatValue(result, "$['cdf:Benchmark']['cdf:title']");
+          xccdfData.version = csts.plugins.jsonPath.flatValue(result, "$['cdf:Benchmark']['cdf:version']");
+          xccdfData.release = csts.plugins.jsonPath.flatValue(result, "$['cdf:Benchmark']['cdf:plain-text']")
+            ._.match(new RegExp('Release: ([0-9]+)'))[1];
+          xccdfData.scanDate = csts.plugins.moment(csts.plugins.jsonPath.value(result, "$['cdf:Benchmark']['cdf:TestResult'][*]['$']['start-time']"))
+            .format('MM/DD/YYYY HH:mm');
+          xccdfData.scanType = 'scap';
+          xccdfData.openFindings = {
+            cat1: result['cdf:Benchmark']['cdf:TestResult'][0]['cdf:rule-result'].filter(element => element['cdf:result'].reduce(a => a) !== 'pass')
+              .filter(element => element.$.severity === 'high')
+              .length,
+            cat2: result['cdf:Benchmark']['cdf:TestResult'][0]['cdf:rule-result'].filter(element => element['cdf:result'].reduce(a => a) !== 'pass')
+              .filter(element => element.$.severity === 'medium')
+              .length,
+            cat3: result['cdf:Benchmark']['cdf:TestResult'][0]['cdf:rule-result'].filter(element => element['cdf:result'].reduce(a => a) !== 'pass')
+              .filter(element => element.$.severity === 'low')
+              .length,
+          };
+          xccdfData.requirements = [];
+          csts.plugins.jsonPath.value(result, "$..['cdf:rule-result']")
+            .forEach((element) => {
+              const ruleData = csts.plugins.jsonPath.query(result, `$..['cdf:Rule'][?(@.$.id=='${element.$.idref}')]`);
+              const vulnerability = {};
+              vulnerability.vulnId = result['cdf:Benchmark']['cdf:Group'].filter(e => e['cdf:Rule'][0].$.id === element.$.idref)[0].$.id;
+              vulnerability.comments = '';
+              vulnerability.findingDetails = JSON.stringify(element);
 
-            vulnerability.cci = [];
-            if (!csts.libs.utils.isBlank(ruleData[0]['cdf:ident'])) {
-              ruleData[0]['cdf:ident'].forEach((cci) => {
-                vulnerability.cci.push(cci._);
-              });
-            }
-            vulnerability.iaControls = '';
-            csts.plugins.xml2js.parseString(`<root>${ruleData[0]['cdf:description'].reduce(a => a).replace('&gt;', '>').replace('&lt;', '<')}</root>`, (e, r) => { if (typeof r !== 'undefined' && typeof r.root !== 'undefined') vulnerability.iaControls = r.root.IAControls; });
+              vulnerability.cci = [];
+              if (!csts.libs.utils.isBlank(ruleData[0]['cdf:ident'])) {
+                ruleData[0]['cdf:ident'].forEach((cci) => {
+                  vulnerability.cci.push(cci._);
+                });
+              }
+              vulnerability.iaControls = '';
+              csts.plugins.xml2js.parseString(`<root>${ruleData[0]['cdf:description'].reduce(a => a).replace('&gt;', '>').replace('&lt;', '<')}</root>`, (e, r) => { if (typeof r !== 'undefined' && typeof r.root !== 'undefined') vulnerability.iaControls = r.root.IAControls; });
 
-            vulnerability.description = ruleData[0]['cdf:description'].reduce(a => a);
-            vulnerability.fixId = ruleData[0]['cdf:fix'][0].$.id;
-            vulnerability.grpId = element.$.version;
-            vulnerability.pluginId = '';
-            vulnerability.resources = '';
-            vulnerability.ruleId = element.$.idref;
-            vulnerability.solution = ruleData[0]['cdf:fixtext'][0]._;
-            vulnerability.references = JSON.stringify(ruleData[0]['cdf:reference']);
-            vulnerability.severity = ruleData[0].$.severity;
-            vulnerability.title = ruleData[0]['cdf:title'].reduce(a => a);
+              vulnerability.description = ruleData[0]['cdf:description'].reduce(a => a);
+              vulnerability.fixId = ruleData[0]['cdf:fix'][0].$.id;
+              vulnerability.grpId = element.$.version;
+              vulnerability.pluginId = '';
+              vulnerability.resources = '';
+              vulnerability.ruleId = element.$.idref;
+              vulnerability.solution = ruleData[0]['cdf:fixtext'][0]._;
+              vulnerability.references = JSON.stringify(ruleData[0]['cdf:reference']);
+              vulnerability.severity = ruleData[0].$.severity;
+              vulnerability.title = ruleData[0]['cdf:title'].reduce(a => a);
 
-            switch (element['cdf:result'].reduce(a => a)) {
-              case 'pass':
-                vulnerability.status = 'Completed';
-                break;
-              case 'fail':
-                vulnerability.status = 'Ongoing';
-                break;
-              case 'error':
-                vulnerability.status = 'Error';
-                break;
-              default:
-                vulnerability.status = 'Ongoing';
-            }
+              switch (element['cdf:result'].reduce(a => a)) {
+                case 'pass':
+                  vulnerability.status = 'Completed';
+                  break;
+                case 'fail':
+                  vulnerability.status = 'Ongoing';
+                  break;
+                case 'error':
+                  vulnerability.status = 'Error';
+                  break;
+                default:
+                  vulnerability.status = 'Ongoing';
+              }
 
-            xccdfData.requirements.push(vulnerability);
-          });
+              xccdfData.requirements.push(vulnerability);
+            });
 
-        this.scans.scap.push(xccdfData);
+          this.scans.scap.push(xccdfData);
+        }
       });
     },
 

@@ -193,7 +193,7 @@ csts.controllers.Scans = ({
               Object.keys(results).forEach((item) => {
                 results[item].forEach((entry) => {
                   Object.keys(entry).forEach((field) => {
-                    if (entry[field].length > 32760) {
+                    if (typeof entry[field] !== 'undefined' && entry[field].length > 32760) {
                       entry[field] = entry[field].substr(0, 32760);
                     }
                   });
