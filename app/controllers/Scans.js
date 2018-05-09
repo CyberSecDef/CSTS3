@@ -346,7 +346,7 @@ csts.controllers.Scans = ({
         {void}
 
       See Also:
-          <Models.Scans.compareRarPoam.compareWorkbooks>
+          <models.Scans.compareRarPoam.compareWorkbooks>
     */
     executeComparison(fields) {
       $('#myModal').modal();

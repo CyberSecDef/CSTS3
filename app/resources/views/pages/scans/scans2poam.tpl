@@ -33,20 +33,26 @@
 												<input type="file" id="files-scans" name="fileList" class="custom-file-input" nwdirectory="nwdirectory"/>
 												<label class="custom-file-label" for="files-scans">Choose file</label>
 											</div>
-											
-											<div class="input-group-text span-dark">
-												<input type="checkbox" aria-label="Checkbox for following text input" checked="checked" id="files-recurse">
-											</div>
-											
-											<div class="input-group-prepend">
-												<span class="input-group-text span-dark" style="width: 100px;" id="basic-addon1">Recurse?</span>
-											</div>
-											
-											<div class="input-group-append">
+											<div>
 												<button type="button" class="btn btn-primary float-right" id="scans2poam-parse-btn">Scan</button>	
 											</div>
 										</div>
-																		
+
+										<div class="input-group mb-3">
+											<div class="input-group-text span-dark">
+												<input type="checkbox" aria-label="Checkbox for following text input" checked="checked" id="files-recurse">
+											</div>
+											<div class="input-group-append">
+												<span class="input-group-text span-dark" style="width: 100px;" id="basic-addon1">Recurse?</span>
+											</div>
+ 											<div class="input-group-text span-dark">
+												<input type="checkbox" aria-label="Checkbox for following text input" id="split-CCI">
+											</div>
+											<div class="input-group-append">
+												<span class="input-group-text span-dark" style="width: 200px;" id="split-cci">Split CCI Entries?</span>
+											</div>
+										</div>
+														
 									</form>
 								</div>
 							</p>

@@ -111,6 +111,8 @@ csts.models.STIG = {
       csts.plugins.xlsx.utils.book_append_sheet(csts.wb, ws, "STIG Info");
 
       csts.plugins.xlsx.writeFile(csts.wb, filename);
+
+      return filename;
     },
     parseXls(source) {
       const ckl = csts.models.STIG.buildCkl();
@@ -130,32 +132,35 @@ csts.models.STIG = {
         ['Vuln_Num','Severity','Group_Title','Rule_ID','Rule_Ver','Rule_Title','Vuln_Discuss','IA_Controls','Check_Content','Fix_Text','False_Positives','False_Negatives','Documentable','Mitigations','Potential_Impact','Third_Party_Tools','Mitigation_Control','Responsibility','Security_Override_Guidance','Check_Content_Ref','Class','STIGRef','TargetKey'].forEach((field) => {
           v.STIG_DATA.push({VULN_ATTRIBUTE: field, ATTRIBUTE_DATA: vuln[field] });
         });
-        
+
         $.each(vuln.CCI_REF.split(','), (i,c) => {
           v.STIG_DATA.push({ VULN_ATTRIBUTE: 'CCI_REF', ATTRIBUTE_DATA: c.trim() });
         });
 
         ckl.CHECKLIST.STIGS[0].iSTIG[0].VULN.push(v);
       });
-      
-      return ckl
+
+      return ckl;
     },
     saveCkl(results) {
       const filename = `./app/storage/results/stigXxls_${csts.plugins.moment().format('YYYYMMDD_HHmmss')}.ckl`;
       const builder = new csts.plugins.xml2js.Builder();
       const xml = builder.buildObject(results);
       csts.plugins.fs.writeFileSync(filename, xml);
+      return filename;
     },
     execute(source) {
       const content = csts.plugins.fs.readFileSync(source, 'utf8');
-      
+      let filename = '';
       if (csts.libs.utils.isXML(content)) {
         console.log('Parsing CKL');
-        this.saveXls(this.parseCkl(content));
+        filename = this.saveXls(this.parseCkl(content));
       } else {
         console.log('Parsing XLS');
-        this.saveCkl(this.parseXls(source));
+        filename = this.saveCkl(this.parseXls(source));
       }
+
+      return filename;
     },
     parseFile(file) {
       return csts.plugins.fs.statSync(file);

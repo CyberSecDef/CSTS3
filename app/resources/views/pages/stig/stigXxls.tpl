@@ -72,14 +72,16 @@
           <div class="card">
             <div class="card-header" id="headingTwo">
               <h5 class="mb-0">
-                <button class="btn btn-link" data-toggle="collapse" data-target="#stig-convert-results" aria-expanded="true" aria-controls="stig-convert-results">
+                <button class="btn btn-link" data-toggle="collapse" data-target="#stig-convert-results" aria-expanded="true" aria-controls="stig-convert-results" id="stig-convert-results-card">
                   Results
                 </button>
               </h5>
             </div>
 
             <div id="stig-convert-results" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
-
+              <div class="card-body" id="stig-convert-results-card-body">
+                              
+              </div>
             </div>
           </div>
         </div>

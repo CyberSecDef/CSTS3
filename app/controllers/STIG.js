@@ -47,7 +47,14 @@ csts.controllers.STIG = ({
       $('#myModalBody').text('Currently Parsing the Selected Files.  Please wait.');
       $('#myModal')
         .one('shown.bs.modal', () => {
-          csts.models.STIG.stigXxls.execute($('#fileSource').val().trim());
+          const filename = csts.models.STIG.stigXxls.execute($('#fileSource').val().trim());
+
+          
+          $('#stig-convert-results-card-body').html($('<a></a>').attr('download', 'download').attr('href', filename.replace('./app/', './')).attr('target', '_blank').text(filename.replace('./app/', '/')));
+
+          // show the results link
+          $('#stig-convert-results-card').click();
+
           $('#myModal').modal('hide');
         });
     },

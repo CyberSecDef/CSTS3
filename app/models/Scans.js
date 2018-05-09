@@ -430,47 +430,95 @@ Plugin ID: ${element}`,
           const m = csts.models.Scans.scans2poam.mitigations.find(i => i.vuln === cklReq.vulnId);
           const mitigation = typeof m !== 'undefined' ? m.mitigation : '';
 
-          results.push({
-            'Non-Compliant Security Controls (16a)': typeof cklReq.iaControls === 'object' ? cklReq.iaControls.join(', ') : cklReq.iaControls,
-            'Affected CCI (16a.1)': cklReq.cci.join(', '),
-            'Source of Discovery(16a.2)': `SCAP/STIG: ${csts.models.Scans.scans2poam.scans.scap
-              .filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
-              .map(h => h.title)
-              .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.title))
-              .sort()
-              .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
-              .join(', ')}`,
-            'Vulnerability ID(16a.3)': `Group ID: ${cklReq.grpId}
-  Vuln ID: ${cklReq.vulnId}
-  Rule ID: ${cklReq.ruleId}
-  Plugin ID: `,
-            'Vulnerability Description (16.b)': cklReq.description,
-            'Devices Affected (16b.1)': csts.models.Scans.scans2poam.scans.scap
-              .filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
-              .map(h => h.hostname)
-              .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.hostname))
-              .sort()
-              .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
-              .filter((el, i, a) => { if (el.trim() !== '') return 1; return 0; })
-              .join(', '),
-            'Security Objectives (C-I-A) (16c)': '',
-            'Raw Test Result (16d)': this.getRiskVal(cklReq.severity, 'CAT'),
-            'Predisposing Condition(s) (16d.1)': '',
-            'Technical Mitigation(s) (16d.2)': mitigation,
-            'Severity or Pervasiveness (VL-VH) (16d.3)': this.getRiskVal(cklReq.severity, 'VL-VH'),
-            'Relevance of Threat (VL-VH) (16e)': this.getRiskVal(cklReq.severity, 'VL-VH'),
-            'Threat Description (16e.1)': cklReq.description,
-            'Likelihood (Cells 16d.3 & 16e) (VL-VH) (16f)': this.getRiskVal(cklReq.severity, 'VL-VH'),
-            'Impact (VL-VH) (16g)': this.getRiskVal(cklReq.severity, 'VL-VH'),
-            'Impact Description (16h)': '',
-            'Risk (Cells 16f & 16g) (VL-VH) (16i)': this.getRiskVal(cklReq.severity, 'VL-VH'),
-            'Proposed Mitigations (From POA&M) (16j)': '',
-            'Residual Risk (After Proposed Mitigations) (16k)': '',
-            Status: cklReq.status,
-            'Recommendations (16l)': cklReq.solution,
-            Comments: `${cklReq.comments} ${cklReq.findingDetails}`,
-            // pluginId: '',
-          });
+          
+          if (cklReq.cci.length > 1 && $('#split-CCI').prop('checked') ) {
+            cklReq.cci.filter(cci => cci.toLowerCase().indexOf('cce') === -1).forEach((cci) => {
+              results.push({
+                'Non-Compliant Security Controls (16a)': typeof cklReq.iaControls === 'object' ? cklReq.iaControls.join(', ') : cklReq.iaControls,
+                'Affected CCI (16a.1)': cci,
+                'Source of Discovery(16a.2)': `SCAP/STIG: ${csts.models.Scans.scans2poam.scans.scap
+                  .filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
+                  .map(h => h.title)
+                  .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.title))
+                  .sort()
+                  .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+                  .join(', ')}`,
+                'Vulnerability ID(16a.3)': `Group ID: ${cklReq.grpId}
+Vuln ID: ${cklReq.vulnId}
+Rule ID: ${cklReq.ruleId}
+Plugin ID: `,
+                'Vulnerability Description (16.b)': cklReq.description,
+                'Devices Affected (16b.1)': csts.models.Scans.scans2poam.scans.scap
+                  .filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
+                  .map(h => h.hostname)
+                  .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.hostname))
+                  .sort()
+                  .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+                  .filter((el, i, a) => { if (el.trim() !== '') return 1; return 0; })
+                  .join(', '),
+                'Security Objectives (C-I-A) (16c)': '',
+                'Raw Test Result (16d)': this.getRiskVal(cklReq.severity, 'CAT'),
+                'Predisposing Condition(s) (16d.1)': '',
+                'Technical Mitigation(s) (16d.2)': mitigation,
+                'Severity or Pervasiveness (VL-VH) (16d.3)': this.getRiskVal(cklReq.severity, 'VL-VH'),
+                'Relevance of Threat (VL-VH) (16e)': this.getRiskVal(cklReq.severity, 'VL-VH'),
+                'Threat Description (16e.1)': cklReq.description,
+                'Likelihood (Cells 16d.3 & 16e) (VL-VH) (16f)': this.getRiskVal(cklReq.severity, 'VL-VH'),
+                'Impact (VL-VH) (16g)': this.getRiskVal(cklReq.severity, 'VL-VH'),
+                'Impact Description (16h)': '',
+                'Risk (Cells 16f & 16g) (VL-VH) (16i)': this.getRiskVal(cklReq.severity, 'VL-VH'),
+                'Proposed Mitigations (From POA&M) (16j)': '',
+                'Residual Risk (After Proposed Mitigations) (16k)': '',
+                Status: cklReq.status,
+                'Recommendations (16l)': cklReq.solution,
+                Comments: `${cklReq.comments} ${cklReq.findingDetails}`,
+                // pluginId: '',
+              });
+            });
+
+          } else {
+            results.push({
+              'Non-Compliant Security Controls (16a)': typeof cklReq.iaControls === 'object' ? cklReq.iaControls.join(', ') : cklReq.iaControls,
+              'Affected CCI (16a.1)': cklReq.cci.join(', '),
+              'Source of Discovery(16a.2)': `SCAP/STIG: ${csts.models.Scans.scans2poam.scans.scap
+                .filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
+                .map(h => h.title)
+                .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.title))
+                .sort()
+                .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+                .join(', ')}`,
+              'Vulnerability ID(16a.3)': `Group ID: ${cklReq.grpId}
+Vuln ID: ${cklReq.vulnId}
+Rule ID: ${cklReq.ruleId}
+Plugin ID: `,
+              'Vulnerability Description (16.b)': cklReq.description,
+              'Devices Affected (16b.1)': csts.models.Scans.scans2poam.scans.scap
+                .filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
+                .map(h => h.hostname)
+                .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.hostname))
+                .sort()
+                .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+                .filter((el, i, a) => { if (el.trim() !== '') return 1; return 0; })
+                .join(', '),
+              'Security Objectives (C-I-A) (16c)': '',
+              'Raw Test Result (16d)': this.getRiskVal(cklReq.severity, 'CAT'),
+              'Predisposing Condition(s) (16d.1)': '',
+              'Technical Mitigation(s) (16d.2)': mitigation,
+              'Severity or Pervasiveness (VL-VH) (16d.3)': this.getRiskVal(cklReq.severity, 'VL-VH'),
+              'Relevance of Threat (VL-VH) (16e)': this.getRiskVal(cklReq.severity, 'VL-VH'),
+              'Threat Description (16e.1)': cklReq.description,
+              'Likelihood (Cells 16d.3 & 16e) (VL-VH) (16f)': this.getRiskVal(cklReq.severity, 'VL-VH'),
+              'Impact (VL-VH) (16g)': this.getRiskVal(cklReq.severity, 'VL-VH'),
+              'Impact Description (16h)': '',
+              'Risk (Cells 16f & 16g) (VL-VH) (16i)': this.getRiskVal(cklReq.severity, 'VL-VH'),
+              'Proposed Mitigations (From POA&M) (16j)': '',
+              'Residual Risk (After Proposed Mitigations) (16k)': '',
+              Status: cklReq.status,
+              'Recommendations (16l)': cklReq.solution,
+              Comments: `${cklReq.comments} ${cklReq.findingDetails}`,
+              // pluginId: '',
+            });
+          }
         });
 
       // just ckl
@@ -481,47 +529,93 @@ Plugin ID: ${element}`,
           const m = csts.models.Scans.scans2poam.mitigations.find(i => i.vuln === cklReq.vulnId);
           const mitigation = typeof m !== 'undefined' ? m.mitigation : '';
 
-          results.push({
-            'Non-Compliant Security Controls (16a)': typeof cklReq.iaControls === 'object' ? cklReq.iaControls.join(', ') : cklReq.iaControls,
-            'Affected CCI (16a.1)': cklReq.cci.join(', '),
-            'Source of Discovery(16a.2)': `STIG: ${csts.models.Scans.scans2poam.scans.ckl
-              .filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
-              .map(h => h.title)
-              .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.title))
-              .sort()
-              .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
-              .join(', ')}`,
-            'Vulnerability ID(16a.3)': `Group ID: ${cklReq.grpId}
-  Vuln ID: ${cklReq.vulnId}
-  Rule ID: ${cklReq.ruleId}
-  Plugin ID: `,
-            'Vulnerability Description (16.b)': cklReq.description,
-            'Devices Affected (16b.1)': csts.models.Scans.scans2poam.scans.scap
-              .filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
-              .map(h => h.hostname)
-              .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.hostname))
-              .sort()
-              .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
-              .filter((el, i, a) => { if (el.trim() !== '') return 1; return 0; })
-              .join(', '),
-            'Security Objectives (C-I-A) (16c)': '',
-            'Raw Test Result (16d)': this.getRiskVal(cklReq.severity, 'CAT'),
-            'Predisposing Condition(s) (16d.1)': '',
-            'Technical Mitigation(s) (16d.2)': mitigation,
-            'Severity or Pervasiveness (VL-VH) (16d.3)': this.getRiskVal(cklReq.severity, 'VL-VH'),
-            'Relevance of Threat (VL-VH) (16e)': this.getRiskVal(cklReq.severity, 'VL-VH'),
-            'Threat Description (16e.1)': cklReq.description,
-            'Likelihood (Cells 16d.3 & 16e) (VL-VH) (16f)': this.getRiskVal(cklReq.severity, 'VL-VH'),
-            'Impact (VL-VH) (16g)': this.getRiskVal(cklReq.severity, 'VL-VH'),
-            'Impact Description (16h)': '',
-            'Risk (Cells 16f & 16g) (VL-VH) (16i)': this.getRiskVal(cklReq.severity, 'VL-VH'),
-            'Proposed Mitigations (From POA&M) (16j)': '',
-            'Residual Risk (After Proposed Mitigations) (16k)': '',
-            Status: cklReq.status,
-            'Recommendations (16l)': cklReq.solution,
-            Comments: `${cklReq.comments} ${cklReq.findingDetails}`,
-            // pluginId: '',
-          });
+          if (cklReq.cci.length > 1 && $('#split-CCI').prop('checked')) {
+            cklReq.cci.filter(cci => cci.toLowerCase().indexOf('cce') === -1).forEach((cci) => {
+              results.push({
+                'Non-Compliant Security Controls (16a)': typeof cklReq.iaControls === 'object' ? cklReq.iaControls.join(', ') : cklReq.iaControls,
+                'Affected CCI (16a.1)': cci,
+                'Source of Discovery(16a.2)': `STIG: ${csts.models.Scans.scans2poam.scans.ckl
+                  .filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
+                  .map(h => h.title)
+                  .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.title))
+                  .sort()
+                  .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+                  .join(', ')}`,
+                'Vulnerability ID(16a.3)': `Group ID: ${cklReq.grpId}
+Vuln ID: ${cklReq.vulnId}
+Rule ID: ${cklReq.ruleId}
+Plugin ID: `,
+                'Vulnerability Description (16.b)': cklReq.description,
+                'Devices Affected (16b.1)': csts.models.Scans.scans2poam.scans.scap
+                  .filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
+                  .map(h => h.hostname)
+                  .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.hostname))
+                  .sort()
+                  .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+                  .filter((el, i, a) => { if (el.trim() !== '') return 1; return 0; })
+                  .join(', '),
+                'Security Objectives (C-I-A) (16c)': '',
+                'Raw Test Result (16d)': this.getRiskVal(cklReq.severity, 'CAT'),
+                'Predisposing Condition(s) (16d.1)': '',
+                'Technical Mitigation(s) (16d.2)': mitigation,
+                'Severity or Pervasiveness (VL-VH) (16d.3)': this.getRiskVal(cklReq.severity, 'VL-VH'),
+                'Relevance of Threat (VL-VH) (16e)': this.getRiskVal(cklReq.severity, 'VL-VH'),
+                'Threat Description (16e.1)': cklReq.description,
+                'Likelihood (Cells 16d.3 & 16e) (VL-VH) (16f)': this.getRiskVal(cklReq.severity, 'VL-VH'),
+                'Impact (VL-VH) (16g)': this.getRiskVal(cklReq.severity, 'VL-VH'),
+                'Impact Description (16h)': '',
+                'Risk (Cells 16f & 16g) (VL-VH) (16i)': this.getRiskVal(cklReq.severity, 'VL-VH'),
+                'Proposed Mitigations (From POA&M) (16j)': '',
+                'Residual Risk (After Proposed Mitigations) (16k)': '',
+                Status: cklReq.status,
+                'Recommendations (16l)': cklReq.solution,
+                Comments: `${cklReq.comments} ${cklReq.findingDetails}`,
+                // pluginId: '',
+              });
+            })
+          } else {
+            results.push({
+              'Non-Compliant Security Controls (16a)': typeof cklReq.iaControls === 'object' ? cklReq.iaControls.join(', ') : cklReq.iaControls,
+              'Affected CCI (16a.1)': cklReq.cci.join(', '),
+              'Source of Discovery(16a.2)': `STIG: ${csts.models.Scans.scans2poam.scans.ckl
+                .filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
+                .map(h => h.title)
+                .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.title))
+                .sort()
+                .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+                .join(', ')}`,
+              'Vulnerability ID(16a.3)': `Group ID: ${cklReq.grpId}
+Vuln ID: ${cklReq.vulnId}
+Rule ID: ${cklReq.ruleId}
+Plugin ID: `,
+              'Vulnerability Description (16.b)': cklReq.description,
+              'Devices Affected (16b.1)': csts.models.Scans.scans2poam.scans.scap
+                .filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
+                .map(h => h.hostname)
+                .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.hostname))
+                .sort()
+                .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+                .filter((el, i, a) => { if (el.trim() !== '') return 1; return 0; })
+                .join(', '),
+              'Security Objectives (C-I-A) (16c)': '',
+              'Raw Test Result (16d)': this.getRiskVal(cklReq.severity, 'CAT'),
+              'Predisposing Condition(s) (16d.1)': '',
+              'Technical Mitigation(s) (16d.2)': mitigation,
+              'Severity or Pervasiveness (VL-VH) (16d.3)': this.getRiskVal(cklReq.severity, 'VL-VH'),
+              'Relevance of Threat (VL-VH) (16e)': this.getRiskVal(cklReq.severity, 'VL-VH'),
+              'Threat Description (16e.1)': cklReq.description,
+              'Likelihood (Cells 16d.3 & 16e) (VL-VH) (16f)': this.getRiskVal(cklReq.severity, 'VL-VH'),
+              'Impact (VL-VH) (16g)': this.getRiskVal(cklReq.severity, 'VL-VH'),
+              'Impact Description (16h)': '',
+              'Risk (Cells 16f & 16g) (VL-VH) (16i)': this.getRiskVal(cklReq.severity, 'VL-VH'),
+              'Proposed Mitigations (From POA&M) (16j)': '',
+              'Residual Risk (After Proposed Mitigations) (16k)': '',
+              Status: cklReq.status,
+              'Recommendations (16l)': cklReq.solution,
+              Comments: `${cklReq.comments} ${cklReq.findingDetails}`,
+              // pluginId: '',
+            });
+          }
         });
 
       // just scap (this should be impossible if SCAP and STIG is done properly)
@@ -531,48 +625,93 @@ Plugin ID: ${element}`,
 
           const m = csts.models.Scans.scans2poam.mitigations.find(i => i.vuln === scapReq.vulnId);
           const mitigation = typeof m !== 'undefined' ? m.mitigation : '';
-
-          results.push({
-            'Non-Compliant Security Controls (16a)': typeof scapReq.iaControls === 'object' ? scapReq.iaControls.join(', ') : scapReq.iaControls,
-            'Affected CCI (16a.1)': scapReq.cci.join(', '),
-            'Source of Discovery(16a.2)': `SCAP: ${csts.models.Scans.scans2poam.scans.scap
-              .filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0)
-              .map(h => h.title)
-              .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.title))
-              .sort()
-              .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
-              .join(', ')}`,
-            'Vulnerability ID(16a.3)': `Group ID: ${scapReq.grpId}
-  Vuln ID: ${scapReq.vulnId}
-  Rule ID: ${scapReq.ruleId}
-  Plugin ID: `,
-            'Vulnerability Description (16.b)': scapReq.description,
-            'Devices Affected (16b.1)': csts.models.Scans.scans2poam.scans.scap
-              .filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0)
-              .map(h => h.hostname)
-              .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.hostname))
-              .sort()
-              .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
-              .filter((el, i, a) => { if (el.trim() !== '') return 1; return 0; })
-              .join(', '),
-            'Security Objectives (C-I-A) (16c)': '',
-            'Raw Test Result (16d)': this.getRiskVal(scapReq.severity, 'CAT'),
-            'Predisposing Condition(s) (16d.1)': '',
-            'Technical Mitigation(s) (16d.2)': mitigation,
-            'Severity or Pervasiveness (VL-VH) (16d.3)': this.getRiskVal(scapReq.severity, 'VL-VH'),
-            'Relevance of Threat (VL-VH) (16e)': this.getRiskVal(scapReq.severity, 'VL-VH'),
-            'Threat Description (16e.1)': scapReq.description,
-            'Likelihood (Cells 16d.3 & 16e) (VL-VH) (16f)': this.getRiskVal(scapReq.severity, 'VL-VH'),
-            'Impact (VL-VH) (16g)': this.getRiskVal(scapReq.severity, 'VL-VH'),
-            'Impact Description (16h)': '',
-            'Risk (Cells 16f & 16g) (VL-VH) (16i)': this.getRiskVal(scapReq.severity, 'VL-VH'),
-            'Proposed Mitigations (From POA&M) (16j)': '',
-            'Residual Risk (After Proposed Mitigations) (16k)': '',
-            Status: scapReq.status,
-            'Recommendations (16l)': scapReq.solution,
-            Comments: `${scapReq.comments} ${scapReq.findingDetails}`,
-            // pluginId: '',
-          });
+          if (scapReq.cci.length > 1 && $('#split-CCI').prop('checked')) {
+            scapReq.cci.filter(cci => cci.toLowerCase().indexOf('cce') === -1).forEach((cci) => {
+              results.push({
+                'Non-Compliant Security Controls (16a)': typeof scapReq.iaControls === 'object' ? scapReq.iaControls.join(', ') : scapReq.iaControls,
+                'Affected CCI (16a.1)': cci,
+                'Source of Discovery(16a.2)': `SCAP: ${csts.models.Scans.scans2poam.scans.scap
+                  .filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0)
+                  .map(h => h.title)
+                  .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.title))
+                  .sort()
+                  .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+                  .join(', ')}`,
+                'Vulnerability ID(16a.3)': `Group ID: ${scapReq.grpId}
+Vuln ID: ${scapReq.vulnId}
+Rule ID: ${scapReq.ruleId}
+Plugin ID: `,
+                'Vulnerability Description (16.b)': scapReq.description,
+                'Devices Affected (16b.1)': csts.models.Scans.scans2poam.scans.scap
+                  .filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0)
+                  .map(h => h.hostname)
+                  .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.hostname))
+                  .sort()
+                  .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+                  .filter((el, i, a) => { if (el.trim() !== '') return 1; return 0; })
+                  .join(', '),
+                'Security Objectives (C-I-A) (16c)': '',
+                'Raw Test Result (16d)': this.getRiskVal(scapReq.severity, 'CAT'),
+                'Predisposing Condition(s) (16d.1)': '',
+                'Technical Mitigation(s) (16d.2)': mitigation,
+                'Severity or Pervasiveness (VL-VH) (16d.3)': this.getRiskVal(scapReq.severity, 'VL-VH'),
+                'Relevance of Threat (VL-VH) (16e)': this.getRiskVal(scapReq.severity, 'VL-VH'),
+                'Threat Description (16e.1)': scapReq.description,
+                'Likelihood (Cells 16d.3 & 16e) (VL-VH) (16f)': this.getRiskVal(scapReq.severity, 'VL-VH'),
+                'Impact (VL-VH) (16g)': this.getRiskVal(scapReq.severity, 'VL-VH'),
+                'Impact Description (16h)': '',
+                'Risk (Cells 16f & 16g) (VL-VH) (16i)': this.getRiskVal(scapReq.severity, 'VL-VH'),
+                'Proposed Mitigations (From POA&M) (16j)': '',
+                'Residual Risk (After Proposed Mitigations) (16k)': '',
+                Status: scapReq.status,
+                'Recommendations (16l)': scapReq.solution,
+                Comments: `${scapReq.comments} ${scapReq.findingDetails}`,
+                // pluginId: '',
+              });
+            })
+          } else {
+            results.push({
+              'Non-Compliant Security Controls (16a)': typeof scapReq.iaControls === 'object' ? scapReq.iaControls.join(', ') : scapReq.iaControls,
+              'Affected CCI (16a.1)': scapReq.cci.join(', '),
+              'Source of Discovery(16a.2)': `SCAP: ${csts.models.Scans.scans2poam.scans.scap
+                .filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0)
+                .map(h => h.title)
+                .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.title))
+                .sort()
+                .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+                .join(', ')}`,
+              'Vulnerability ID(16a.3)': `Group ID: ${scapReq.grpId}
+Vuln ID: ${scapReq.vulnId}
+Rule ID: ${scapReq.ruleId}
+Plugin ID: `,
+              'Vulnerability Description (16.b)': scapReq.description,
+              'Devices Affected (16b.1)': csts.models.Scans.scans2poam.scans.scap
+                .filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0)
+                .map(h => h.hostname)
+                .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.hostname))
+                .sort()
+                .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+                .filter((el, i, a) => { if (el.trim() !== '') return 1; return 0; })
+                .join(', '),
+              'Security Objectives (C-I-A) (16c)': '',
+              'Raw Test Result (16d)': this.getRiskVal(scapReq.severity, 'CAT'),
+              'Predisposing Condition(s) (16d.1)': '',
+              'Technical Mitigation(s) (16d.2)': mitigation,
+              'Severity or Pervasiveness (VL-VH) (16d.3)': this.getRiskVal(scapReq.severity, 'VL-VH'),
+              'Relevance of Threat (VL-VH) (16e)': this.getRiskVal(scapReq.severity, 'VL-VH'),
+              'Threat Description (16e.1)': scapReq.description,
+              'Likelihood (Cells 16d.3 & 16e) (VL-VH) (16f)': this.getRiskVal(scapReq.severity, 'VL-VH'),
+              'Impact (VL-VH) (16g)': this.getRiskVal(scapReq.severity, 'VL-VH'),
+              'Impact Description (16h)': '',
+              'Risk (Cells 16f & 16g) (VL-VH) (16i)': this.getRiskVal(scapReq.severity, 'VL-VH'),
+              'Proposed Mitigations (From POA&M) (16j)': '',
+              'Residual Risk (After Proposed Mitigations) (16k)': '',
+              Status: scapReq.status,
+              'Recommendations (16l)': scapReq.solution,
+              Comments: `${scapReq.comments} ${scapReq.findingDetails}`,
+              // pluginId: '',
+            });
+          }
         });
 
       return results;
@@ -633,6 +772,7 @@ Devices Affected:
           'Security Checks': `Group ID: ${acasPlugin.grpId}
 Vuln ID:
 Rule ID:
+CCI: 
 Plugin ID: ${element}`,
           'Raw Severity Value': this.getRiskVal(acasPlugin.severity, 'CAT'),
           Mitigations: mitigation,
@@ -650,23 +790,23 @@ Plugin ID: ${element}`,
       // unique list of requirements for scap and ckl
       const ckls = csts.plugins.jsonQuery('ckl[*].requirements[*status!=Completed].vulnId', { data: csts.models.Scans.scans2poam.scans }).value.sort().filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; });
       const scaps = csts.plugins.jsonQuery('scap[*].requirements[*status!=Completed].vulnId', { data: csts.models.Scans.scans2poam.scans }).value.sort().filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; });
-
       // ckl and scap
       ckls.filter(e => scaps.includes(e)).concat(scaps.filter(e => ckls.includes(e))).sort()
         .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
         .forEach((element) => {
           const cklReq = csts.plugins.jsonQuery(`ckl[*].requirements[vulnId=${element}]`, { data: csts.models.Scans.scans2poam.scans }).value;
-          
           const m = csts.models.Scans.scans2poam.mitigations.find(i => i.plugin === cklReq.vulnId);
           const mitigation = typeof m !== 'undefined' ? m.mitigation : '';
 
-          results.push({
-            A: '',
-            'Control Vulnerability Description': `Title: ${cklReq.title}
-
- Description:
+          if (cklReq.cci.length > 1 && $('#split-CCI').prop('checked')) {
+            cklReq.cci.filter(cci => cci.toLowerCase().indexOf('cce') === -1).forEach((cci) => {
+              results.push({
+                A: '',
+                'Control Vulnerability Description': `Title: ${cklReq.title}
+  
+Description:
   ${cklReq.description}
-
+  
 Devices Affected:
   ${csts.models.Scans.scans2poam.scans.scap
     .filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
@@ -677,29 +817,74 @@ Devices Affected:
     .filter((el, i, a) => { if (el.trim() !== '') return 1; return 0; })
     .join(', ')
 }`,
-            'Security Control Number (NC/NA controls only)': typeof cklReq.iaControls === 'object' ? cklReq.iaControls.join(', ') : cklReq.iaControls,
-            'Office/Org': '',
-            'Security Checks': `Group ID: ${cklReq.grpId}
+                'Security Control Number (NC/NA controls only)': typeof cklReq.iaControls === 'object' ? cklReq.iaControls.join(', ') : cklReq.iaControls,
+                'Office/Org': '',
+                'Security Checks': `Group ID: ${cklReq.grpId}
+  Vuln ID: ${cklReq.vulnId}
+  Rule ID: ${cklReq.ruleId}
+  CCI: ${cci}
+  Plugin ID:`,
+                'Raw Severity Value': this.getRiskVal(cklReq.severity, 'CAT'),
+                Mitigations: mitigation,
+                'Severity Value': this.getRiskVal(cklReq.severity, 'CAT'),
+                'Resources Required': cklReq.resources,
+                'Scheduled Completion Date': '',
+                'Milestone with Completion Dates': '',
+                'Milestone Changes': '',
+                'Source Identifying Control Vulnerability': `SCAP/STIG: ${csts.models.Scans.scans2poam.scans.scap
+                  .filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
+                  .map(h => h.title)
+                  .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.title))
+                  .sort()
+                  .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+                  .join(', ')}`,
+                Status: 'Ongoing',
+                Comments: cklReq.comments,
+              });
+            });
+          } else {
+            results.push({
+              A: '',
+              'Control Vulnerability Description': `Title: ${cklReq.title}
+
+ Description:
+    ${cklReq.description}
+
+Devices Affected:
+${csts.models.Scans.scans2poam.scans.scap
+    .filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
+    .map(h => h.hostname)
+    .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.hostname))
+    .sort()
+    .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+    .filter((el, i, a) => { if (el.trim() !== '') return 1; return 0; })
+    .join(', ')
+}`,
+              'Security Control Number (NC/NA controls only)': typeof cklReq.iaControls === 'object' ? cklReq.iaControls.join(', ') : cklReq.iaControls,
+              'Office/Org': '',
+              'Security Checks': `Group ID: ${cklReq.grpId}
 Vuln ID: ${cklReq.vulnId}
 Rule ID: ${cklReq.ruleId}
+CCI: ${cklReq.cci}
 Plugin ID:`,
-            'Raw Severity Value': this.getRiskVal(cklReq.severity, 'CAT'),
-            Mitigations: mitigation,
-            'Severity Value': this.getRiskVal(cklReq.severity, 'CAT'),
-            'Resources Required': cklReq.resources,
-            'Scheduled Completion Date': '',
-            'Milestone with Completion Dates': '',
-            'Milestone Changes': '',
-            'Source Identifying Control Vulnerability': `SCAP/STIG: ${csts.models.Scans.scans2poam.scans.scap
-              .filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
-              .map(h => h.title)
-              .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.title))
-              .sort()
-              .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
-              .join(', ')}`,
-            Status: 'Ongoing',
-            Comments: cklReq.comments,
-          });
+              'Raw Severity Value': this.getRiskVal(cklReq.severity, 'CAT'),
+              Mitigations: mitigation,
+              'Severity Value': this.getRiskVal(cklReq.severity, 'CAT'),
+              'Resources Required': cklReq.resources,
+              'Scheduled Completion Date': '',
+              'Milestone with Completion Dates': '',
+              'Milestone Changes': '',
+              'Source Identifying Control Vulnerability': `SCAP/STIG: ${csts.models.Scans.scans2poam.scans.scap
+                .filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
+                .map(h => h.title)
+                .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.title))
+                .sort()
+                .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+                .join(', ')}`,
+              Status: 'Ongoing',
+              Comments: cklReq.comments,
+            });
+          }
         });
 
       // just ckl
@@ -710,9 +895,54 @@ Plugin ID:`,
           const m = csts.models.Scans.scans2poam.mitigations.find(i => i.plugin === cklReq.vulnId);
           const mitigation = typeof m !== 'undefined' ? m.mitigation : '';
 
-          results.push({
-            A: '',
-            'Control Vulnerability Description': `Title: ${cklReq.title}
+          if (cklReq.cci.length > 1 && $('#split-CCI').prop('checked')) {
+            cklReq.cci.filter(cci => cci.toLowerCase().indexOf('cce') === -1).forEach((cci) => {
+              results.push({
+                A: '',
+                'Control Vulnerability Description': `Title: ${cklReq.title}
+  
+Description:
+${cklReq.description}
+
+Devices Affected:
+${csts.models.Scans.scans2poam.scans.scap
+    .filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
+    .map(h => h.hostname)
+    .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.hostname))
+    .sort()
+    .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+    .filter((el, i, a) => { if (el.trim() !== '') return 1; return 0; })
+    .join(', ')
+}`,
+                'Security Control Number (NC/NA controls only)': typeof cklReq.iaControls === 'object' ? cklReq.iaControls.join(', ') : cklReq.iaControls,
+                'Office/Org': '',
+                'Security Checks': `Group ID: ${cklReq.grpId}
+  Vuln ID: ${cklReq.vulnId}
+  Rule ID: ${cklReq.ruleId}
+  CCI: ${cci}
+  Plugin ID:`,
+                'Raw Severity Value': this.getRiskVal(cklReq.severity, 'CAT'),
+                Mitigations: mitigation,
+                'Severity Value': this.getRiskVal(cklReq.severity, 'CAT'),
+                'Resources Required': cklReq.resources,
+                'Scheduled Completion Date': '',
+                'Milestone with Completion Dates': '',
+                'Milestone Changes': '',
+                'Source Identifying Control Vulnerability': `STIG: ${csts.models.Scans.scans2poam.scans.scap
+                  .filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
+                  .map(h => h.title)
+                  .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.title))
+                  .sort()
+                  .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+                  .join(', ')}`,
+                Status: 'Ongoing',
+                Comments: cklReq.comments,
+              });
+            });
+          } else {
+            results.push({
+              A: '',
+              'Control Vulnerability Description': `Title: ${cklReq.title}
 
 Description:
 ${cklReq.description}
@@ -727,29 +957,31 @@ ${csts.models.Scans.scans2poam.scans.scap
     .filter((el, i, a) => { if (el.trim() !== '') return 1; return 0; })
     .join(', ')
 }`,
-            'Security Control Number (NC/NA controls only)': typeof cklReq.iaControls === 'object' ? cklReq.iaControls.join(', ') : cklReq.iaControls,
-            'Office/Org': '',
-            'Security Checks': `Group ID: ${cklReq.grpId}
+              'Security Control Number (NC/NA controls only)': typeof cklReq.iaControls === 'object' ? cklReq.iaControls.join(', ') : cklReq.iaControls,
+              'Office/Org': '',
+              'Security Checks': `Group ID: ${cklReq.grpId}
 Vuln ID: ${cklReq.vulnId}
 Rule ID: ${cklReq.ruleId}
+CCI: ${cklReq.cci}
 Plugin ID:`,
-            'Raw Severity Value': this.getRiskVal(cklReq.severity, 'CAT'),
-            Mitigations: mitigation,
-            'Severity Value': this.getRiskVal(cklReq.severity, 'CAT'),
-            'Resources Required': cklReq.resources,
-            'Scheduled Completion Date': '',
-            'Milestone with Completion Dates': '',
-            'Milestone Changes': '',
-            'Source Identifying Control Vulnerability': `STIG: ${csts.models.Scans.scans2poam.scans.scap
-              .filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
-              .map(h => h.title)
-              .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.title))
-              .sort()
-              .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
-              .join(', ')}`,
-            Status: 'Ongoing',
-            Comments: cklReq.comments,
-          });
+              'Raw Severity Value': this.getRiskVal(cklReq.severity, 'CAT'),
+              Mitigations: mitigation,
+              'Severity Value': this.getRiskVal(cklReq.severity, 'CAT'),
+              'Resources Required': cklReq.resources,
+              'Scheduled Completion Date': '',
+              'Milestone with Completion Dates': '',
+              'Milestone Changes': '',
+              'Source Identifying Control Vulnerability': `STIG: ${csts.models.Scans.scans2poam.scans.scap
+                .filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
+                .map(h => h.title)
+                .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.title))
+                .sort()
+                .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+                .join(', ')}`,
+              Status: 'Ongoing',
+              Comments: cklReq.comments,
+            });
+          }
         });
 
       // just scap (this should be impossible if SCAP and STIG is done properly)
@@ -760,10 +992,54 @@ Plugin ID:`,
           const m = csts.models.Scans.scans2poam.mitigations.find(i => i.plugin === scapReq.vulnId);
           const mitigation = typeof m !== 'undefined' ? m.mitigation : '';
 
+          if (scapReq.cci.length > 1 && $('#split-CCI').prop('checked')) {
+            scapReq.cci.filter(cci => cci.toLowerCase().indexOf('cce') === -1).forEach((cci) => {
+              results.push({
+                A: '',
+                'Control Vulnerability Description': `Title: ${scapReq.title}
+  
+Description:
+${scapReq.description}
 
-          results.push({
-            A: '',
-            'Control Vulnerability Description': `Title: ${scapReq.title}
+Devices Affected:
+${csts.models.Scans.scans2poam.scans.scap
+    .filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0)
+    .map(h => h.hostname)
+    .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.hostname))
+    .sort()
+    .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+    .filter((el, i, a) => { if (el.trim() !== '') return 1; return 0; })
+    .join(', ')
+}`,
+                'Security Control Number (NC/NA controls only)': typeof scapReq.iaControls === 'object' ? scapReq.iaControls.join(', ') : scapReq.iaControls,
+                'Office/Org': '',
+                'Security Checks': `Group ID: ${scapReq.grpId}
+Vuln ID: ${scapReq.vulnId}
+Rule ID: ${scapReq.ruleId}
+CCI: ${cci}
+Plugin ID:`,
+                'Raw Severity Value': this.getRiskVal(scapReq.severity, 'CAT'),
+                Mitigations: mitigation,
+                'Severity Value': this.getRiskVal(scapReq.severity, 'CAT'),
+                'Resources Required': scapReq.resources,
+                'Scheduled Completion Date': '',
+                'Milestone with Completion Dates': '',
+                'Milestone Changes': '',
+                'Source Identifying Control Vulnerability': `SCAP: ${csts.models.Scans.scans2poam.scans.scap
+                  .filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0)
+                  .map(h => h.title)
+                  .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.title))
+                  .sort()
+                  .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+                  .join(', ')}`,
+                Status: 'Ongoing',
+                Comments: scapReq.findingDetails,
+              });
+            });
+          } else {
+            results.push({
+              A: '',
+              'Control Vulnerability Description': `Title: ${scapReq.title}
 
 Description:
 ${scapReq.description}
@@ -778,29 +1054,31 @@ ${csts.models.Scans.scans2poam.scans.scap
     .filter((el, i, a) => { if (el.trim() !== '') return 1; return 0; })
     .join(', ')
 }`,
-            'Security Control Number (NC/NA controls only)': typeof scapReq.iaControls === 'object' ? scapReq.iaControls.join(', ') : scapReq.iaControls,
-            'Office/Org': '',
-            'Security Checks': `Group ID: ${scapReq.grpId}
+              'Security Control Number (NC/NA controls only)': typeof scapReq.iaControls === 'object' ? scapReq.iaControls.join(', ') : scapReq.iaControls,
+              'Office/Org': '',
+              'Security Checks': `Group ID: ${scapReq.grpId}
 Vuln ID: ${scapReq.vulnId}
 Rule ID: ${scapReq.ruleId}
+CCI: ${scapReq.cci}
 Plugin ID:`,
-            'Raw Severity Value': this.getRiskVal(scapReq.severity, 'CAT'),
-            Mitigations: mitigation,
-            'Severity Value': this.getRiskVal(scapReq.severity, 'CAT'),
-            'Resources Required': scapReq.resources,
-            'Scheduled Completion Date': '',
-            'Milestone with Completion Dates': '',
-            'Milestone Changes': '',
-            'Source Identifying Control Vulnerability': `SCAP: ${csts.models.Scans.scans2poam.scans.scap
-              .filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0)
-              .map(h => h.title)
-              .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.title))
-              .sort()
-              .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
-              .join(', ')}`,
-            Status: 'Ongoing',
-            Comments: scapReq.findingDetails,
-          });
+              'Raw Severity Value': this.getRiskVal(scapReq.severity, 'CAT'),
+              Mitigations: mitigation,
+              'Severity Value': this.getRiskVal(scapReq.severity, 'CAT'),
+              'Resources Required': scapReq.resources,
+              'Scheduled Completion Date': '',
+              'Milestone with Completion Dates': '',
+              'Milestone Changes': '',
+              'Source Identifying Control Vulnerability': `SCAP: ${csts.models.Scans.scans2poam.scans.scap
+                .filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0)
+                .map(h => h.title)
+                .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.title))
+                .sort()
+                .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+                .join(', ')}`,
+              Status: 'Ongoing',
+              Comments: scapReq.findingDetails,
+            });
+          }
         });
 
       return results;
@@ -1197,6 +1475,36 @@ Plugin ID:`,
     },
 
     /*
+      Method: getRiskVal
+
+      Description:
+        formats the submitted 'risk' into the desired format
+
+       Paramters:
+        source - the Risk being formatted
+        format - the desired format (VL-VH, N-C, CAT)
+    */
+    getRiskVal(source, format) {
+      const crossWalkFrom = {
+        VL: 0, L: 1, M: 2, H: 3, VH: 4, NONE: 0, LOW: 1, MEDIUM: 2, HIGH: 3, CRITICAL: 4, CATIV: 0, CATIII: 1, CATII: 2, CATI: 3, 'CAT IV': 0, 'CAT III': 1, 'CAT II': 2, 'CAT I': 3, MODERATE: 2, 0: 0, 1: 1, 2: 2, 3: 3, 4: 4,
+      };
+      const crossWalkTo = {
+        'VL-VH': {
+          0: 'VL', 1: 'L', 2: 'M', 3: 'H', 4: 'VH',
+        },
+        'N-C': {
+          0: 'None', 1: 'Low', 2: 'Medium', 3: 'High', 4: 'Critical',
+        },
+        CAT: {
+          0: 'CAT IV', 1: 'CAT III', 2: 'CAT II', 3: 'CAT I', 4: 'CAT I',
+        },
+      };
+
+      return crossWalkTo[format][crossWalkFrom[`${source}`.toUpperCase().trim()]];
+    },
+
+
+    /*
       Method: compareVals
 
       Description:
@@ -1238,9 +1546,13 @@ Plugin ID:`,
       // since there is no consistency, try to map which fields are in which columns for the RAR and POAM
       'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach((i) => {
         if (csts.models.Scans.workbooks.rar.val(rarTab, `${i}1`).toLowerCase().indexOf('raw') >= 0) { this.rarFields['Raw Risk'] = i; }
-        if (csts.models.Scans.workbooks.rar.val(rarTab, `${i}1`).toLowerCase().indexOf('residual') >= 0) { this.rarFields['Residual Risk'] = i; }
+        
+        if (csts.models.Scans.workbooks.rar.val(rarTab, `${i}1`).toLowerCase().indexOf('residual') >   0 && csts.models.Scans.workbooks.rar.val(rarTab, `${i}1`).toLowerCase().indexOf('proposed') < 0) { this.rarFields['Residual Risk'] = i; }
+        if (csts.models.Scans.workbooks.rar.val(rarTab, `${i}1`).toLowerCase().indexOf('risk') === 0     && csts.models.Scans.workbooks.rar.val(rarTab, `${i}1`).toLowerCase().indexOf('proposed') < 0) { this.rarFields['Residual Risk'] = i; }
         if (csts.models.Scans.workbooks.rar.val(rarTab, `${i}1`).toLowerCase().indexOf('control') >= 0) { this.rarFields['Security Control'] = i; }
-        if (csts.models.Scans.workbooks.rar.val(rarTab, `${i}1`).toLowerCase().indexOf('source') >= 0) { this.rarFields.Source = i; }
+        if ( csts.models.Scans.workbooks.rar.val(rarTab, `${i}1`).toLowerCase().indexOf('source') >= 0 && csts.models.Scans.workbooks.rar.val(rarTab, `${i}1`).toLowerCase().indexOf('resources') < 0) {
+          this.rarFields.Source = i; 
+        }
         if (csts.models.Scans.workbooks.rar.val(rarTab, `${i}1`).toLowerCase().indexOf('status') >= 0) { this.rarFields.Status = i; }
 
         if (
@@ -1267,18 +1579,21 @@ Plugin ID:`,
         }
 
         if (csts.models.Scans.workbooks.poam.val(poamTab, `${i}1`).toLowerCase().indexOf('raw') >= 0) { this.poamFields['Raw Risk'] = i; }
-        if (csts.models.Scans.workbooks.poam.val(poamTab, `${i}1`).toLowerCase().indexOf('residual') >= 0) { this.poamFields['Residual Risk'] = i; }
-        if (csts.models.Scans.workbooks.poam.val(poamTab, `${i}1`).toLowerCase().indexOf('severity value') >= 0) { this.poamFields['Residual Risk'] = i; }
-        if (csts.models.Scans.workbooks.poam.val(poamTab, `${i}1`).toLowerCase().indexOf('control') >= 0) { this.poamFields['Security Control'] = i; }
-        if (csts.models.Scans.workbooks.poam.val(poamTab, `${i}1`).toLowerCase().indexOf('source') >= 0) { this.poamFields.Source = i; }
+        if (csts.models.Scans.workbooks.poam.val(poamTab, `${i}1`).toLowerCase().indexOf('residual') >= 0 || csts.models.Scans.workbooks.poam.val(poamTab, `${i}1`).toLowerCase().indexOf('severity value') >= 0) { this.poamFields['Residual Risk'] = i; }
+        if (csts.models.Scans.workbooks.poam.val(poamTab, `${i}1`).toLowerCase().indexOf('control') >= 0 && csts.models.Scans.workbooks.poam.val(poamTab, `${i}1`).toLowerCase().indexOf('source') < 0) { this.poamFields['Security Control'] = i; }
+        if (csts.models.Scans.workbooks.poam.val(poamTab, `${i}1`).toLowerCase().indexOf('source') >= 0 && csts.models.Scans.workbooks.poam.val(poamTab, `${i}1`).toLowerCase().indexOf('resources') < 0) { this.poamFields.Source = i; }
+        if (csts.models.Scans.workbooks.poam.val(poamTab, `${i}1`).toLowerCase().indexOf('comment') >= 0) { this.poamFields.Comment = i; }
         if (csts.models.Scans.workbooks.poam.val(poamTab, `${i}1`).toLowerCase().indexOf('status') >= 0) { this.poamFields.Status = i; }
         if (csts.models.Scans.workbooks.poam.val(poamTab, `${i}1`).toLowerCase().indexOf('mitigations') >= 0) { this.poamFields.Mitigation = i; }
         if (csts.models.Scans.workbooks.poam.val(poamTab, `${i}1`).toLowerCase().indexOf('description') >= 0) { this.poamFields.Description = i; }
         if (csts.models.Scans.workbooks.poam.val(poamTab, `${i}1`).toLowerCase().indexOf('checks') >= 0) { this.poamFields['Test Id'] = i; }
       });
+
+
+
       rarRow = 2;
       while (rarRow < 5000 && (!csts.models.Scans.workbooks.rar.isBlank(rarTab, [`${this.rarFields['Security Control']}${rarRow}`, `${this.rarFields.CCI}${rarRow}`, `${this.rarFields.Source}${rarRow}`]))) {
-        if (String(csts.models.Scans.workbooks.rar.Sheets[rarTab][`${this.rarFields['Raw Risk']}${rarRow}`]).v !== 'IV') {
+        if ( String(csts.models.Scans.workbooks.rar.Sheets[rarTab][`${this.rarFields['Raw Risk']}${rarRow}`]).v !== 'IV' && String(csts.models.Scans.workbooks.rar.Sheets[rarTab][`${this.rarFields['Raw Risk']}${rarRow}`]).v !== 'VL' ) {
           const vulnId = csts.models.Scans.compareRarPoam.getVulnId('rar', rarTab, `${this.rarFields['Test Id']}${rarRow}`);
           $items.push({
             row: rarRow,
@@ -1298,10 +1613,6 @@ Plugin ID:`,
         }
         rarRow += 1;
       }
-
-      console.log(this.rarFields);
-      console.log(this.poamFields);
-      console.log($items);
 
       // all rar foundings are found, time to search the poam
       $.each($items, (index, element) => {
@@ -1358,8 +1669,8 @@ Plugin ID:`,
               });
             }
 
-            if (!this.compareVals('poam', poamTab, `${this.poamFields['Raw Risk']}${poamRow}`, element.rawRisk) &&
-            element.rawRisk.toUpperCase().replace('CAT', '') !== csts.models.Scans.workbooks.poam.val(poamTab, `${this.poamFields['Raw Risk']}${poamRow}`) &&
+            if (
+              this.getRiskVal(element.rawRisk, 'CAT') !== this.getRiskVal(csts.models.Scans.workbooks.poam.val(poamTab, `${this.poamFields['Raw Risk']}${poamRow}`), 'CAT') &&
               $.grep(fields, n => n.value === 'Raw Risk').length > 0
             ) {
               resRow += 1;
@@ -1376,8 +1687,7 @@ Plugin ID:`,
               });
             }
 
-            if (!this.compareVals('poam', poamTab, `${this.poamFields['Residual Risk']}${poamRow}`, element.residualRisk) &&
-            element.residualRisk.toUpperCase().replace('CAT', '') !== csts.models.Scans.workbooks.poam.val(poamTab, `${this.poamFields['Residual Risk']}${poamRow}`) &&
+            if (this.getRiskVal(element.residualRisk, 'CAT') !== this.getRiskVal(csts.models.Scans.workbooks.poam.val(poamTab, `${this.poamFields['Residual Risk']}${poamRow}`), 'CAT') &&
               $.grep(fields, n => n.value === 'Residual Risk').length > 0
             ) {
               resRow += 1;
