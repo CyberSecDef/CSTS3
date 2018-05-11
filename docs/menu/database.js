@@ -1,1 +1,0 @@
-NDMenu.OnSectionLoaded("database.js",[[1,"CodeDb"],[1,"config"]]);

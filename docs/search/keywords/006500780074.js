@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("ext",["Function"],[["extend",,[["Libs.Workbooks",,,,0,"File:lib/workbooks.js:Libs.Workbooks.extend","JavaScriptClass:Libs.Workbooks:extend"]]]]);

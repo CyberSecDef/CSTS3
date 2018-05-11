@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("os",["Variable"],[["os",,[["CSTS",,,,0,"File:csts.js:CSTS.os","JavaScriptClass:CSTS:os"]]]]);

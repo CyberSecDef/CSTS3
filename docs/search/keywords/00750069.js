@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("ui",["Class"],[["UI",,[["Libs",,,,0,"File:lib/ui.js:Libs.UI","JavaScriptClass:Libs.UI"]]]]);

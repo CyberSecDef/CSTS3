@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("log",["Function"],[["log",,[["Libs.Utils",,,,0,"File:lib/utils.js:Libs.Utils.log","JavaScriptClass:Libs.Utils:log"]]]]);

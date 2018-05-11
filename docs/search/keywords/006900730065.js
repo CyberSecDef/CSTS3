@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("ise",["Variable"],[["isElevated",,[["CSTS",,,,0,"File:csts.js:CSTS.isElevated","JavaScriptClass:CSTS:isElevated"]]]]);

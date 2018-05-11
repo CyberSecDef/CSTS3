@@ -1,1 +1,0 @@
-NDFramePage.OnPageTitleLoaded("Database:config","config");NDSummary.OnSummaryLoaded("Database:config",[["Text File","TextFile"]],[["Tables","DatabaseTable"]],[[3,0,0,"config","config"]]);

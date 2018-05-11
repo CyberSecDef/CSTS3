@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("she",["Variable"],[["Shell",,[["CSTS",,,,0,"File:csts.js:CSTS.Shell","JavaScriptClass:CSTS:Shell"]]],["shells",,[["CSTS",,,,0,"File:csts.js:CSTS.shells","JavaScriptClass:CSTS:shells"]]]]);

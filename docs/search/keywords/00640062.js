@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("db",["Variable"],[["db",,[["CSTS",,,,0,"File:csts.js:CSTS.db","JavaScriptClass:CSTS:db"]]]]);

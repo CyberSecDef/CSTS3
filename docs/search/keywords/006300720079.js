@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("cry",["Variable"],[["crypto",,[["CSTS",,,,0,"File:csts.js:CSTS.crypto","JavaScriptClass:CSTS:crypto"]]]]);

@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("poa",["Variable"],[["poamFields",,[["Models.Scans.compareRarPoam",,,,0,"File:models/Scans.js:Models.Scans.compareRarPoam.poamFields","JavaScriptClass:Models.Scans.compareRarPoam:poamFields"]]]]);

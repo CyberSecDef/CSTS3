@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("cod",["Database"],[["CodeDb",,[[,,,,0,"File:database/config.txt:CodeDb","Database:CodeDb:CodeDb"]]]]);

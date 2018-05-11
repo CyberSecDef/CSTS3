@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("rou",["Variable","Class"],[["router",,[["CSTS",,,,0,"File:csts.js:CSTS.router","JavaScriptClass:CSTS:router"]]],["Routes",,[[,,,,1,"File:routes/csts.js:Routes","JavaScriptClass:Routes"],["CSTS","routes",,,0,"File:csts.js:CSTS.routes","JavaScriptClass:CSTS:routes"]]]]);

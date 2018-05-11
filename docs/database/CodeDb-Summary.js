@@ -1,1 +1,0 @@
-NDFramePage.OnPageTitleLoaded("Database:CodeDb","CodeDb");NDSummary.OnSummaryLoaded("Database:CodeDb",[["Text File","TextFile"]],[["Databases","Database"]],[[2,0,0,"CodeDb","CodeDb"]]);

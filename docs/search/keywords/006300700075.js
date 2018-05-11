@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("cpu",["Variable"],[["cpu",,[["CSTS",,,,0,"File:csts.js:CSTS.cpu","JavaScriptClass:CSTS:cpu"]]]]);

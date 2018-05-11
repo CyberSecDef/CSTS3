@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("set",["Function"],[["setStatus",,[["Libs.UI",,,,0,"File:lib/ui.js:Libs.UI.setStatus","JavaScriptClass:Libs.UI:setStatus"]]]]);
