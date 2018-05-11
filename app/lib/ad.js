@@ -129,6 +129,9 @@ csts.libs.ad = {
     return ad;
   },
 
+  adsiGetLocalAccounts(host, age) {
+    return require('child_process').execSync(`powershell.exe -file D:\\sandbox\\development\\CSTS3\\app\\resources\\cmds\\adsiGetLocalAccounts.ps1 -computer ${host}`).toString();
+  },
   adsiUpdateAccount(host, user, payload) {
     let $commands = '';
     $commands += `$u = [ADSI]'WinNT://${host}/${user},user';`;

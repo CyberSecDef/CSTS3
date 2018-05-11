@@ -38,6 +38,59 @@ csts.controllers.Accounts = ({
   controllerName - the name of the controller
 */
   controllerName: 'Accounts',
+  dormantAccounts: {
+    name: 'Find Dormant Accounts',
+    default: 'showIndex',
+    showIndex() {
+      csts.plugins.ejs.renderFile(
+        'app/resources/views/pages/accounts/dormantAccounts.tpl',
+        {},
+        { rmWhitespace: true },
+        (err, str) => {
+          if (err) { 
+            $('#errors').html(err).show();
+            $('#main-center-col').animate({ scrollTop: ($('#errors').offset().top) }, 1000);
+          }
+          $('#main-center-col').html(str);
+        },
+      );
+    },
+    execute() {
+      const caller = this;
+      const ous = [];
+      let hosts = $('div.hostManual textarea').val();
+      $('#adOUTree input:checkbox:checked').each((i, c) => { ous.push($(c).data('path')); });
+      $('table#accounts-dormantAccounts-detailed-results-table tbody').empty();
+      $('#errors').html('');
+      $('#errors').hide();
+
+      $('#myModal').modal();
+      $('#myModalLabel').text('Please Wait...');
+      $('#myModalBody').html('Currently Scanning systems.  Please wait.');
+      $('#myModal')
+        .one('shown.bs.modal', () => {
+          csts.models.Accounts.dormantAccounts.execute(hosts, ous, $('#dormant-age-txt').val());
+        });
+    },
+    cease() {
+      $('#myModal').modal('hide');
+      $('#headingTwo h5 button').click();
+    },
+    addRow(row) {
+      const rh = $('<tr></tr>');
+      $.each(row, (r, e) =>{ rh.append( $('<td></td>').html( e ) ) });
+      $('table#accounts-dormantAccounts-detailed-results-table tbody').append(rh);
+
+      const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
+
+      const comparer = (idx, asc) => (a, b) => ((v1, v2) => v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2))(getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
+
+      Array.from($('table#accounts-dormantAccounts-detailed-results-table tbody').find('tr:nth-child(n+1)'))
+        .sort(comparer(1, true))
+        .forEach(tr => $('table#accounts-dormantAccounts-detailed-results-table tbody').append(tr));
+    },
+
+  },
   manageLocalUsers: {
     name: 'Manage Local Accounts',
     default: 'showIndex',

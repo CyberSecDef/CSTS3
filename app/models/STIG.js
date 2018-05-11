@@ -94,21 +94,21 @@ csts.models.STIG = {
     saveXls(ckl) {
       const filename = `./app/storage/results/stigXxls_${csts.plugins.moment().format('YYYYMMDD_HHmmss')}.xlsx`;
       csts.wb = csts.plugins.xlsx.utils.book_new();
-      
+
       let ws = csts.plugins.xlsx.utils.json_to_sheet(ckl.vulns);
       ws['!cols'] = 28;
       ws['!autofilter'] = { ref: `A1:${String.fromCharCode(64 + 28)}1` };
-      csts.plugins.xlsx.utils.book_append_sheet(csts.wb, ws, "VULN Info");
+      csts.plugins.xlsx.utils.book_append_sheet(csts.wb, ws, 'VULN Info');
 
       ws = csts.plugins.xlsx.utils.json_to_sheet(ckl.asset);
       ws['!cols'] = 7;
       ws['!autofilter'] = { ref: `A1:${String.fromCharCode(64 + 7)}1` };
-      csts.plugins.xlsx.utils.book_append_sheet(csts.wb, ws, "ASSET Info");
+      csts.plugins.xlsx.utils.book_append_sheet(csts.wb, ws, 'ASSET Info');
 
       ws = csts.plugins.xlsx.utils.json_to_sheet(ckl.stig);
       ws['!cols'] = 10;
-      ws['!autofilter'] = { ref: `A1:${String.fromCharCode(64 +108)}1` };
-      csts.plugins.xlsx.utils.book_append_sheet(csts.wb, ws, "STIG Info");
+      ws['!autofilter'] = { ref: `A1:${String.fromCharCode(64 + 108)}1` };
+      csts.plugins.xlsx.utils.book_append_sheet(csts.wb, ws, 'STIG Info');
 
       csts.plugins.xlsx.writeFile(csts.wb, filename);
 
@@ -118,12 +118,12 @@ csts.models.STIG = {
       const ckl = csts.models.STIG.buildCkl();
 
       const asset = csts.plugins.xlsx.utils.sheet_to_json(csts.plugins.xlsx.readFile(source).Sheets['ASSET Info']);
-      ['ASSET_TYPE', 'HOST_NAME', 'HOST_IP', 'HOST_MAC', 'HOST_GUID', 'HOST_FQDN', 'TECH_AREA', 'TARGET_KEY'].forEach( (field) => {
+      ['ASSET_TYPE', 'HOST_NAME', 'HOST_IP', 'HOST_MAC', 'HOST_GUID', 'HOST_FQDN', 'TECH_AREA', 'TARGET_KEY'].forEach((field) => {
         ckl.CHECKLIST.ASSET[0][field] = asset[0][field];
       });
 
       const stig = csts.plugins.xlsx.utils.sheet_to_json(csts.plugins.xlsx.readFile(source).Sheets['STIG Info']);
-      ['version','classification','customname','stigid','description','filename','releaseinfo','title','uuid','notice','source'].forEach( (field) => {
+      ['version','classification','customname','stigid','description','filename','releaseinfo','title','uuid','notice','source'].forEach((field) => {
         ckl.CHECKLIST.STIGS[0].iSTIG[0].STIG_INFO[0].SI_DATA.push({ SID_NAME: field, SID_DATA: stig[0][field] });
       });
 
