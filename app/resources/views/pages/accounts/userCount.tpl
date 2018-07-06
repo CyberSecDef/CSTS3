@@ -108,6 +108,7 @@
                 <tr>
                   <th class="w-50">Path</th>
                   <th>Username</th>
+                  <th>Description</th>
                   <th>Disabled</th>
                   <th>Smartcard</th>
                   

@@ -262,7 +262,7 @@ csts.controllers.Accounts = ({
     showUsers(u) {
       $('#accounts-usercount-detailed-results-table tbody tr').remove();
       u.data.forEach((i) => {
-        $('#accounts-usercount-detailed-results-table tbody').append( $(`<tr><td>${i.Path}</td><td><u>${i.Name}</u></td><td>${i.Disabled}</td><td>${i.Smartcard}</td></tr>`) );
+        $('#accounts-usercount-detailed-results-table tbody').append( $(`<tr><td>${i.Path}</td><td><u>${i.Name}</u></td><td>${i.Description}</td><td>${i.Disabled}</td><td>${i.Smartcard}</td></tr>`) );
         $('#accounts-usercount-detailed-results-table tbody td:contains("true")').css('font-weight', 'bold').css('color', 'darkgreen').css('background-color', '#f9fff9').css('text-align','center');
         $('#accounts-usercount-detailed-results-table tbody td:contains("false")').css('font-weight', 'bold').css('color', 'darkred').css('background-color', '#fff9f9').css('text-align','center');
       });

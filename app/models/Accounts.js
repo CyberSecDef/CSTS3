@@ -138,7 +138,8 @@ csts.models.Accounts = {
             if (this.users.filter(a => a.Name === item.Properties.samaccountname).length === 0) {
               this.users.push({ 
                 Path: item.Path,
-                Name: item.Properties.samaccountname, 
+                Name: item.Properties.samaccountname,
+                Description: typeof item.Properties.description !== 'undefined' ? item.Properties.description : '',
                 Disabled: (item.UAC & 2) !== 0,
                 Smartcard: (item.UAC & 262144) !== 0,
                 UAC: item.UAC });
