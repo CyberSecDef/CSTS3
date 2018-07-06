@@ -200,12 +200,36 @@ csts.models.Scans = {
 
       csts.models.Scans.scans2poam.scans.scap.forEach((scap) => {
         scap.requirements.filter(s => s.status !== 'Completed').forEach((r) => {
-          if (csts.models.Scans.scans2poam.scans.ckl.filter(stig => stig.title === scap.title).length > 0) {
-            csts.models.Scans.scans2poam.scans.ckl.filter(stig => stig.title === scap.title).forEach((c) => {
+          if (csts.models.Scans.scans2poam.scans.ckl.filter(stig => 
+            stig.id
+              .replace(/ /ig, '_')
+              .replace(/STIG/ig, '')
+              .replace(/Security_Technical_Implementation_Guide/ig, '')
+              .replace(/xccdf_mil\.disa/ig, '')
+              .replace(/benchmark/ig, '')
+              .replace(/ /ig, '_')
+              .replace(/__/ig, '_')
+              .replace(/\./ig, '')
+              .replace(/_$/ig, '')
+              .replace(/^_/ig, '')
+              .toLowerCase()
+          === scap.id
+            .replace(/ /ig, '_')
+            .replace(/STIG/ig, '')
+            .replace(/Security_Technical_Implementation_Guide/ig, '')
+            .replace(/xccdf_mil\.disa/ig, '')
+            .replace(/benchmark/ig, '')
+            .replace(/ /ig, '_')
+            .replace(/__/ig, '_')
+            .replace(/\./ig, '')
+            .replace(/_$/ig, '')
+            .replace(/^_/ig, '')
+            .toLowerCase()).length > 0) {
+            csts.models.Scans.scans2poam.scans.ckl.filter(stig => stig.id === scap.id).forEach((c) => {
               if (r.status !== c.requirements.filter(cr => cr.vulnId === r.vulnId).map(cr => cr.status).join(', ')) {
                 results.push({
                   Title: scap.title,
-                  Hosts: csts.models.Scans.scans2poam.scans.scap.filter(s => s.title === scap.title && s.requirements.filter(srf => srf.status !== 'Completed').length > 0)
+                  Hosts: csts.models.Scans.scans2poam.scans.scap.filter(s => s.id === scap.id && s.requirements.filter(srf => srf.status !== 'Completed').length > 0)
                     .map(h => h.hostname)
                     .sort()
                     .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
@@ -231,7 +255,7 @@ csts.models.Scans = {
           } else {
             results.push({
               Title: scap.title,
-              Hosts: csts.models.Scans.scans2poam.scans.scap.filter(s => s.title === scap.title && s.requirements.filter(srf => srf.status !== 'Completed').length > 0)
+              Hosts: csts.models.Scans.scans2poam.scans.scap.filter(s => s.id === scap.id && s.requirements.filter(srf => srf.status !== 'Completed').length > 0)
                 .map(h => h.hostname)
                 .sort()
                 .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
@@ -419,8 +443,8 @@ Plugin ID: ${element}`,
       });
 
       // unique list of requirements for scap and ckl
-      const ckls = csts.plugins.jsonQuery('ckl[*].requirements[*status!=Completed].vulnId', { data: csts.models.Scans.scans2poam.scans }).value.sort().filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; });
-      const scaps = csts.plugins.jsonQuery('scap[*].requirements[*status!=Completed].vulnId', { data: csts.models.Scans.scans2poam.scans }).value.sort().filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; });
+      const ckls = csts.plugins.jsonQuery('ckl[*].requirements[*status!=Completed & status!=Not_Applicable].vulnId', { data: csts.models.Scans.scans2poam.scans }).value.sort().filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; });
+      const scaps = csts.plugins.jsonQuery('scap[*].requirements[*status!=Completed & status!=Not Applicable].vulnId', { data: csts.models.Scans.scans2poam.scans }).value.sort().filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; });
       // ckl and scap
       ckls.filter(e => scaps.includes(e)).concat(scaps.filter(e => ckls.includes(e))).sort()
         .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
@@ -741,9 +765,398 @@ Plugin ID: `,
         CAT: {
           0: 'CAT IV', 1: 'CAT III', 2: 'CAT II', 3: 'CAT I', 4: 'CAT I',
         },
+        MIN: {
+          0: 'IV', 1: 'III', 2: 'II', 3: 'I', 4: 'I',
+        },
       };
 
       return crossWalkTo[format][crossWalkFrom[`${source}`.toUpperCase().trim()]];
+    },
+
+    getPoam55() {
+      const results = [];
+      csts.plugins.jsonQuery('acas[*].hosts[*].requirements[*].pluginId', { data: csts.models.Scans.scans2poam.scans }).value.sort().filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; }).forEach((element) => {
+        const acasPlugin = csts.plugins.jsonQuery(`acas[*].hosts[*].requirements[pluginId = ${element}`, { data: csts.models.Scans.scans2poam.scans }).value;
+
+        const m = csts.models.Scans.scans2poam.mitigations.find(i => i.plugin === element);
+        const mitigation = typeof m !== 'undefined' ? m.mitigation : '';
+
+        results.push({
+          A: '',
+          'Control Vulnerability Description': `Title: ${acasPlugin.title}
+
+Description:
+${acasPlugin.description}
+`,
+          'Security Control Number (NC/NA controls only)': '',
+          'Office/Org': '',
+          'Security Checks': `${acasPlugin.grpId}
+${element}`,
+          'Resources Required': '',  
+          'Scheduled Completion Date': '',
+          'Milestone with Completion Dates': '',
+          'Milestone Changes': '',
+          'Source Identifying Control Vulnerability': 'Assured Compliance Assessment Solution (ACAS) Nessus Scanner',
+          Status: 'Ongoing',
+          Comments: `${acasPlugin.comments}`,
+          'Raw Severity Value': this.getRiskVal(acasPlugin.severity, 'MIN'),
+          'Devices Affected': `
+${csts.plugins.jsonQuery(
+    "acas[*].hosts[*hostname!='']",
+    { data: csts.models.Scans.scans2poam.scans },
+  ).value.filter(host => host.requirements.filter(req => req.pluginId === element).length).map(h => h.hostname).sort().join(', ')
+}`,
+          Mitigations: mitigation,
+          'Predisposing Conditions': '',
+          Severity: this.getRiskVal(acasPlugin.severity, 'N-C'),
+          'Relevance of Threat': this.getRiskVal(acasPlugin.severity, 'N-C'),
+          'Threat Description': '',
+          Likelihood: this.getRiskVal(acasPlugin.severity, 'N-C'),
+          Impact: this.getRiskVal(acasPlugin.severity, 'N-C'),
+          'Impact Description': '',
+          'Residual Risk Level': this.getRiskVal(acasPlugin.severity, 'N-C'),
+          Recommendations: '',
+          'Resulting Residual Risk after Proposed Mitigations': this.getRiskVal(acasPlugin.severity, 'N-C'),
+        });
+      });
+
+      // unique list of requirements for scap and ckl
+      const ckls = csts.plugins.jsonQuery('ckl[*].requirements[*status!=Completed & status!=Not_Applicable].vulnId', { data: csts.models.Scans.scans2poam.scans }).value.sort().filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; });
+      const scaps = csts.plugins.jsonQuery('scap[*].requirements[*status!=Completed & status!=Not Applicable].vulnId', { data: csts.models.Scans.scans2poam.scans }).value.sort().filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; });
+      // ckl and scap
+      ckls.filter(e => scaps.includes(e)).concat(scaps.filter(e => ckls.includes(e))).sort()
+        .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+        .forEach((element) => {
+          const cklReq = csts.plugins.jsonQuery(`ckl[*].requirements[vulnId=${element}]`, { data: csts.models.Scans.scans2poam.scans }).value;
+          const m = csts.models.Scans.scans2poam.mitigations.find(i => i.plugin === cklReq.vulnId);
+          const mitigation = typeof m !== 'undefined' ? m.mitigation : '';
+
+          if (cklReq.cci.length > 1 && $('#split-CCI').prop('checked')) {
+            cklReq.cci.filter(cci => cci.toLowerCase().indexOf('cce') === -1).forEach((cci) => {
+              results.push({
+                A: '',
+                'Control Vulnerability Description': `Title: ${cklReq.title}
+
+Description:
+  ${cklReq.description}
+`,
+                'Security Control Number (NC/NA controls only)': typeof cklReq.iaControls === 'object' ? cklReq.iaControls.join(', ') : cklReq.iaControls,
+                'Office/Org': '',
+                'Security Checks': `${cklReq.grpId}
+${cklReq.vulnId}
+${cklReq.ruleId}`,
+                'Resources Required': cklReq.resources,
+                'Scheduled Completion Date': '',
+                'Milestone with Completion Dates': '',
+                'Milestone Changes': '',
+                'Source Identifying Control Vulnerability': `SCAP/STIG: ${csts.models.Scans.scans2poam.scans.scap
+.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
+.map(h => h.title)
+.concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.title))
+.sort()
+.filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+.join(', ')}`,
+                Status: 'Ongoing',
+                Comments: `${cklReq.comments}
+${cci}`,
+                'Raw Severity Value': this.getRiskVal(cklReq.severity, 'MIN'),
+                'Devices Affected': `${csts.models.Scans.scans2poam.scans.scap
+                  .filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
+                  .map(h => h.hostname)
+                  .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.hostname))
+                  .sort()
+                  .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+                  .filter((el, i, a) => { if (el.trim() !== '') return 1; return 0; })
+                  .join(', ')
+                }`,
+                Mitigations: mitigation,
+                'Predisposing Conditions': '',
+                Severity: this.getRiskVal(cklReq.severity, 'N-C'),
+                'Relevance of Threat': this.getRiskVal(cklReq.severity, 'N-C'),
+                'Threat Description': '',
+                Likelihood: this.getRiskVal(cklReq.severity, 'N-C'),
+                Impact: this.getRiskVal(cklReq.severity, 'N-C'),
+                'Impact Description': '',
+                'Residual Risk Level': this.getRiskVal(cklReq.severity, 'N-C'),
+                Rescommendations: '',
+                'Resulting Residual Risk after Proposed Mitigations': this.getRiskVal(cklReq.severity, 'N-C'),
+              });
+            });
+          } else {
+            results.push({
+              A: '',
+              'Control Vulnerability Description': `Title: ${cklReq.title}
+
+Description:
+  ${cklReq.description}
+`,
+              'Security Control Number (NC/NA controls only)': typeof cklReq.iaControls === 'object' ? cklReq.iaControls.join(', ') : cklReq.iaControls,
+              'Office/Org': '',
+              'Security Checks': `${cklReq.grpId}
+${cklReq.vulnId}
+${cklReq.ruleId}`,
+              'Resources Required': cklReq.resources,
+              'Scheduled Completion Date': '',
+              'Milestone with Completion Dates': '',
+              'Milestone Changes': '',
+              'Source Identifying Control Vulnerability': `SCAP/STIG: ${csts.models.Scans.scans2poam.scans.scap
+                .filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
+                .map(h => h.title)
+                .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.title))
+                .sort()
+                .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+                .join(', ')}`,
+              Status: 'Ongoing',
+              Comments: `${cklReq.comments}
+${cklReq.cci}`,
+              'Raw Severity Value': this.getRiskVal(cklReq.severity, 'MIN'),
+              'Devices Affected': `${csts.models.Scans.scans2poam.scans.scap
+                .filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
+                .map(h => h.hostname)
+                .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.hostname))
+                .sort()
+                .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+                .filter((el, i, a) => { if (el.trim() !== '') return 1; return 0; })
+                .join(', ')
+              }`,
+              Mitigations: mitigation,
+              'Predisposing Conditions': '',
+              Severity: this.getRiskVal(cklReq.severity, 'N-C'),
+              'Relevance of Threat': this.getRiskVal(cklReq.severity, 'N-C'),
+              'Threat Description': '',
+              Likelihood: this.getRiskVal(cklReq.severity, 'N-C'),
+              Impact: this.getRiskVal(cklReq.severity, 'N-C'),
+              'Impact Description': '',
+              'Residual Risk Level': this.getRiskVal(cklReq.severity, 'N-C'),
+              Recommendations: '',
+              'Resulting Residual Risk after Proposed Mitigations': this.getRiskVal(cklReq.severity, 'N-C'),
+            });
+          }
+        });
+
+      // just ckl
+      ckls.filter(e => !scaps.includes(e)).sort()
+        .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; }).forEach((element) => {
+          const cklReq = csts.plugins.jsonQuery(`ckl[*].requirements[vulnId=${element}]`, { data: csts.models.Scans.scans2poam.scans }).value;
+
+          const m = csts.models.Scans.scans2poam.mitigations.find(i => i.plugin === cklReq.vulnId);
+          const mitigation = typeof m !== 'undefined' ? m.mitigation : '';
+
+          if (cklReq.cci.length > 1 && $('#split-CCI').prop('checked')) {
+            cklReq.cci.filter(cci => cci.toLowerCase().indexOf('cce') === -1).forEach((cci) => {
+              results.push({
+                A: '',
+                'Control Vulnerability Description': `Title: ${cklReq.title}
+
+Description:
+  ${cklReq.description}
+  }`,
+                'Security Control Number (NC/NA controls only)': typeof cklReq.iaControls === 'object' ? cklReq.iaControls.join(', ') : cklReq.iaControls,
+                'Office/Org': '',
+                'Security Checks': `${cklReq.grpId}
+${cklReq.vulnId}
+${cklReq.ruleId}`,
+                'Resources Required': cklReq.resources,
+                'Scheduled Completion Date': '',
+                'Milestone with Completion Dates': '',
+                'Milestone Changes': '',
+                'Source Identifying Control Vulnerability': `STIG: ${csts.models.Scans.scans2poam.scans.scap
+                  .filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
+                  .map(h => h.title)
+                  .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.title))
+                  .sort()
+                  .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+                  .join(', ')}`,
+                Status: 'Ongoing',
+                Comments: `${cklReq.comments}
+${cci}`,
+                'Raw Severity Value': this.getRiskVal(cklReq.severity, 'MIN'),
+                'Devices Affected': `${csts.models.Scans.scans2poam.scans.scap
+                  .filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
+                  .map(h => h.hostname)
+                  .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.hostname))
+                  .sort()
+                  .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+                  .filter((el, i, a) => { if (el.trim() !== '') return 1; return 0; })
+                  .join(', ')
+                }`,
+                Mitigations: mitigation,
+                'Predisposing Conditions': '',
+                Severity: this.getRiskVal(cklReq.severity, 'N-C'),
+                'Relevance of Threat': this.getRiskVal(cklReq.severity, 'N-C'),
+                'Threat Description': '',
+                Likelihood: this.getRiskVal(cklReq.severity, 'N-C'),
+                Impact: this.getRiskVal(cklReq.severity, 'N-C'),
+                'Impact Description': '',
+                'Residual Risk Level': this.getRiskVal(cklReq.severity, 'N-C'),
+                Recommendations: '',
+                'Resulting Residual Risk after Proposed Mitigations': this.getRiskVal(cklReq.severity, 'N-C'),
+              });
+            });
+          } else {
+            results.push({
+              A: '',
+              'Control Vulnerability Description': `Title: ${cklReq.title}
+
+Description:
+  ${cklReq.description}
+`,
+              'Security Control Number (NC/NA controls only)': typeof cklReq.iaControls === 'object' ? cklReq.iaControls.join(', ') : cklReq.iaControls,
+              'Office/Org': '',
+              'Security Checks': `${cklReq.grpId}
+${cklReq.vulnId}
+${cklReq.ruleId}`,
+              'Resources Required': cklReq.resources,
+              'Scheduled Completion Date': '',
+              'Milestone with Completion Dates': '',
+              'Milestone Changes': '',
+              'Source Identifying Control Vulnerability': `STIG: ${csts.models.Scans.scans2poam.scans.scap
+                .filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
+                .map(h => h.title)
+                .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.title))
+                .sort()
+                .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+                .join(', ')}`,
+              Status: 'Ongoing',
+              Comments: `${cklReq.comments}
+${cklReq.cci}`,
+              'Raw Severity Value': this.getRiskVal(cklReq.severity, 'MIN'),
+              'Devices Affected':`${csts.models.Scans.scans2poam.scans.scap
+                .filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0)
+                .map(h => h.hostname)
+                .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === cklReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.hostname))
+                .sort()
+                .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+                .filter((el, i, a) => { if (el.trim() !== '') return 1; return 0; })
+                .join(', ')
+              }`,
+              Mitigations: mitigation,
+              'Predisposing Conditions': '',
+              Severity: this.getRiskVal(cklReq.severity, 'N-C'),
+              'Relevance of Threat': this.getRiskVal(cklReq.severity, 'N-C'),
+              'Threat Description': '',
+              Likelihood: this.getRiskVal(cklReq.severity, 'N-C'),
+              Impact: this.getRiskVal(cklReq.severity, 'N-C'),
+              'Impact Description': '',
+              'Residual Risk Level': this.getRiskVal(cklReq.severity, 'N-C'),
+              Recommendations: '',
+              'Resulting Residual Risk after Proposed Mitigations': this.getRiskVal(cklReq.severity, 'N-C'),
+            });
+          }
+        });
+
+      // just scap (this should be impossible if SCAP and STIG is done properly)
+      scaps.filter(e => !ckls.includes(e)).sort()
+        .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; }).forEach((element) => {
+          const scapReq = csts.plugins.jsonQuery(`scap[*].requirements[vulnId=${element}]`, { data: csts.models.Scans.scans2poam.scans }).value;
+
+          const m = csts.models.Scans.scans2poam.mitigations.find(i => i.plugin === scapReq.vulnId);
+          const mitigation = typeof m !== 'undefined' ? m.mitigation : '';
+
+          if (scapReq.cci.length > 1 && $('#split-CCI').prop('checked')) {
+            scapReq.cci.filter(cci => cci.toLowerCase().indexOf('cce') === -1).forEach((cci) => {
+              results.push({
+                A: '',
+                'Control Vulnerability Description': `Title: ${scapReq.title}
+
+Description:
+  ${scapReq.description}
+`,
+                'Security Control Number (NC/NA controls only)': typeof scapReq.iaControls === 'object' ? scapReq.iaControls.join(', ') : scapReq.iaControls,
+                'Office/Org': '',
+                'Security Checks': `${scapReq.grpId}
+  ${scapReq.vulnId}
+  ${scapReq.ruleId}`,
+                'Resources Required': scapReq.resources,
+                'Scheduled Completion Date': '',
+                'Milestone with Completion Dates': '',
+                'Milestone Changes': '',
+                'Source Identifying Control Vulnerability': `SCAP: ${csts.models.Scans.scans2poam.scans.scap
+                  .filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0)
+                  .map(h => h.title)
+                  .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.title))
+                  .sort()
+                  .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+                  .join(', ')}`,
+                Status: 'Ongoing',
+                Comments: `${scapReq.findingDetails}
+${cci}`,
+                'Raw Severity Value': this.getRiskVal(scapReq.severity, 'MIN'),
+                'Devices Affected':`${csts.models.Scans.scans2poam.scans.scap
+                  .filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0)
+                  .map(h => h.hostname)
+                  .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.hostname))
+                  .sort()
+                  .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+                  .filter((el, i, a) => { if (el.trim() !== '') return 1; return 0; })
+                  .join(', ')
+                }`,
+                Mitigations: mitigation,
+                'Predisposing Conditions': '',
+                Severity: this.getRiskVal(scapReq.severity, 'N-C'),
+                'Relevance of Threat': this.getRiskVal(scapReq.severity, 'N-C'),
+                'Threat Description': '',
+                Likelihood: this.getRiskVal(scapReq.severity, 'N-C'),
+                Impact: this.getRiskVal(scapReq.severity, 'N-C'),
+                'Impact Description': '',
+                'Residual Risk Level': this.getRiskVal(scapReq.severity, 'N-C'),
+                Recommendations: '',
+                'Resulting Residual Risk after Proposed Mitigations': this.getRiskVal(scapReq.severity, 'N-C'),
+              });
+            });
+          } else {
+            results.push({
+              A: '',
+              'Control Vulnerability Description': `Title: ${scapReq.title}
+
+Description:
+  ${scapReq.description}
+`,
+              'Security Control Number (NC/NA controls only)': typeof scapReq.iaControls === 'object' ? scapReq.iaControls.join(', ') : scapReq.iaControls,
+              'Office/Org': '',
+              'Security Checks': `${scapReq.grpId}
+${scapReq.vulnId}
+${scapReq.ruleId}`,
+              'Resources Required': scapReq.resources,
+              'Scheduled Completion Date': '',
+              'Milestone with Completion Dates': '',
+              'Milestone Changes': '',
+              'Source Identifying Control Vulnerability': `SCAP: ${csts.models.Scans.scans2poam.scans.scap
+                .filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0)
+                .map(h => h.title)
+                .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.title))
+                .sort()
+                .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+                .join(', ')}`,
+              Status: 'Ongoing',
+              Comments: `${scapReq.findingDetails}
+${scapReq.cci}`,
+              'Raw Severity Value': this.getRiskVal(scapReq.severity, 'MIN'),
+              'Devices Affected':`${csts.models.Scans.scans2poam.scans.scap
+                .filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0)
+                .map(h => h.hostname)
+                .concat(csts.models.Scans.scans2poam.scans.ckl.filter(f => f.requirements.filter(g => g.vulnId === scapReq.vulnId && g.status !== 'Completed').length > 0).map(h => h.hostname))
+                .sort()
+                .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
+                .filter((el, i, a) => { if (el.trim() !== '') return 1; return 0; })
+                .join(', ')
+              }`,
+              Mitigations: mitigation,
+              'Predisposing Conditions': '',
+              Severity: this.getRiskVal(scapReq.severity, 'N-C'),
+              'Relevance of Threat': this.getRiskVal(scapReq.severity, 'N-C'),
+              'Threat Description': '',
+              Likelihood: this.getRiskVal(scapReq.severity, 'N-C'),
+              Impact: this.getRiskVal(scapReq.severity, 'N-C'),
+              'Impact Description': '',
+              'Residual Risk Level': this.getRiskVal(scapReq.severity, 'N-C'),
+              Recommendations: '',
+              'Resulting Residual Risk after Proposed Mitigations': this.getRiskVal(scapReq.severity, 'N-C'),
+            });
+          }
+        });
+
+      return results;
     },
 
     getPoam() {
@@ -769,27 +1182,24 @@ Devices Affected:
 }`,
           'Security Control Number (NC/NA controls only)': '',
           'Office/Org': '',
-          'Security Checks': `Group ID: ${acasPlugin.grpId}
-Vuln ID:
-Rule ID:
-CCI: 
-Plugin ID: ${element}`,
-          'Raw Severity Value': this.getRiskVal(acasPlugin.severity, 'CAT'),
+          'Security Checks': `${acasPlugin.grpId}
+${element}`,
+          'Raw Severity Value': this.getRiskVal(acasPlugin.severity, 'MIN'),
           Mitigations: mitigation,
-          'Severity Value': this.getRiskVal(acasPlugin.severity, 'CAT'),
+          'Severity Value': this.getRiskVal(acasPlugin.severity, 'MIN'),
           'Resources Required': '',
           'Scheduled Completion Date': '',
           'Milestone with Completion Dates': '',
           'Milestone Changes': '',
           'Source Identifying Control Vulnerability': 'Assured Compliance Assessment Solution (ACAS) Nessus Scanner',
           Status: 'Ongoing',
-          Comments: acasPlugin.comments,
+          Comments: `${acasPlugin.comments}`,
         });
       });
 
       // unique list of requirements for scap and ckl
-      const ckls = csts.plugins.jsonQuery('ckl[*].requirements[*status!=Completed].vulnId', { data: csts.models.Scans.scans2poam.scans }).value.sort().filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; });
-      const scaps = csts.plugins.jsonQuery('scap[*].requirements[*status!=Completed].vulnId', { data: csts.models.Scans.scans2poam.scans }).value.sort().filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; });
+      const ckls = csts.plugins.jsonQuery('ckl[*].requirements[*status!=Completed & status!=Not_Applicable].vulnId', { data: csts.models.Scans.scans2poam.scans }).value.sort().filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; });
+      const scaps = csts.plugins.jsonQuery('scap[*].requirements[*status!=Completed & status!=Not Applicable].vulnId', { data: csts.models.Scans.scans2poam.scans }).value.sort().filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; });
       // ckl and scap
       ckls.filter(e => scaps.includes(e)).concat(scaps.filter(e => ckls.includes(e))).sort()
         .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
@@ -819,14 +1229,12 @@ Devices Affected:
 }`,
                 'Security Control Number (NC/NA controls only)': typeof cklReq.iaControls === 'object' ? cklReq.iaControls.join(', ') : cklReq.iaControls,
                 'Office/Org': '',
-                'Security Checks': `Group ID: ${cklReq.grpId}
-  Vuln ID: ${cklReq.vulnId}
-  Rule ID: ${cklReq.ruleId}
-  CCI: ${cci}
-  Plugin ID:`,
-                'Raw Severity Value': this.getRiskVal(cklReq.severity, 'CAT'),
+                'Security Checks': `${cklReq.grpId}
+${cklReq.vulnId}
+${cklReq.ruleId}`,
+                'Raw Severity Value': this.getRiskVal(cklReq.severity, 'MIN'),
                 Mitigations: mitigation,
-                'Severity Value': this.getRiskVal(cklReq.severity, 'CAT'),
+                'Severity Value': this.getRiskVal(cklReq.severity, 'MIN'),
                 'Resources Required': cklReq.resources,
                 'Scheduled Completion Date': '',
                 'Milestone with Completion Dates': '',
@@ -839,7 +1247,8 @@ Devices Affected:
                   .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
                   .join(', ')}`,
                 Status: 'Ongoing',
-                Comments: cklReq.comments,
+                Comments: `${cklReq.comments}
+${cci}`,
               });
             });
           } else {
@@ -862,14 +1271,12 @@ ${csts.models.Scans.scans2poam.scans.scap
 }`,
               'Security Control Number (NC/NA controls only)': typeof cklReq.iaControls === 'object' ? cklReq.iaControls.join(', ') : cklReq.iaControls,
               'Office/Org': '',
-              'Security Checks': `Group ID: ${cklReq.grpId}
-Vuln ID: ${cklReq.vulnId}
-Rule ID: ${cklReq.ruleId}
-CCI: ${cklReq.cci}
-Plugin ID:`,
-              'Raw Severity Value': this.getRiskVal(cklReq.severity, 'CAT'),
+              'Security Checks': `${cklReq.grpId}
+${cklReq.vulnId}
+${cklReq.ruleId}`,
+              'Raw Severity Value': this.getRiskVal(cklReq.severity, 'MIN'),
               Mitigations: mitigation,
-              'Severity Value': this.getRiskVal(cklReq.severity, 'CAT'),
+              'Severity Value': this.getRiskVal(cklReq.severity, 'MIN'),
               'Resources Required': cklReq.resources,
               'Scheduled Completion Date': '',
               'Milestone with Completion Dates': '',
@@ -882,7 +1289,8 @@ Plugin ID:`,
                 .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
                 .join(', ')}`,
               Status: 'Ongoing',
-              Comments: cklReq.comments,
+              Comments: `${cklReq.comments}
+${cklReq.cci}`,
             });
           }
         });
@@ -916,14 +1324,12 @@ ${csts.models.Scans.scans2poam.scans.scap
 }`,
                 'Security Control Number (NC/NA controls only)': typeof cklReq.iaControls === 'object' ? cklReq.iaControls.join(', ') : cklReq.iaControls,
                 'Office/Org': '',
-                'Security Checks': `Group ID: ${cklReq.grpId}
-  Vuln ID: ${cklReq.vulnId}
-  Rule ID: ${cklReq.ruleId}
-  CCI: ${cci}
-  Plugin ID:`,
-                'Raw Severity Value': this.getRiskVal(cklReq.severity, 'CAT'),
+                'Security Checks': `${cklReq.grpId}
+${cklReq.vulnId}
+${cklReq.ruleId}`,
+                'Raw Severity Value': this.getRiskVal(cklReq.severity, 'MIN'),
                 Mitigations: mitigation,
-                'Severity Value': this.getRiskVal(cklReq.severity, 'CAT'),
+                'Severity Value': this.getRiskVal(cklReq.severity, 'MIN'),
                 'Resources Required': cklReq.resources,
                 'Scheduled Completion Date': '',
                 'Milestone with Completion Dates': '',
@@ -936,7 +1342,8 @@ ${csts.models.Scans.scans2poam.scans.scap
                   .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
                   .join(', ')}`,
                 Status: 'Ongoing',
-                Comments: cklReq.comments,
+                Comments: `${cklReq.comments}
+${cci}`,
               });
             });
           } else {
@@ -959,14 +1366,12 @@ ${csts.models.Scans.scans2poam.scans.scap
 }`,
               'Security Control Number (NC/NA controls only)': typeof cklReq.iaControls === 'object' ? cklReq.iaControls.join(', ') : cklReq.iaControls,
               'Office/Org': '',
-              'Security Checks': `Group ID: ${cklReq.grpId}
-Vuln ID: ${cklReq.vulnId}
-Rule ID: ${cklReq.ruleId}
-CCI: ${cklReq.cci}
-Plugin ID:`,
-              'Raw Severity Value': this.getRiskVal(cklReq.severity, 'CAT'),
+              'Security Checks': `${cklReq.grpId}
+${cklReq.vulnId}
+${cklReq.ruleId}`,
+              'Raw Severity Value': this.getRiskVal(cklReq.severity, 'MIN'),
               Mitigations: mitigation,
-              'Severity Value': this.getRiskVal(cklReq.severity, 'CAT'),
+              'Severity Value': this.getRiskVal(cklReq.severity, 'MIN'),
               'Resources Required': cklReq.resources,
               'Scheduled Completion Date': '',
               'Milestone with Completion Dates': '',
@@ -979,7 +1384,8 @@ Plugin ID:`,
                 .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
                 .join(', ')}`,
               Status: 'Ongoing',
-              Comments: cklReq.comments,
+              Comments: `${cklReq.comments}
+${cklReq.cci}`,
             });
           }
         });
@@ -1013,14 +1419,12 @@ ${csts.models.Scans.scans2poam.scans.scap
 }`,
                 'Security Control Number (NC/NA controls only)': typeof scapReq.iaControls === 'object' ? scapReq.iaControls.join(', ') : scapReq.iaControls,
                 'Office/Org': '',
-                'Security Checks': `Group ID: ${scapReq.grpId}
-Vuln ID: ${scapReq.vulnId}
-Rule ID: ${scapReq.ruleId}
-CCI: ${cci}
-Plugin ID:`,
-                'Raw Severity Value': this.getRiskVal(scapReq.severity, 'CAT'),
+                'Security Checks': `${scapReq.grpId}
+${scapReq.vulnId}
+${scapReq.ruleId}`,
+                'Raw Severity Value': this.getRiskVal(scapReq.severity, 'MIN'),
                 Mitigations: mitigation,
-                'Severity Value': this.getRiskVal(scapReq.severity, 'CAT'),
+                'Severity Value': this.getRiskVal(scapReq.severity, 'MIN'),
                 'Resources Required': scapReq.resources,
                 'Scheduled Completion Date': '',
                 'Milestone with Completion Dates': '',
@@ -1033,7 +1437,8 @@ Plugin ID:`,
                   .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
                   .join(', ')}`,
                 Status: 'Ongoing',
-                Comments: scapReq.findingDetails,
+                Comments: `${scapReq.findingDetails}
+${cci}`,
               });
             });
           } else {
@@ -1056,14 +1461,12 @@ ${csts.models.Scans.scans2poam.scans.scap
 }`,
               'Security Control Number (NC/NA controls only)': typeof scapReq.iaControls === 'object' ? scapReq.iaControls.join(', ') : scapReq.iaControls,
               'Office/Org': '',
-              'Security Checks': `Group ID: ${scapReq.grpId}
-Vuln ID: ${scapReq.vulnId}
-Rule ID: ${scapReq.ruleId}
-CCI: ${scapReq.cci}
-Plugin ID:`,
-              'Raw Severity Value': this.getRiskVal(scapReq.severity, 'CAT'),
+              'Security Checks': `${scapReq.grpId}
+${scapReq.vulnId}
+${scapReq.ruleId}`,
+              'Raw Severity Value': this.getRiskVal(scapReq.severity, 'MIN'),
               Mitigations: mitigation,
-              'Severity Value': this.getRiskVal(scapReq.severity, 'CAT'),
+              'Severity Value': this.getRiskVal(scapReq.severity, 'MIN'),
               'Resources Required': scapReq.resources,
               'Scheduled Completion Date': '',
               'Milestone with Completion Dates': '',
@@ -1076,7 +1479,8 @@ Plugin ID:`,
                 .filter((el, i, a) => { if (i === a.indexOf(el)) return 1; return 0; })
                 .join(', ')}`,
               Status: 'Ongoing',
-              Comments: scapReq.findingDetails,
+              Comments: `${scapReq.findingDetails}
+${scapReq.cci}`,
             });
           }
         });
@@ -1133,13 +1537,16 @@ Plugin ID:`,
         fileData = csts.plugins.fs.readFileSync(file, 'utf8');
         fileName = csts.plugins.path.basename(file);
       }
-
+      
       csts.plugins.xml2js.parseString(fileData, (err, result) => {
         if (typeof csts.plugins.jsonPath.value(result, "$['cdf:Benchmark']['cdf:TestResult']") !== 'undefined') {
+          csts.xccdf = result;
+
           xccdfData.credentialed = true;
           xccdfData.scanFile = fileName;
           xccdfData.hostname = csts.plugins.jsonPath.value(result, "$['cdf:Benchmark']['cdf:TestResult'][0]['cdf:target'][0]");
           xccdfData.title = csts.plugins.jsonPath.flatValue(result, "$['cdf:Benchmark']['cdf:title']");
+          xccdfData.id = result['cdf:Benchmark'].$.id;
           xccdfData.version = csts.plugins.jsonPath.flatValue(result, "$['cdf:Benchmark']['cdf:version']");
           xccdfData.release = csts.plugins.jsonPath.flatValue(result, "$['cdf:Benchmark']['cdf:plain-text']")
             ._.match(new RegExp('Release: ([0-9]+)'))[1];
@@ -1162,7 +1569,7 @@ Plugin ID:`,
             .forEach((element) => {
               const ruleData = csts.plugins.jsonPath.query(result, `$..['cdf:Rule'][?(@.$.id=='${element.$.idref}')]`);
               const vulnerability = {};
-              vulnerability.vulnId = result['cdf:Benchmark']['cdf:Group'].filter(e => e['cdf:Rule'][0].$.id === element.$.idref)[0].$.id;
+              vulnerability.vulnId = result['cdf:Benchmark']['cdf:Group'].filter(e => e['cdf:Rule'][0].$.id === element.$.idref)[0].$.id.replace('xccdf_mil.disa.stig_group_', '');
               vulnerability.comments = '';
               vulnerability.findingDetails = JSON.stringify(element);
 
@@ -1195,6 +1602,9 @@ Plugin ID:`,
                   break;
                 case 'error':
                   vulnerability.status = 'Error';
+                  break;
+                case 'notapplicable':
+                  vulnerability.status = 'Not Applicable';
                   break;
                 default:
                   vulnerability.status = 'Ongoing';
@@ -1234,6 +1644,7 @@ Plugin ID:`,
         cklData.scanFile = fileName;
         cklData.hostname = [csts.plugins.jsonPath.value(result, '$..HOST_NAME')][0].reduce(a => a);
         cklData.title = csts.plugins.jsonPath.flatValue(result, "$..STIG_INFO[0].SI_DATA[?(@.SID_NAME=='title')].SID_DATA");
+        cklData.id = csts.plugins.jsonPath.flatValue(result, "$..STIG_INFO[0].SI_DATA[?(@.SID_NAME=='stigid')].SID_DATA");
 
         const vrMatch = csts.plugins.path.basename(file)
           .match(new RegExp('V([0-9]+)R([0-9]+)'));
