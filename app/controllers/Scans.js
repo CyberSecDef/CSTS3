@@ -179,6 +179,16 @@ csts.controllers.Scans = ({
                 { width: 30 }, { width: 30 }, { width: 30 }, { width: 20 }, { width: 40 },
               ];
 
+              results.POAM55 = csts.models.Scans.scans2poam.getPoam55();
+              cols.POAM55 = [
+                { width: 1 }, { width: 40 }, { width: 15 }, { width: 25 }, { width: 25 },
+                { width: 15 }, { width: 30 }, { width: 15 }, { width: 30 }, { width: 15 },
+                { width: 30 }, { width: 30 }, { width: 30 }, { width: 20 }, { width: 40 },
+                { width: 30 }, { width: 30 }, { width: 30 }, { width: 30 }, { width: 30 },
+                { width: 30 }, { width: 30 }, { width: 30 }, { width: 30 }, { width: 30 }
+              ];
+
+
               results['Raw Results'] = csts.models.Scans.scans2poam.getRawData();
               cols['Raw Results'] = [
                 { width: 15 }, { width: 40 }, { width: 40 }, { width: 15 }, { width: 10 }, // a-e
